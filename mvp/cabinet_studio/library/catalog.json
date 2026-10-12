@@ -1,0 +1,2482 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "ab-compactlogix-5380",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "CompactLogix 5380",
+      "catalog": "5069-L306ER",
+      "summary": "CompactLogix CPU, EtherNet/IP, local 5069 I/O. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-L306ER",
+        "protocol": "EtherNet/IP",
+        "mounting": "In cabinet",
+        "outline_w_mm": "80",
+        "outline_h_mm": "145",
+        "outline_d_mm": "105"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5069-L306ER.html"
+    },
+    {
+      "id": "ab-micro850",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "Micro850",
+      "catalog": "2080-LC50-24QWB",
+      "summary": "Micro850 with embedded I/O and EtherNet/IP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2080-LC50-24QWB",
+        "protocol": "EtherNet/IP",
+        "mounting": "In cabinet",
+        "outline_w_mm": "158",
+        "outline_h_mm": "90",
+        "outline_d_mm": "80"
+      }
+    },
+    {
+      "id": "siemens-s7-1200-1214c",
+      "type_id": "plc",
+      "vendor": "Siemens",
+      "name": "S7-1200 CPU 1214C",
+      "catalog": "6ES7214-1AG40-0XB0",
+      "summary": "S7-1200 CPU, PROFINET, embedded I/O plus signal modules.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7214-1AG40-0XB0",
+        "protocol": "PROFINET",
+        "mounting": "In cabinet",
+        "outline_w_mm": "110",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      }
+    },
+    {
+      "id": "siemens-s7-1500-1511",
+      "type_id": "plc",
+      "vendor": "Siemens",
+      "name": "S7-1500 CPU 1511-1 PN",
+      "catalog": "6ES7511-1AK02-0AB0",
+      "summary": "S7-1500 CPU, PROFINET.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7511-1AK02-0AB0",
+        "protocol": "PROFINET",
+        "mounting": "In cabinet",
+        "outline_w_mm": "35",
+        "outline_h_mm": "147",
+        "outline_d_mm": "129"
+      }
+    },
+    {
+      "id": "generic-modbus-plc",
+      "type_id": "plc",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP controller",
+      "catalog": "MB-PLC",
+      "summary": "Generic controller that is supervised or polled over Modbus TCP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PLC",
+        "protocol": "Modbus TCP",
+        "mounting": "In cabinet",
+        "outline_w_mm": "110",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      }
+    },
+    {
+      "id": "ab-panelview-5310",
+      "type_id": "hmi",
+      "vendor": "Allen-Bradley",
+      "name": "PanelView 5310 7 in",
+      "catalog": "2713P-T7CD1",
+      "summary": "7 inch PanelView 5310, EtherNet/IP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2713P-T7CD1",
+        "screen_size": "7 in",
+        "protocol": "EtherNet/IP",
+        "mounting": "On door",
+        "outline_w_mm": "197",
+        "outline_h_mm": "146",
+        "outline_d_mm": "54"
+      }
+    },
+    {
+      "id": "siemens-ktp700",
+      "type_id": "hmi",
+      "vendor": "Siemens",
+      "name": "KTP700 Basic",
+      "catalog": "6AV2123-2GB03-0AX0",
+      "summary": "7 inch Basic panel, PROFINET.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6AV2123-2GB03-0AX0",
+        "screen_size": "7 in",
+        "protocol": "PROFINET",
+        "mounting": "On door",
+        "outline_w_mm": "214",
+        "outline_h_mm": "158",
+        "outline_d_mm": "39"
+      }
+    },
+    {
+      "id": "generic-modbus-hmi",
+      "type_id": "hmi",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP HMI 7 in",
+      "catalog": "MB-HMI-7",
+      "summary": "Generic 7 inch panel that polls a Modbus TCP map. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-HMI-7",
+        "screen_size": "7 in",
+        "protocol": "Modbus TCP",
+        "mounting": "On door",
+        "outline_w_mm": "200",
+        "outline_h_mm": "146",
+        "outline_d_mm": "50"
+      }
+    },
+    {
+      "id": "ab-powerflex-525",
+      "type_id": "vfd",
+      "vendor": "Allen-Bradley",
+      "name": "PowerFlex 525",
+      "catalog": "25B-D6P0N104",
+      "summary": "480 VAC PowerFlex 525 with EtherNet/IP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "25B-D6P0N104",
+        "voltage": "480 VAC",
+        "comms": "EtherNet/IP",
+        "mounting": "In cabinet",
+        "outline_w_mm": "87",
+        "outline_h_mm": "180",
+        "outline_d_mm": "172"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.25B-D6P0N104.html"
+    },
+    {
+      "id": "siemens-g120c",
+      "type_id": "vfd",
+      "vendor": "Siemens",
+      "name": "SINAMICS G120C",
+      "catalog": "6SL3210-1KE15-8UF1",
+      "summary": "480 VAC SINAMICS G120C with PROFINET. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6SL3210-1KE15-8UF1",
+        "voltage": "480 VAC",
+        "comms": "PROFINET",
+        "mounting": "In cabinet",
+        "outline_w_mm": "73",
+        "outline_h_mm": "196",
+        "outline_d_mm": "225"
+      }
+    },
+    {
+      "id": "generic-modbus-vfd",
+      "type_id": "vfd",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP VFD",
+      "catalog": "MB-VFD",
+      "summary": "Generic drive commanded over Modbus TCP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-VFD",
+        "voltage": "480 VAC",
+        "comms": "Modbus TCP",
+        "mounting": "In cabinet",
+        "outline_w_mm": "90",
+        "outline_h_mm": "180",
+        "outline_d_mm": "170"
+      }
+    },
+    {
+      "id": "motor-nema-5hp",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "NEMA 5 HP motor",
+      "catalog": "NEMA-5HP-1750",
+      "summary": "Generic NEMA motor, 5 HP, 1750 RPM, 460 VAC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "NEMA-5HP-1750",
+        "horsepower": "5 HP",
+        "rpm": "1750",
+        "voltage": "460 VAC",
+        "mounting": "Field device",
+        "outline_w_mm": "360",
+        "outline_h_mm": "280",
+        "outline_d_mm": "230"
+      }
+    },
+    {
+      "id": "motor-iec-4kw",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "IEC 4 kW motor",
+      "catalog": "IEC-4KW-1450",
+      "summary": "Generic IEC motor, 4 kW, 1450 RPM, 400 VAC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "IEC-4KW-1450",
+        "horsepower": "4 kW",
+        "rpm": "1450",
+        "voltage": "400 VAC",
+        "mounting": "Field device",
+        "outline_w_mm": "380",
+        "outline_h_mm": "270",
+        "outline_d_mm": "225"
+      }
+    },
+    {
+      "id": "motor-nema-1hp",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "NEMA 1 HP motor",
+      "catalog": "NEMA-1HP-1750",
+      "summary": "Generic NEMA motor, 1 HP, 1750 RPM, 230 VAC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "NEMA-1HP-1750",
+        "horsepower": "1 HP",
+        "rpm": "1750",
+        "voltage": "230 VAC",
+        "mounting": "Field device",
+        "outline_w_mm": "300",
+        "outline_h_mm": "230",
+        "outline_d_mm": "170"
+      }
+    },
+    {
+      "id": "ab-contactor-100c",
+      "type_id": "contactor",
+      "vendor": "Allen-Bradley",
+      "name": "100-C contactor",
+      "catalog": "100-C09D10",
+      "summary": "9 A contactor, 24 VDC coil, 3-pole.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "100-C09D10",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "9 A",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "81",
+        "outline_d_mm": "84"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C09D10.html"
+    },
+    {
+      "id": "siemens-contactor-3rt",
+      "type_id": "contactor",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3RT contactor",
+      "catalog": "3RT2015-1BB41",
+      "summary": "7 A SIRIUS contactor, 24 VDC coil, 3-pole.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RT2015-1BB41",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "7 A",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "58",
+        "outline_d_mm": "73"
+      }
+    },
+    {
+      "id": "generic-contactor",
+      "type_id": "contactor",
+      "vendor": "Generic / Modbus",
+      "name": "3-pole contactor",
+      "catalog": "MB-C12",
+      "summary": "Generic 12 A contactor, 24 VDC coil. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-C12",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "12 A",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "80",
+        "outline_d_mm": "85"
+      }
+    },
+    {
+      "id": "ab-estop-800t",
+      "type_id": "estop",
+      "vendor": "Allen-Bradley",
+      "name": "800T e-stop",
+      "catalog": "800T-FXJT6A",
+      "summary": "30 mm twist-to-release e-stop, 2NC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800T-FXJT6A",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door",
+        "outline_w_mm": "60",
+        "outline_h_mm": "60",
+        "outline_d_mm": "75"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800T-FXJT6A.html"
+    },
+    {
+      "id": "siemens-estop-3su1",
+      "type_id": "estop",
+      "vendor": "Siemens",
+      "name": "3SU1 e-stop",
+      "catalog": "3SU1000-1HB20-0AA0",
+      "summary": "22 mm twist-to-release e-stop, 2NC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1000-1HB20-0AA0",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door",
+        "outline_w_mm": "60",
+        "outline_h_mm": "60",
+        "outline_d_mm": "70"
+      }
+    },
+    {
+      "id": "generic-estop",
+      "type_id": "estop",
+      "vendor": "Generic / Modbus",
+      "name": "Dual-channel e-stop",
+      "catalog": "MB-ES-2NC",
+      "summary": "Generic dual-channel e-stop, twist release. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-ES-2NC",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door",
+        "outline_w_mm": "60",
+        "outline_h_mm": "60",
+        "outline_d_mm": "70"
+      }
+    },
+    {
+      "id": "ab-stratix-2000",
+      "type_id": "ethernet_switch",
+      "vendor": "Allen-Bradley",
+      "name": "Stratix 2000",
+      "catalog": "1783-US8T",
+      "summary": "8-port unmanaged Stratix switch. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1783-US8T",
+        "port_count": "8",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "110",
+        "outline_d_mm": "90"
+      }
+    },
+    {
+      "id": "siemens-xb005",
+      "type_id": "ethernet_switch",
+      "vendor": "Siemens",
+      "name": "SCALANCE XB005",
+      "catalog": "6GK5005-0BA00-1AB2",
+      "summary": "5-port unmanaged SCALANCE switch. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6GK5005-0BA00-1AB2",
+        "port_count": "5",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet",
+        "outline_w_mm": "40",
+        "outline_h_mm": "100",
+        "outline_d_mm": "70"
+      }
+    },
+    {
+      "id": "generic-switch-8",
+      "type_id": "ethernet_switch",
+      "vendor": "Generic / Modbus",
+      "name": "8-port unmanaged switch",
+      "catalog": "MB-SW-8",
+      "summary": "Generic unmanaged industrial switch. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-SW-8",
+        "port_count": "8",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "110",
+        "outline_d_mm": "90"
+      }
+    },
+    {
+      "id": "ab-1606-xls",
+      "type_id": "power_supply",
+      "vendor": "Allen-Bradley",
+      "name": "1606-XLE power supply",
+      "catalog": "1606-XLE240EN",
+      "summary": "24 VDC, 10 A, single-phase input. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1606-XLE240EN",
+        "input_voltage": "120/240 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet",
+        "outline_w_mm": "60",
+        "outline_h_mm": "124",
+        "outline_d_mm": "117"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1606-XLE240EN.html"
+    },
+    {
+      "id": "siemens-sitop",
+      "type_id": "power_supply",
+      "vendor": "Siemens",
+      "name": "SITOP 24 V / 10 A",
+      "catalog": "6EP1334-2BA20",
+      "summary": "24 VDC, 10 A SITOP, single-phase input. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6EP1334-2BA20",
+        "input_voltage": "120/230 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet",
+        "outline_w_mm": "50",
+        "outline_h_mm": "125",
+        "outline_d_mm": "125"
+      }
+    },
+    {
+      "id": "generic-psu-24-10",
+      "type_id": "power_supply",
+      "vendor": "Generic / Modbus",
+      "name": "24 VDC 10 A supply",
+      "catalog": "MB-PSU-2410",
+      "summary": "Generic 24 VDC, 10 A, single-phase supply. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PSU-2410",
+        "input_voltage": "100-240 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet",
+        "outline_w_mm": "60",
+        "outline_h_mm": "125",
+        "outline_d_mm": "120"
+      }
+    },
+    {
+      "id": "ab-prox-871c",
+      "type_id": "sensor",
+      "vendor": "Allen-Bradley",
+      "name": "872C proximity",
+      "catalog": "872C-D5NP18-D4",
+      "summary": "18 mm inductive proximity, PNP, shielded, 5 mm, Micro QD. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "872C-D5NP18-D4",
+        "sensor_kind": "Proximity",
+        "signal": "PNP",
+        "mounting": "Field device",
+        "outline_w_mm": "18",
+        "outline_h_mm": "70",
+        "outline_d_mm": "18"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.872C-D5NP18-D4.html"
+    },
+    {
+      "id": "siemens-prox-3rg",
+      "type_id": "sensor",
+      "vendor": "Siemens",
+      "name": "3RG40 proximity",
+      "catalog": "3RG4014-0AG33",
+      "summary": "Inductive proximity, PNP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RG4014-0AG33",
+        "sensor_kind": "Proximity",
+        "signal": "PNP",
+        "mounting": "Field device",
+        "outline_w_mm": "18",
+        "outline_h_mm": "70",
+        "outline_d_mm": "18"
+      }
+    },
+    {
+      "id": "generic-photoeye",
+      "type_id": "sensor",
+      "vendor": "Generic / Modbus",
+      "name": "Photoeye",
+      "catalog": "MB-PE-PNP",
+      "summary": "Generic retroreflective photoeye, PNP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PE-PNP",
+        "sensor_kind": "Photoeye",
+        "signal": "PNP",
+        "mounting": "Field device",
+        "outline_w_mm": "20",
+        "outline_h_mm": "40",
+        "outline_d_mm": "30"
+      }
+    },
+    {
+      "id": "valve-2way-24v",
+      "type_id": "valve",
+      "vendor": "Generic / Modbus",
+      "name": "2-way solenoid valve",
+      "catalog": "MB-XV-2W",
+      "summary": "1/2 in 2-way valve, 24 VDC coil, fails closed. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-XV-2W",
+        "size": "1/2 in NPT",
+        "solenoid_voltage": "24 VDC",
+        "ports": "2-way",
+        "fail_position": "Closed",
+        "mounting": "Field device",
+        "outline_w_mm": "60",
+        "outline_h_mm": "90",
+        "outline_d_mm": "60"
+      }
+    },
+    {
+      "id": "valve-3way-24v",
+      "type_id": "valve",
+      "vendor": "Generic / Modbus",
+      "name": "3-way solenoid valve",
+      "catalog": "MB-XV-3W",
+      "summary": "1/4 in 3-way valve, 24 VDC coil, fails closed. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-XV-3W",
+        "size": "1/4 in NPT",
+        "solenoid_voltage": "24 VDC",
+        "ports": "3-way",
+        "fail_position": "Closed",
+        "mounting": "Field device",
+        "outline_w_mm": "50",
+        "outline_h_mm": "80",
+        "outline_d_mm": "50"
+      }
+    },
+    {
+      "id": "solenoid-24vdc",
+      "type_id": "solenoid",
+      "vendor": "Generic / Modbus",
+      "name": "24 VDC solenoid",
+      "catalog": "MB-SOL-24",
+      "summary": "Generic continuous-duty 24 VDC coil. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-SOL-24",
+        "voltage": "24 VDC",
+        "duty": "Continuous",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "50",
+        "outline_d_mm": "30"
+      }
+    },
+    {
+      "id": "ab-stack-855e",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "855E stack light",
+      "catalog": "855E-BVM10",
+      "summary": "24 VDC multi-color stack. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "855E-BVM10",
+        "color": "Multi-color stack",
+        "voltage": "24 VDC",
+        "function": "Stack",
+        "mounting": "Field device",
+        "outline_w_mm": "60",
+        "outline_h_mm": "260",
+        "outline_d_mm": "60"
+      }
+    },
+    {
+      "id": "generic-indicator-green",
+      "type_id": "light",
+      "vendor": "Generic / Modbus",
+      "name": "Green indicator",
+      "catalog": "MB-LT-GN",
+      "summary": "24 VDC green pilot light. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-LT-GN",
+        "color": "Green",
+        "voltage": "24 VDC",
+        "function": "Run",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      }
+    },
+    {
+      "id": "relay-control-24v",
+      "type_id": "relay",
+      "vendor": "Generic / Modbus",
+      "name": "24 VDC control relay",
+      "catalog": "CR-24VDC-2C",
+      "summary": "General-purpose interposing / control relay placeholder until a verified Allen-Bradley 700-series row is stocked. Never invent an AB catalog number. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "CR-24VDC-2C",
+        "description": "24 VDC control relay",
+        "coil_voltage": "24 VDC",
+        "contact_form": "2NO+2NC",
+        "amp_rating": "10 A",
+        "function": "Interposing",
+        "outline_w_mm": "27",
+        "outline_h_mm": "75",
+        "outline_d_mm": "70"
+      }
+    },
+    {
+      "id": "ab-guardmaster-msr127",
+      "type_id": "safety_relay",
+      "vendor": "Allen-Bradley",
+      "name": "Guardmaster MSR127",
+      "catalog": "440R-N23132",
+      "summary": "Dual-channel e-stop relay, monitored manual reset. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440R-N23132",
+        "safety_function": "E-stop monitoring",
+        "channels": "Dual",
+        "reset_type": "Monitored manual",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "100",
+        "outline_d_mm": "120"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.440R-N23132.html"
+    },
+    {
+      "id": "siemens-3sk1111",
+      "type_id": "safety_relay",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3SK1",
+      "catalog": "3SK1111-1AB30",
+      "summary": "Dual-channel safety relay, monitored manual reset.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SK1111-1AB30",
+        "safety_function": "E-stop monitoring",
+        "channels": "Dual",
+        "reset_type": "Monitored manual",
+        "mounting": "In cabinet",
+        "outline_w_mm": "22.5",
+        "outline_h_mm": "100",
+        "outline_d_mm": "121"
+      }
+    },
+    {
+      "id": "tx-pressure-4-20",
+      "type_id": "transmitter",
+      "vendor": "Generic / Modbus",
+      "name": "Pressure transmitter",
+      "catalog": "MB-PT-420",
+      "summary": "Loop-powered pressure transmitter, 4-20 mA. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PT-420",
+        "measured_variable": "Pressure",
+        "signal": "4-20 mA",
+        "loop_power": "Loop-powered",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "120",
+        "outline_d_mm": "30"
+      }
+    },
+    {
+      "id": "tx-temperature-4-20",
+      "type_id": "transmitter",
+      "vendor": "Generic / Modbus",
+      "name": "Temperature transmitter",
+      "catalog": "MB-TT-420",
+      "summary": "Loop-powered temperature transmitter, 4-20 mA. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-TT-420",
+        "measured_variable": "Temperature",
+        "signal": "4-20 mA",
+        "loop_power": "Loop-powered",
+        "mounting": "Field device",
+        "outline_w_mm": "50",
+        "outline_h_mm": "150",
+        "outline_d_mm": "50"
+      }
+    },
+    {
+      "id": "ab-5069-ib16",
+      "type_id": "io_module",
+      "vendor": "Allen-Bradley",
+      "name": "5069-IB16",
+      "catalog": "5069-IB16",
+      "summary": "16-point 24 VDC sinking input module. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-IB16",
+        "io_kind": "DI",
+        "point_count": "16",
+        "mounting": "In cabinet",
+        "outline_w_mm": "22",
+        "outline_h_mm": "145",
+        "outline_d_mm": "105"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5069-IB16.html"
+    },
+    {
+      "id": "ab-5069-ob16",
+      "type_id": "io_module",
+      "vendor": "Allen-Bradley",
+      "name": "5069-OB16",
+      "catalog": "5069-OB16",
+      "summary": "16-point 24 VDC sourcing output module. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-OB16",
+        "io_kind": "DO",
+        "point_count": "16",
+        "mounting": "In cabinet",
+        "outline_w_mm": "22",
+        "outline_h_mm": "145",
+        "outline_d_mm": "105"
+      }
+    },
+    {
+      "id": "siemens-sm1223",
+      "type_id": "io_module",
+      "vendor": "Siemens",
+      "name": "SM 1223 DI/DO",
+      "catalog": "6ES7223-1BL32-0XB0",
+      "summary": "16 DI / 16 DO signal module for S7-1200.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7223-1BL32-0XB0",
+        "io_kind": "Mixed",
+        "point_count": "16 DI / 16 DO",
+        "mounting": "In cabinet",
+        "outline_w_mm": "70",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      }
+    },
+    {
+      "id": "generic-modbus-io",
+      "type_id": "io_module",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP I/O",
+      "catalog": "MB-IO-16",
+      "summary": "Generic 16-point Modbus TCP I/O block. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-IO-16",
+        "io_kind": "Mixed",
+        "point_count": "16",
+        "mounting": "In cabinet",
+        "outline_w_mm": "70",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      }
+    },
+    {
+      "id": "ab-pb-green-start",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F start",
+      "catalog": "800FP-F3",
+      "summary": "Green momentary start, normally open. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-F3",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800FP-F3.html"
+    },
+    {
+      "id": "ab-pb-red-stop",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F stop",
+      "catalog": "800FP-F4",
+      "summary": "Red momentary stop, normally closed. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-F4",
+        "color": "Red",
+        "function": "Stop",
+        "contact": "NC momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800FP-F4.html"
+    },
+    {
+      "id": "siemens-pb-green-start",
+      "type_id": "pushbutton",
+      "vendor": "Siemens",
+      "name": "3SU1 start",
+      "catalog": "3SU1000-0AB20-0AA0",
+      "summary": "Green momentary start, normally open. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1000-0AB20-0AA0",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      }
+    },
+    {
+      "id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "vendor": "Generic / Modbus",
+      "name": "Start pushbutton",
+      "catalog": "MB-PB-START",
+      "summary": "Generic green start, normally open, 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PB-START",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      }
+    },
+    {
+      "id": "hoffman-a363012lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A363012LP",
+      "catalog": "A363012LP",
+      "summary": "36×30×12 wall-mount enclosure · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A363012LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "36×30×12 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a302412lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A302412LP",
+      "catalog": "A302412LP",
+      "summary": "30×24×12 wall-mount enclosure · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A302412LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "30×24×12 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a242408lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A242408LP",
+      "catalog": "A242408LP",
+      "summary": "24×24×8 wall-mount enclosure · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A242408LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "24×24×8 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a202008lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A202008LP",
+      "catalog": "A202008LP",
+      "summary": "20×20×8 wall-mount enclosure · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A202008LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "20",
+        "enclosure_height_in": "20",
+        "enclosure_depth_in": "8",
+        "description": "20×20×8 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a16p16",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A16P16",
+      "catalog": "A16P16",
+      "summary": "16×16 subpanel · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A16P16",
+        "mounting": "In cabinet",
+        "backplate_width_in": "16",
+        "backplate_height_in": "16",
+        "description": "16×16 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a20p20",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A20P20",
+      "catalog": "A20P20",
+      "summary": "20×20 subpanel · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A20P20",
+        "mounting": "In cabinet",
+        "backplate_width_in": "20",
+        "backplate_height_in": "20",
+        "description": "20×20 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a24p24",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A24P24",
+      "catalog": "A24P24",
+      "summary": "24×24 subpanel · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A24P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "24",
+        "backplate_height_in": "24",
+        "description": "24×24 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a30p24",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A30P24",
+      "catalog": "A30P24",
+      "summary": "30×24 subpanel (≈27×21 usable) · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A30P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "30×24 subpanel (≈27×21 usable)"
+      }
+    },
+    {
+      "id": "hoffman-a36p30",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A36P30",
+      "catalog": "A36P30",
+      "summary": "36×30 subpanel (≈33×27 usable) · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A36P30",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "36×30 subpanel (≈33×27 usable)"
+      }
+    },
+    {
+      "id": "saginaw-sce-36x30x12",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-36X30X12",
+      "catalog": "SCE-36X30X12",
+      "summary": "36×30×12 wall-mount · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-36X30X12",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "36×30×12 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-30x24x12",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-30X24X12",
+      "catalog": "SCE-30X24X12",
+      "summary": "30×24×12 wall-mount · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-30X24X12",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "30×24×12 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-24x24x8",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-24X24X8",
+      "catalog": "SCE-24X24X8",
+      "summary": "24×24×8 wall-mount · NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-24X24X8",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "24×24×8 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-36p30",
+      "type_id": "backplate",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-36P30",
+      "catalog": "SCE-36P30",
+      "summary": "Subpanel for 36×30 class · mates to matching enclosure.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-36P30",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "Subpanel for 36×30 class"
+      }
+    },
+    {
+      "id": "saginaw-sce-30p24",
+      "type_id": "backplate",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-30P24",
+      "catalog": "SCE-30P24",
+      "summary": "Subpanel for 30×24 class · mates to matching enclosure.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-30P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "Subpanel for 30×24 class"
+      }
+    },
+    {
+      "id": "hammond-en4sd363012",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD363012",
+      "catalog": "EN4SD363012",
+      "summary": "Eclipse 36×30×12 · NEMA 12/4 family — confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD363012",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "Eclipse 36×30×12"
+      }
+    },
+    {
+      "id": "hammond-en4sd302412",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD302412",
+      "catalog": "EN4SD302412",
+      "summary": "Eclipse 30×24×12 · NEMA 12/4 family — confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD302412",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "Eclipse 30×24×12"
+      }
+    },
+    {
+      "id": "hammond-en4sd242408",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD242408",
+      "catalog": "EN4SD242408",
+      "summary": "Eclipse 24×24×8 · NEMA 12/4 family — confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD242408",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "Eclipse 24×24×8"
+      }
+    },
+    {
+      "id": "hammond-ep3630",
+      "type_id": "backplate",
+      "vendor": "Hammond",
+      "name": "Hammond EP3630",
+      "catalog": "EP3630",
+      "summary": "Eclipse panel 36×30 class",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EP3630",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "Eclipse panel 36×30 class"
+      }
+    },
+    {
+      "id": "hammond-ep3024",
+      "type_id": "backplate",
+      "vendor": "Hammond",
+      "name": "Hammond EP3024",
+      "catalog": "EP3024",
+      "summary": "Eclipse panel 30×24 class",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EP3024",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "Eclipse panel 30×24 class"
+      }
+    },
+    {
+      "id": "ab-compactlogix-5370-l33er",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "CompactLogix 5370 L33ER",
+      "catalog": "1769-L33ER",
+      "summary": "CompactLogix CPU with 1769 I/O, dual EtherNet/IP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1769-L33ER",
+        "mounting": "In cabinet",
+        "outline_w_mm": "55",
+        "outline_h_mm": "118",
+        "protocol": "EtherNet/IP",
+        "outline_d_mm": "105"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-micro820",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "Micro820 20 I/O",
+      "catalog": "2080-LC20-20QBB",
+      "summary": "Micro820 20-point controller, 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2080-LC20-20QBB",
+        "mounting": "In cabinet",
+        "outline_w_mm": "90",
+        "outline_h_mm": "90",
+        "outline_d_mm": "80"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-panelview-plus7-10",
+      "type_id": "hmi",
+      "vendor": "Allen-Bradley",
+      "name": "PanelView Plus 7 10 in",
+      "catalog": "2711P-T10C22D9P",
+      "summary": "10.4 in touch, EtherNet/IP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2711P-T10C22D9P",
+        "mounting": "On door",
+        "outline_w_mm": "304",
+        "outline_h_mm": "238",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-powerflex-525-frame-a",
+      "type_id": "vfd",
+      "vendor": "Allen-Bradley",
+      "name": "PowerFlex 525 0.75 kW 480 V (frame A)",
+      "catalog": "25B-D2P3N104",
+      "summary": "Frame A drive, 480 V 2.3 A.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "25B-D2P3N104",
+        "mounting": "In cabinet",
+        "outline_w_mm": "72",
+        "outline_h_mm": "152",
+        "outline_d_mm": "172"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-powerflex-525-frame-c",
+      "type_id": "vfd",
+      "vendor": "Allen-Bradley",
+      "name": "PowerFlex 525 5.5 kW 480 V (frame C)",
+      "catalog": "25B-D013N104",
+      "summary": "Frame C drive, 480 V 13 A. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "25B-D013N104",
+        "mounting": "In cabinet",
+        "outline_w_mm": "109",
+        "outline_h_mm": "220",
+        "outline_d_mm": "184"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-powerflex-525-frame-e",
+      "type_id": "vfd",
+      "vendor": "Allen-Bradley",
+      "name": "PowerFlex 525 15 kW 480 V (frame E)",
+      "catalog": "25B-D030N104",
+      "summary": "Frame E drive, 480 V 30 A. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "25B-D030N104",
+        "mounting": "In cabinet",
+        "outline_w_mm": "185",
+        "outline_h_mm": "300",
+        "outline_d_mm": "279"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-contactor-100c23",
+      "type_id": "contactor",
+      "vendor": "Allen-Bradley",
+      "name": "100-C 23 A contactor",
+      "catalog": "100-C23D10",
+      "summary": "23 A, 24 VDC coil. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "100-C23D10",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "81",
+        "outline_d_mm": "84"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-contactor-100c43",
+      "type_id": "contactor",
+      "vendor": "Allen-Bradley",
+      "name": "100-C 43 A contactor",
+      "catalog": "100-C43D10",
+      "summary": "43 A, 24 VDC coil. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "100-C43D10",
+        "mounting": "In cabinet",
+        "outline_w_mm": "54",
+        "outline_h_mm": "107",
+        "outline_d_mm": "107"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-relay-700ha",
+      "type_id": "relay",
+      "vendor": "Allen-Bradley",
+      "name": "700-HA 8-pin relay + base",
+      "catalog": "700-HA32Z24",
+      "summary": "2 C/O tube-base relay 24 VDC on a 700-HN100 socket. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "700-HA32Z24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "27",
+        "outline_h_mm": "75",
+        "coil_voltage": "24 VDC",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-relay-700hk",
+      "type_id": "relay",
+      "vendor": "Allen-Bradley",
+      "name": "700-HK 4PDT relay + base",
+      "catalog": "700-HK36Z24",
+      "summary": "4 C/O plug-in relay 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "700-HK36Z24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "29",
+        "outline_h_mm": "78",
+        "coil_voltage": "24 VDC",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-relay-700hlt",
+      "type_id": "relay",
+      "vendor": "Allen-Bradley",
+      "name": "700-HLT slim terminal relay",
+      "catalog": "700-HLT1Z24",
+      "summary": "6 mm slim interposing relay 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "700-HLT1Z24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "6.2",
+        "outline_h_mm": "80",
+        "coil_voltage": "24 VDC",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-estop-800f-40mm",
+      "type_id": "estop",
+      "vendor": "Allen-Bradley",
+      "name": "800F 40 mm twist-release E-stop",
+      "catalog": "800FP-MT44",
+      "summary": "Red 40 mm mushroom, twist to release. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-MT44",
+        "mounting": "On door",
+        "outline_w_mm": "60",
+        "outline_h_mm": "60",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-pb-reset",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F flush pushbutton, blue (reset)",
+      "catalog": "800FP-F6",
+      "summary": "22 mm flush momentary, blue. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-F6",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Blue",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-selector-hoa",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F 3-position selector (HOA)",
+      "catalog": "800FP-SM32",
+      "summary": "22 mm 3-position maintained selector. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-SM32",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-indicator-green",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "800F pilot light, green",
+      "catalog": "800FP-P3",
+      "summary": "22 mm LED pilot light, green 24 V. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-P3",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Green",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-indicator-red",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "800F pilot light, red",
+      "catalog": "800FP-P4",
+      "summary": "22 mm LED pilot light, red 24 V. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-P4",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Red",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-stack-855t-green",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "855T stack light module, green",
+      "catalog": "855T-B24TL3",
+      "summary": "70 mm control tower steady LED module, green 24 V. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "855T-B24TL3",
+        "mounting": "Field device",
+        "outline_w_mm": "70",
+        "outline_h_mm": "60",
+        "color": "Green",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-stack-855t-amber",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "855T stack light module, amber",
+      "catalog": "855T-B24TL5",
+      "summary": "70 mm control tower steady LED module, amber 24 V. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "855T-B24TL5",
+        "mounting": "Field device",
+        "outline_w_mm": "70",
+        "outline_h_mm": "60",
+        "color": "Amber",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-stack-855t-red",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "855T stack light module, red",
+      "catalog": "855T-B24TL4",
+      "summary": "70 mm control tower steady LED module, red 24 V. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "855T-B24TL4",
+        "mounting": "Field device",
+        "outline_w_mm": "70",
+        "outline_h_mm": "60",
+        "color": "Red",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1606-xls480",
+      "type_id": "power_supply",
+      "vendor": "Allen-Bradley",
+      "name": "1606-XLS 24 V 20 A supply",
+      "catalog": "1606-XLS480E",
+      "summary": "480 W, 24 VDC, DIN rail. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1606-XLS480E",
+        "mounting": "In cabinet",
+        "outline_w_mm": "82",
+        "outline_h_mm": "124",
+        "output_voltage": "24 VDC",
+        "outline_d_mm": "127"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-guardmaster-gsr-si",
+      "type_id": "safety_relay",
+      "vendor": "Allen-Bradley",
+      "name": "Guardmaster GSR SI safety relay",
+      "catalog": "440R-S12R2",
+      "summary": "Single-input safety relay for an E-stop or a light curtain (OSSD). Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440R-S12R2",
+        "mounting": "In cabinet",
+        "outline_w_mm": "23",
+        "outline_h_mm": "114",
+        "outline_d_mm": "120"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-guardmaster-cr30",
+      "type_id": "safety_relay",
+      "vendor": "Allen-Bradley",
+      "name": "Guardmaster 440C-CR30 configurable",
+      "catalog": "440C-CR30-22BBB",
+      "summary": "Software-configured safety relay: E-stops, light curtains, gates in one unit. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440C-CR30-22BBB",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "100",
+        "outline_d_mm": "120"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-440l-guardshield-640",
+      "type_id": "light_curtain",
+      "vendor": "Allen-Bradley",
+      "name": "GuardShield 440L Type 4, 14 mm, 640 mm",
+      "catalog": "440L-P4J0640YD",
+      "summary": "Finger-safe light curtain pair (transmitter + receiver). verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440L-P4J0640YD",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "640",
+        "safety_type": "Type 4",
+        "resolution": "14 mm (finger)",
+        "protective_height": "640 mm",
+        "outputs": "2 × PNP OSSD",
+        "outline_d_mm": "30"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-440l-guardshield-30mm",
+      "type_id": "light_curtain",
+      "vendor": "Allen-Bradley",
+      "name": "GuardShield 440L Type 4, 30 mm, 960 mm",
+      "catalog": "440L-P4K0960YD",
+      "summary": "Hand-safe light curtain pair. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440L-P4K0960YD",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "960",
+        "safety_type": "Type 4",
+        "resolution": "30 mm (hand)",
+        "protective_height": "960 mm",
+        "outputs": "2 × PNP OSSD",
+        "outline_d_mm": "30"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1489-m1c100",
+      "type_id": "breaker",
+      "vendor": "Allen-Bradley",
+      "name": "1489-M 1-pole 10 A breaker",
+      "catalog": "1489-M1C100",
+      "summary": "Miniature circuit breaker, C curve. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1489-M1C100",
+        "mounting": "In cabinet",
+        "outline_w_mm": "12.7",
+        "outline_h_mm": "90",
+        "poles": "1",
+        "amp_rating": "10 A",
+        "trip_curve": "C",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1489-m3c200",
+      "type_id": "breaker",
+      "vendor": "Allen-Bradley",
+      "name": "1489-M 3-pole 20 A breaker",
+      "catalog": "1489-M3C200",
+      "summary": "Miniature circuit breaker, C curve. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1489-M3C200",
+        "mounting": "In cabinet",
+        "outline_w_mm": "38.1",
+        "outline_h_mm": "90",
+        "poles": "3",
+        "amp_rating": "20 A",
+        "trip_curve": "C",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-194e-a40",
+      "type_id": "disconnect",
+      "vendor": "Allen-Bradley",
+      "name": "194E 40 A load switch",
+      "catalog": "194E-A40-1753",
+      "summary": "3-pole rotary load switch, door handle sold separately. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "194E-A40-1753",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "80",
+        "amp_rating": "40 A",
+        "poles": "3",
+        "fused": "Non-fused",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-140mt-c-b63",
+      "type_id": "motor_protector",
+      "vendor": "Allen-Bradley",
+      "name": "140MT-C motor protector 4-6.3 A",
+      "catalog": "140MT-C3E-B63",
+      "summary": "Motor protection circuit breaker. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "140MT-C3E-B63",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "90",
+        "amp_range": "4-6.3 A",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1492-fb3c30",
+      "type_id": "fuse_holder",
+      "vendor": "Allen-Bradley",
+      "name": "1492-FB 3-pole class CC holder",
+      "catalog": "1492-FB3C30",
+      "summary": "30 A class CC fuse holder. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1492-FB3C30",
+        "mounting": "In cabinet",
+        "outline_w_mm": "54",
+        "outline_h_mm": "81",
+        "fuse_class": "CC",
+        "amp_rating": "30 A",
+        "poles": "3",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1492-j3-strip",
+      "type_id": "terminal_block",
+      "vendor": "Allen-Bradley",
+      "name": "1492-J3 terminal strip (20)",
+      "catalog": "1492-J3",
+      "summary": "20 feed-through terminals, 5 mm, with end barrier and anchors. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1492-J3",
+        "mounting": "In cabinet",
+        "outline_w_mm": "121",
+        "outline_h_mm": "45",
+        "terminal_count": "20",
+        "terminal_kind": "Feed-through",
+        "outline_d_mm": "40"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-1497-250",
+      "type_id": "transformer",
+      "vendor": "Allen-Bradley",
+      "name": "1497 control transformer 250 VA",
+      "catalog": "1497-A-BASX-3-N",
+      "summary": "480 to 120 VAC control transformer. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1497-A-BASX-3-N",
+        "mounting": "In cabinet",
+        "outline_w_mm": "117",
+        "outline_h_mm": "102",
+        "va_rating": "250 VA",
+        "primary": "480 VAC",
+        "secondary": "120 VAC",
+        "outline_d_mm": "113"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-prox-871tm",
+      "type_id": "sensor",
+      "vendor": "Allen-Bradley",
+      "name": "871TM M18 inductive prox",
+      "catalog": "871TM-DH8NP18-D4",
+      "summary": "M18 PNP, 8 mm. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "871TM-DH8NP18-D4",
+        "mounting": "Field device",
+        "outline_w_mm": "18",
+        "outline_h_mm": "70",
+        "sensor_kind": "Proximity",
+        "signal": "PNP",
+        "outline_d_mm": "18"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "ab-photo-42ef",
+      "type_id": "sensor",
+      "vendor": "Allen-Bradley",
+      "name": "42EF RightSight photoelectric",
+      "catalog": "42EF-D2MPAK-F4",
+      "summary": "Diffuse photoelectric, PNP. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "42EF-D2MPAK-F4",
+        "mounting": "Field device",
+        "outline_w_mm": "20",
+        "outline_h_mm": "40",
+        "sensor_kind": "Photoeye",
+        "signal": "PNP",
+        "outline_d_mm": "30"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-s7-1200-1215c",
+      "type_id": "plc",
+      "vendor": "Siemens",
+      "name": "S7-1200 CPU 1215C",
+      "catalog": "6ES7215-1AG40-0XB0",
+      "summary": "CPU 1215C DC/DC/DC.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7215-1AG40-0XB0",
+        "mounting": "In cabinet",
+        "outline_w_mm": "130",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-sm1221-di16",
+      "type_id": "io_module",
+      "vendor": "Siemens",
+      "name": "SM 1221 DI 16",
+      "catalog": "6ES7221-1BH32-0XB0",
+      "summary": "16 × 24 VDC inputs.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7221-1BH32-0XB0",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-sm1222-dq16",
+      "type_id": "io_module",
+      "vendor": "Siemens",
+      "name": "SM 1222 DQ 16",
+      "catalog": "6ES7222-1BH32-0XB0",
+      "summary": "16 × 24 VDC outputs.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7222-1BH32-0XB0",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "100",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-v20-fsa",
+      "type_id": "vfd",
+      "vendor": "Siemens",
+      "name": "SINAMICS V20 0.75 kW 400 V",
+      "catalog": "6SL3210-5BE17-5UV0",
+      "summary": "Frame A basic drive.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6SL3210-5BE17-5UV0",
+        "mounting": "In cabinet",
+        "outline_w_mm": "90",
+        "outline_h_mm": "166",
+        "outline_d_mm": "146"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-contactor-3rt2026",
+      "type_id": "contactor",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3RT2026 contactor (S0)",
+      "catalog": "3RT2026-1BB40",
+      "summary": "25 A, 24 VDC coil.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RT2026-1BB40",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "85",
+        "outline_d_mm": "97"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-3rv2011",
+      "type_id": "motor_protector",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3RV2011 motor protector",
+      "catalog": "3RV2011-1EA10",
+      "summary": "2.8-4 A motor starter protector.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RV2011-1EA10",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "97",
+        "amp_range": "2.8-4 A",
+        "outline_d_mm": "97"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-5sy4-1p-c16",
+      "type_id": "breaker",
+      "vendor": "Siemens",
+      "name": "5SY4 1-pole C16 breaker",
+      "catalog": "5SY4116-7",
+      "summary": "Miniature circuit breaker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "5SY4116-7",
+        "mounting": "In cabinet",
+        "outline_w_mm": "18",
+        "outline_h_mm": "90",
+        "poles": "1",
+        "amp_rating": "16 A",
+        "trip_curve": "C",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-5sy6-3p-c10",
+      "type_id": "breaker",
+      "vendor": "Siemens",
+      "name": "5SY6 3-pole C10 breaker",
+      "catalog": "5SY6310-7",
+      "summary": "Miniature circuit breaker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "5SY6310-7",
+        "mounting": "In cabinet",
+        "outline_w_mm": "54",
+        "outline_h_mm": "90",
+        "poles": "3",
+        "amp_rating": "10 A",
+        "trip_curve": "C",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-sitop-20a",
+      "type_id": "power_supply",
+      "vendor": "Siemens",
+      "name": "SITOP PSU8200 24 V 20 A",
+      "catalog": "6EP1336-3BA10",
+      "summary": "480 W, 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6EP1336-3BA10",
+        "mounting": "In cabinet",
+        "outline_w_mm": "70",
+        "outline_h_mm": "125",
+        "output_voltage": "24 VDC",
+        "outline_d_mm": "125"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-3sk1121",
+      "type_id": "safety_relay",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3SK1121 safety relay",
+      "catalog": "3SK1121-1AB40",
+      "summary": "Advanced safety relay for E-stop / light curtain. verify the exact model with the maker before ordering.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SK1121-1AB40",
+        "mounting": "In cabinet",
+        "outline_w_mm": "22.5",
+        "outline_h_mm": "100",
+        "outline_d_mm": "121"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-8wh-strip",
+      "type_id": "terminal_block",
+      "vendor": "Siemens",
+      "name": "8WH terminal strip (20)",
+      "catalog": "8WH1000-0AF00",
+      "summary": "20 feed-through terminals, 2.5 mm². Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "8WH1000-0AF00",
+        "mounting": "In cabinet",
+        "outline_w_mm": "123",
+        "outline_h_mm": "47",
+        "terminal_count": "20",
+        "terminal_kind": "Feed-through",
+        "outline_d_mm": "40"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-pb-red-stop",
+      "type_id": "pushbutton",
+      "vendor": "Siemens",
+      "name": "3SU1 stop pushbutton, red",
+      "catalog": "3SU1000-0AB20-0AA0",
+      "summary": "22 mm flush momentary. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1000-0AB20-0AA0",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Red",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-3su1-pilot-green",
+      "type_id": "light",
+      "vendor": "Siemens",
+      "name": "3SU1 pilot light, green",
+      "catalog": "3SU1001-6AA40-0AA0",
+      "summary": "22 mm LED pilot light, green. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1001-6AA40-0AA0",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Green",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-8wd44-stack",
+      "type_id": "light",
+      "vendor": "Siemens",
+      "name": "8WD44 signal column (G/A/R)",
+      "catalog": "8WD4420-0BB",
+      "summary": "70 mm signal column base; add LED modules. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "8WD4420-0BB",
+        "mounting": "Field device",
+        "outline_w_mm": "70",
+        "outline_h_mm": "220",
+        "color": "Multi-color stack",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-3rg78-curtain",
+      "type_id": "light_curtain",
+      "vendor": "Siemens",
+      "name": "SIGUARD 3RG78 light curtain",
+      "catalog": "3RG7844-3CF00",
+      "summary": "Type 4 light curtain pair. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RG7844-3CF00",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "600",
+        "safety_type": "Type 4",
+        "resolution": "14 mm (finger)",
+        "protective_height": "600 mm",
+        "outputs": "2 × PNP OSSD",
+        "outline_d_mm": "30"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "siemens-3va-disconnect",
+      "type_id": "disconnect",
+      "vendor": "Siemens",
+      "name": "3LD2 main switch 40 A",
+      "catalog": "3LD2504-0TK51",
+      "summary": "3-pole main / emergency-stop switch. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3LD2504-0TK51",
+        "mounting": "In cabinet",
+        "outline_w_mm": "60",
+        "outline_h_mm": "90",
+        "amp_rating": "40 A",
+        "poles": "3",
+        "fused": "Non-fused",
+        "outline_d_mm": "80"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-nx1p2",
+      "type_id": "plc",
+      "vendor": "Omron",
+      "name": "NX1P2 machine controller",
+      "catalog": "NX1P2-9024DT",
+      "summary": "24 built-in I/O, EtherNet/IP + EtherCAT. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NX1P2-9024DT",
+        "mounting": "In cabinet",
+        "outline_w_mm": "154",
+        "outline_h_mm": "100",
+        "protocol": "EtherNet/IP",
+        "outline_d_mm": "71"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-cp2e-n30",
+      "type_id": "plc",
+      "vendor": "Omron",
+      "name": "CP2E-N30 compact PLC",
+      "catalog": "CP2E-N30DT-D",
+      "summary": "30 I/O, Ethernet. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "CP2E-N30DT-D",
+        "mounting": "In cabinet",
+        "outline_w_mm": "130",
+        "outline_h_mm": "90",
+        "outline_d_mm": "85"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-nj101",
+      "type_id": "plc",
+      "vendor": "Omron",
+      "name": "NJ101 machine automation controller",
+      "catalog": "NJ101-9000",
+      "summary": "Sysmac NJ CPU. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NJ101-9000",
+        "mounting": "In cabinet",
+        "outline_w_mm": "90",
+        "outline_h_mm": "100",
+        "outline_d_mm": "100"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-nx-id5342",
+      "type_id": "io_module",
+      "vendor": "Omron",
+      "name": "NX-ID5342 16 DI",
+      "catalog": "NX-ID5342",
+      "summary": "16 × 24 VDC inputs. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NX-ID5342",
+        "mounting": "In cabinet",
+        "outline_w_mm": "12",
+        "outline_h_mm": "100",
+        "outline_d_mm": "71"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-nx-od5256",
+      "type_id": "io_module",
+      "vendor": "Omron",
+      "name": "NX-OD5256 16 DO",
+      "catalog": "NX-OD5256",
+      "summary": "16 × 24 VDC PNP outputs. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NX-OD5256",
+        "mounting": "In cabinet",
+        "outline_w_mm": "12",
+        "outline_h_mm": "100",
+        "outline_d_mm": "71"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-na5-7w",
+      "type_id": "hmi",
+      "vendor": "Omron",
+      "name": "NA5 7 in HMI",
+      "catalog": "NA5-7W001B",
+      "summary": "7 in Sysmac HMI. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NA5-7W001B",
+        "mounting": "On door",
+        "outline_w_mm": "196",
+        "outline_h_mm": "148",
+        "outline_d_mm": "64"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-nb7w",
+      "type_id": "hmi",
+      "vendor": "Omron",
+      "name": "NB7W 7 in HMI",
+      "catalog": "NB7W-TW01B",
+      "summary": "7 in basic HMI. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "NB7W-TW01B",
+        "mounting": "On door",
+        "outline_w_mm": "200",
+        "outline_h_mm": "146",
+        "outline_d_mm": "46"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-mx2-2k2",
+      "type_id": "vfd",
+      "vendor": "Omron",
+      "name": "MX2 2.2 kW 400 V",
+      "catalog": "3G3MX2-A4022-V1",
+      "summary": "Compact drive. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "3G3MX2-A4022-V1",
+        "mounting": "In cabinet",
+        "outline_w_mm": "108",
+        "outline_h_mm": "128",
+        "outline_d_mm": "170"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-m1-0k75",
+      "type_id": "vfd",
+      "vendor": "Omron",
+      "name": "M1 0.75 kW 400 V",
+      "catalog": "3G3M1-A4007",
+      "summary": "Compact drive. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "3G3M1-A4007",
+        "mounting": "In cabinet",
+        "outline_w_mm": "68",
+        "outline_h_mm": "128",
+        "outline_d_mm": "150"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-j7kna-09",
+      "type_id": "contactor",
+      "vendor": "Omron",
+      "name": "J7KNA 9 A contactor",
+      "catalog": "J7KNA-09-10 24D",
+      "summary": "9 A, 24 VDC coil. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "J7KNA-09-10 24D",
+        "mounting": "In cabinet",
+        "outline_w_mm": "45",
+        "outline_h_mm": "76",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-my2n",
+      "type_id": "relay",
+      "vendor": "Omron",
+      "name": "MY2N relay + socket",
+      "catalog": "MY2N-GS DC24",
+      "summary": "2 C/O relay on a PYF08A-E socket. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "MY2N-GS DC24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "23",
+        "outline_h_mm": "70",
+        "coil_voltage": "24 VDC",
+        "outline_d_mm": "65"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-g2rv",
+      "type_id": "relay",
+      "vendor": "Omron",
+      "name": "G2RV slim relay",
+      "catalog": "G2RV-SR500 DC24",
+      "summary": "6 mm slim interposing relay. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "G2RV-SR500 DC24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "6.2",
+        "outline_h_mm": "93",
+        "coil_voltage": "24 VDC",
+        "outline_d_mm": "75"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-s8vk-240",
+      "type_id": "power_supply",
+      "vendor": "Omron",
+      "name": "S8VK-G 24 V 10 A",
+      "catalog": "S8VK-G24024",
+      "summary": "240 W, 24 VDC. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "S8VK-G24024",
+        "mounting": "In cabinet",
+        "outline_w_mm": "50",
+        "outline_h_mm": "125",
+        "output_voltage": "24 VDC",
+        "outline_d_mm": "125"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-g9se-201",
+      "type_id": "safety_relay",
+      "vendor": "Omron",
+      "name": "G9SE-201 safety relay",
+      "catalog": "G9SE-201 DC24",
+      "summary": "Compact safety relay for E-stop / light curtain. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "G9SE-201 DC24",
+        "mounting": "In cabinet",
+        "outline_w_mm": "17.5",
+        "outline_h_mm": "100",
+        "outline_d_mm": "115"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-f3sg-ra-640",
+      "type_id": "light_curtain",
+      "vendor": "Omron",
+      "name": "F3SG-RA Type 4, 14 mm, 640 mm",
+      "catalog": "F3SG-4RA0640-14",
+      "summary": "Advanced light curtain pair. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "F3SG-4RA0640-14",
+        "mounting": "Field device",
+        "outline_w_mm": "30",
+        "outline_h_mm": "640",
+        "safety_type": "Type 4",
+        "resolution": "14 mm (finger)",
+        "protective_height": "640 mm",
+        "outputs": "2 × PNP OSSD",
+        "outline_d_mm": "30"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-e3z-d81",
+      "type_id": "sensor",
+      "vendor": "Omron",
+      "name": "E3Z diffuse photoelectric (PNP)",
+      "catalog": "E3Z-D81",
+      "summary": "100 mm diffuse, PNP. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "E3Z-D81",
+        "mounting": "Field device",
+        "outline_w_mm": "11",
+        "outline_h_mm": "32",
+        "sensor_kind": "Photoeye",
+        "signal": "PNP",
+        "outline_d_mm": "20"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-e2e-x5",
+      "type_id": "sensor",
+      "vendor": "Omron",
+      "name": "E2E M18 inductive prox",
+      "catalog": "E2E-X5ME1",
+      "summary": "M18, 5 mm, NPN. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "E2E-X5ME1",
+        "mounting": "Field device",
+        "outline_w_mm": "18",
+        "outline_h_mm": "60",
+        "sensor_kind": "Proximity",
+        "signal": "NPN",
+        "outline_d_mm": "18"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-a22n-green",
+      "type_id": "pushbutton",
+      "vendor": "Omron",
+      "name": "A22N flush pushbutton, green",
+      "catalog": "A22NN-BNM-NGA-G100-NN",
+      "summary": "22 mm momentary. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "A22NN-BNM-NGA-G100-NN",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Green",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-a22ne-estop",
+      "type_id": "estop",
+      "vendor": "Omron",
+      "name": "A22NE 40 mm E-stop",
+      "catalog": "A22NE-PD-P102-N",
+      "summary": "Push-pull / twist E-stop. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "A22NE-PD-P102-N",
+        "mounting": "On door",
+        "outline_w_mm": "60",
+        "outline_h_mm": "60",
+        "outline_d_mm": "70"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-m22n-green",
+      "type_id": "light",
+      "vendor": "Omron",
+      "name": "M22N pilot light, green",
+      "catalog": "M22N-BN-TGA-GA",
+      "summary": "22 mm LED pilot light. verify the exact model with the maker before ordering. Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "M22N-BN-TGA-GA",
+        "mounting": "On door",
+        "outline_w_mm": "30",
+        "outline_h_mm": "45",
+        "color": "Green",
+        "outline_d_mm": "60"
+      },
+      "source_url": ""
+    },
+    {
+      "id": "omron-xw5t-strip",
+      "type_id": "terminal_block",
+      "vendor": "Omron",
+      "name": "XW5T push-in terminal strip (20)",
+      "catalog": "XW5T-S2.5-1.1-1",
+      "summary": "20 push-in terminals, 2.5 mm². Outline typical - verify with maker.",
+      "defaults": {
+        "vendor": "Omron",
+        "catalog": "XW5T-S2.5-1.1-1",
+        "mounting": "In cabinet",
+        "outline_w_mm": "123",
+        "outline_h_mm": "50",
+        "terminal_count": "20",
+        "terminal_kind": "Feed-through",
+        "outline_d_mm": "40"
+      },
+      "source_url": ""
+    }
+  ]
+}

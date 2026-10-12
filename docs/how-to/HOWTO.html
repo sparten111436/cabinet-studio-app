@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Cabinet Studio how-to — Warren Williams</title>
+<style>
+body{font-family:Segoe UI,Arial,sans-serif;max-width:960px;margin:24px auto;padding:0 16px;background:#111820;color:#e8eef7;line-height:1.45}
+h1,h2,h3{color:#fff} h2{border-bottom:1px solid #2a3648;padding-bottom:6px;margin-top:2em}
+a{color:#6aa8ff} code,pre{background:#1a2330;padding:2px 6px;border-radius:4px}
+img{max-width:100%;height:auto;border:1px solid #2a3648;border-radius:6px;margin:10px 0 18px;background:#0b1018}
+.note{background:#243044;border-left:4px solid #f0a020;padding:10px 14px;margin:16px 0}
+table{border-collapse:collapse;width:100%} td,th{border:1px solid #2a3648;padding:8px;text-align:left}
+th{background:#1a2330}
+</style>
+</head>
+<body>
+<h1>Cabinet Studio how-to</h1>
+<p>For <strong>Warren Williams</strong>. Guide folder: <code>C:\Users\spart\OneDrive\Desktop\CabinetStudio\docs\how-to\</code></p>
+<div class="note"><strong>Design aid:</strong> drawings are not certified UL 508A. Programming is not a live PLC download. Edit devices/wires in the cabinet UI, then re-run <strong>Drawings</strong> — do not hand-edit the SVG.</div>
+
+<h2>A. Start</h2>
+<ol><li>Double-click Desktop shortcut <strong>Cabinet Studio</strong>.</li></ol>
+<p><img src="images/01-desktop-icon.png" alt="Desktop shortcut"/><img src="images/02-main-open.png" alt="Main window"/></p>
+
+<h2>B. Open sample</h2>
+<ol>
+<li>Click <strong>Open</strong> (or Ctrl+O).</li>
+<li>Open <code>CabinetStudio\saves\sample-motor-cabinet.cabinet.json</code>.</li>
+</ol>
+<p><img src="images/04-sample-loaded.png" alt="Sample loaded"/><img src="images/02b-exe-sample-loaded.png" alt="Exe sample"/></p>
+
+<h2>C. Left rail (order of operations)</h2>
+<p>New build with AI → Open/Save → Save as → New → Guide build / AI suggest → Drawings / View drawings → Programming / Program stubs → Desktop shortcut → UL 508A review.</p>
+<p><img src="images/05-left-rail-top.png" alt="Left rail top"/><img src="images/05-rail-with-programming.png" alt="Left rail with programming"/></p>
+
+<h2>D. Drawings</h2>
+<ol><li>Click <strong>Drawings</strong>.</li><li>Click <strong>View drawings</strong> and flip with Previous/Next.</li></ol>
+<p><img src="images/09-cabinet-ready-for-drawings.png" alt="Ready"/><img src="images/10-view-drawings-sheet1.png" alt="Sheet 1"/><img src="images/11-view-drawings-sheet2.png" alt="Sheet 2"/></p>
+
+<h2>E. Edit schematics (via cabinet, not SVG)</h2>
+<ol>
+<li>Select a tile → Inspector → <strong>Edit definition</strong>.</li>
+<li>On the Wiring step set terminal landings, wire numbers, wire color.</li>
+<li>Click <strong>Drawings</strong> again to regenerate.</li>
+</ol>
+<p><img src="images/07-inspector-selected.png" alt="Inspector"/><img src="images/08-device-properties-editor.png" alt="Properties"/><img src="images/08-wiring-landings.png" alt="Wiring"/></p>
+
+<h2>F. Programming</h2>
+<ol>
+<li>Click <strong>Programming</strong>.</li>
+<li>Use Ask questions / Ladder / Copy PLC / Print / Rung editor.</li>
+<li>Click <strong>Done - return to cabinet</strong>.</li>
+</ol>
+<p><img src="images/12-programming-open.png" alt="Programming"/><img src="images/13-programming-ladder.png" alt="Ladder"/><img src="images/14-back-to-cabinet.png" alt="Back"/></p>
+
+<h2>G. New build with AI</h2>
+<p>Top button walks interview → recommend → define → save → drawings → programming with confirms.</p>
+<p><img src="images/03-rail-new-build-ai.png" alt="New build with AI"/></p>
+</body></html>

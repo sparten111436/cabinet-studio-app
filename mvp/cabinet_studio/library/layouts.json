@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "layouts": [
+    {
+      "id": "compact-machine-station",
+      "name": "Compact machine station",
+      "description": "PLC, HMI, I/O, e-stop, start/stop, and a stack light for a small machine.",
+      "cabinet_width": 780,
+      "cabinet_height": 860,
+      "cabinet_label": "STA1",
+      "placements": [
+        {
+          "library_id": "generic-psu-24-10",
+          "x": 24,
+          "y": 48,
+          "tag": "PSU1",
+          "description": "24 VDC control power"
+        },
+        {
+          "library_id": "ab-compactlogix-5380",
+          "x": 234,
+          "y": 48,
+          "tag": "PLC1",
+          "description": "Machine controller"
+        },
+        {
+          "library_id": "ab-stratix-2000",
+          "x": 478,
+          "y": 48,
+          "tag": "ESW1",
+          "description": "Cell Ethernet switch"
+        },
+        {
+          "library_id": "ab-5069-ib16",
+          "x": 24,
+          "y": 176,
+          "tag": "DI1",
+          "description": "Discrete inputs"
+        },
+        {
+          "library_id": "ab-5069-ob16",
+          "x": 234,
+          "y": 176,
+          "tag": "DO1",
+          "description": "Discrete outputs"
+        },
+        {
+          "library_id": "ab-panelview-5310",
+          "x": 454,
+          "y": 168,
+          "tag": "HMI1",
+          "description": "Operator panel"
+        },
+        {
+          "library_id": "ab-estop-800t",
+          "x": 24,
+          "y": 304,
+          "tag": "ES1",
+          "description": "Door e-stop"
+        },
+        {
+          "library_id": "ab-pb-green-start",
+          "x": 210,
+          "y": 308,
+          "tag": "HS_START",
+          "description": "Cycle start"
+        },
+        {
+          "library_id": "ab-pb-red-stop",
+          "x": 392,
+          "y": 308,
+          "tag": "HS_STOP",
+          "description": "Cycle stop"
+        },
+        {
+          "library_id": "ab-stack-855e",
+          "x": 574,
+          "y": 304,
+          "tag": "SL1",
+          "description": "Machine status stack"
+        }
+      ]
+    },
+    {
+      "id": "small-motor-cabinet",
+      "name": "Small motor cabinet",
+      "description": "One drive, one motor, a contactor, and the operator and network devices around them.",
+      "cabinet_width": 780,
+      "cabinet_height": 860,
+      "cabinet_label": "MCC1",
+      "placements": [
+        {
+          "library_id": "ab-1606-xls",
+          "x": 24,
+          "y": 48,
+          "tag": "PSU1",
+          "description": "24 VDC control power"
+        },
+        {
+          "library_id": "ab-compactlogix-5380",
+          "x": 234,
+          "y": 48,
+          "tag": "PLC1",
+          "description": "Drive controller"
+        },
+        {
+          "library_id": "ab-stratix-2000",
+          "x": 478,
+          "y": 48,
+          "tag": "ESW1",
+          "description": "Drive network switch"
+        },
+        {
+          "library_id": "ab-powerflex-525",
+          "x": 24,
+          "y": 180,
+          "tag": "VFD1",
+          "description": "Conveyor variable-frequency drive"
+        },
+        {
+          "library_id": "ab-contactor-100c",
+          "x": 258,
+          "y": 184,
+          "tag": "M1C",
+          "description": "Conveyor output contactor"
+        },
+        {
+          "library_id": "ab-estop-800t",
+          "x": 470,
+          "y": 184,
+          "tag": "ES1",
+          "description": "Drive cabinet e-stop"
+        },
+        {
+          "library_id": "motor-nema-5hp",
+          "x": 24,
+          "y": 320,
+          "tag": "MTR1",
+          "description": "Conveyor drive motor"
+        },
+        {
+          "library_id": "ab-pb-red-stop",
+          "x": 258,
+          "y": 324,
+          "tag": "HS_STOP",
+          "description": "Motor stop"
+        },
+        {
+          "library_id": "ab-pb-green-start",
+          "x": 470,
+          "y": 324,
+          "tag": "HS_START",
+          "description": "Motor start"
+        }
+      ]
+    },
+    {
+      "id": "process-skid-panel",
+      "name": "Process skid panel",
+      "description": "Siemens skid panel with transmitters, a valve, a prox, and a safety relay.",
+      "cabinet_width": 780,
+      "cabinet_height": 860,
+      "cabinet_label": "SKD1",
+      "placements": [
+        {
+          "library_id": "siemens-sitop",
+          "x": 24,
+          "y": 48,
+          "tag": "PSU1",
+          "description": "24 VDC control power"
+        },
+        {
+          "library_id": "siemens-s7-1200-1214c",
+          "x": 234,
+          "y": 48,
+          "tag": "PLC1",
+          "description": "Skid controller"
+        },
+        {
+          "library_id": "siemens-xb005",
+          "x": 478,
+          "y": 48,
+          "tag": "ESW1",
+          "description": "Skid Ethernet switch"
+        },
+        {
+          "library_id": "siemens-ktp700",
+          "x": 24,
+          "y": 180,
+          "tag": "HMI1",
+          "description": "Skid operator panel"
+        },
+        {
+          "library_id": "siemens-3sk1111",
+          "x": 258,
+          "y": 180,
+          "tag": "SR1",
+          "description": "E-stop safety relay"
+        },
+        {
+          "library_id": "tx-pressure-4-20",
+          "x": 478,
+          "y": 180,
+          "tag": "PT1",
+          "description": "Discharge pressure"
+        },
+        {
+          "library_id": "tx-temperature-4-20",
+          "x": 24,
+          "y": 316,
+          "tag": "TT1",
+          "description": "Process temperature"
+        },
+        {
+          "library_id": "siemens-prox-3rg",
+          "x": 258,
+          "y": 320,
+          "tag": "PX1",
+          "description": "Valve closed position"
+        },
+        {
+          "library_id": "valve-2way-24v",
+          "x": 478,
+          "y": 316,
+          "tag": "XV1",
+          "description": "Process block valve"
+        }
+      ]
+    }
+  ]
+}

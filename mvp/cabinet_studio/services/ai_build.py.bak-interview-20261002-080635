@@ -1,0 +1,414 @@
+"""New build with AI: plain-English interview and library-backed device picks.
+
+Catalog numbers come only from the starter library. Prefer Allen-Bradley when
+the library has one for that device class. Never invent a catalog number.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from cabinet_studio.models.project import PlacedItem, Project
+from cabinet_studio.models.schema import CatalogItem, Library
+from cabinet_studio.services.layouts import new_blank_project, new_id
+from cabinet_studio.services.placement import next_free_position
+from cabinet_studio.services.standards import StandardsProfile
+from cabinet_studio.services.suggestions import DeviceSuggestion, suggest_device, used_wire_numbers
+
+CATALOG_NOT_IDENTIFIED = "catalog not identified"
+
+AI_BUILD_DISCLAIMER = (
+    "This is a design aid, not a certified UL 508A listing. "
+    "Programming here is cut-and-paste help only — not a live PLC download."
+)
+
+# One question at a time. Labels are plain English for a young reader.
+AI_BUILD_QUESTIONS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
+    (
+        "duty",
+        "What does this machine do?",
+        "text",
+        (),
+    ),
+    (
+        "supply_voltage",
+        "What voltage feeds the cabinet?",
+        "choice",
+        ("480 VAC", "240 VAC", "208 VAC", "120 VAC", "24 VDC", "Other / not sure"),
+    ),
+    (
+        "control_voltage",
+        "What voltage do the pushbuttons and sensors use?",
+        "choice",
+        ("24 VDC", "120 VAC", "24 VAC", "Other / not sure"),
+    ),
+    (
+        "has_motor",
+        "Does this machine run a motor?",
+        "choice",
+        ("Yes", "No", "Not sure"),
+    ),
+    (
+        "start_stop",
+        "How do people start and stop it?",
+        "choice",
+        ("Pushbuttons", "Touchscreen (HMI)", "Both", "Not sure"),
+    ),
+    (
+        "has_estop",
+        "Is there an emergency stop (e-stop) button?",
+        "choice",
+        ("Yes", "No", "Not sure"),
+    ),
+    (
+        "has_hmi",
+        "Is there a touchscreen or HMI for the operator?",
+        "choice",
+        ("Yes", "No", "Not sure"),
+    ),
+    (
+        "project_name",
+        "What should we call this cabinet project?",
+        "text",
+        (),
+    ),
+)
+
+
+@dataclass(frozen=True)
+class RecommendedDevice:
+    type_id: str
+    label: str
+    catalog_id: str | None
+    catalog_number: str
+    vendor: str
+    name: str
+    reason: str
+    suggestion: DeviceSuggestion
+
+
+def blank_ai_answers() -> dict[str, str]:
+    return {key: "" for key, _label, _kind, _options in AI_BUILD_QUESTIONS}
+
+
+def interview_from_ai_answers(answers: dict[str, str]) -> dict[str, str]:
+    """Map AI answers into the project interview keys Guide build already uses."""
+    duty = (answers.get("duty") or "").strip()
+    start_stop = (answers.get("start_stop") or "").strip().lower()
+    has_hmi = (answers.get("has_hmi") or "").strip().lower()
+    has_motor = (answers.get("has_motor") or "").strip().lower()
+    has_estop = (answers.get("has_estop") or "").strip().lower()
+    bits = [duty]
+    if has_motor.startswith("y"):
+        bits.append("motor drive")
+    if "push" in start_stop or start_stop == "both":
+        bits.append("start stop pushbutton")
+    if "touch" in start_stop or "hmi" in start_stop or has_hmi.startswith("y"):
+        bits.append("hmi operator screen")
+    if has_estop.startswith("y"):
+        bits.append("safety e-stop")
+    return {
+        "duty": " ".join(part for part in bits if part).strip() or duty,
+        "supply_voltage": _clean_choice(answers.get("supply_voltage", "")),
+        "control_voltage": _clean_choice(answers.get("control_voltage", "")),
+        "environment": "",
+        "enclosure_type": "",
+        "grounding": "",
+        "sccr": "",
+        "disconnect": "",
+        "branch_protection": "",
+        "power_control_separation": "",
+        "field_wiring": "",
+        "has_motor": (answers.get("has_motor") or "").strip(),
+        "start_stop": (answers.get("start_stop") or "").strip(),
+        "has_estop": (answers.get("has_estop") or "").strip(),
+        "has_hmi": (answers.get("has_hmi") or "").strip(),
+    }
+
+
+def _clean_choice(value: str) -> str:
+    text = (value or "").strip()
+    if not text or "not sure" in text.lower() or text.lower().startswith("other"):
+        return ""
+    return text
+
+
+def ab_catalog_for_type(library: Library, type_id: str) -> CatalogItem | None:
+    for item in library.catalog:
+        if item.type_id == type_id and "allen" in item.vendor.lower():
+            return item
+    return None
+
+
+def catalog_label(library: Library, catalog_id: str | None) -> tuple[str, str, str]:
+    """Return (catalog_number, vendor, name). Never invent a number."""
+    if not catalog_id:
+        return CATALOG_NOT_IDENTIFIED, "", ""
+    item = library.catalog_by_id.get(catalog_id)
+    if item is None:
+        return CATALOG_NOT_IDENTIFIED, "", ""
+    number = (item.catalog or "").strip() or CATALOG_NOT_IDENTIFIED
+    return number, item.vendor, item.name
+
+
+def recommend_type_ids(answers: dict[str, str]) -> list[str]:
+    has_motor = (answers.get("has_motor") or "").strip().lower()
+    start_stop = (answers.get("start_stop") or "").strip().lower()
+    has_estop = (answers.get("has_estop") or "").strip().lower()
+    has_hmi = (answers.get("has_hmi") or "").strip().lower()
+    duty = (answers.get("duty") or "").lower()
+
+    types = ["plc", "power_supply"]
+    if has_motor.startswith("y") or any(
+        word in duty for word in ("motor", "conveyor", "pump", "drive", "vfd")
+    ):
+        types.extend(["vfd", "motor"])
+    if has_estop.startswith("y") or has_estop == "not sure":
+        types.append("estop")
+    if (
+        has_hmi.startswith("y")
+        or "touch" in start_stop
+        or "hmi" in start_stop
+        or start_stop == "both"
+    ):
+        types.append("hmi")
+    if "push" in start_stop or start_stop == "both" or start_stop == "not sure":
+        types.append("pushbutton")
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for type_id in types:
+        if type_id not in seen:
+            seen.add(type_id)
+            ordered.append(type_id)
+    return ordered
+
+
+def recommend_devices(
+    library: Library,
+    profile: StandardsProfile,
+    answers: dict[str, str],
+    *,
+    project: Project | None = None,
+) -> list[RecommendedDevice]:
+    """Build recommendations from answers. AB catalog only when the library has one."""
+    base = project or new_blank_project()
+    interview = interview_from_ai_answers(answers)
+    used = used_wire_numbers(base)
+    out: list[RecommendedDevice] = []
+    for type_id in recommend_type_ids(answers):
+        if type_id not in library.types:
+            continue
+        ab = ab_catalog_for_type(library, type_id)
+        suggestion = suggest_device(library, profile, base, type_id, interview, used=used)
+        if ab is not None:
+            fields = dict(suggestion.fields)
+            fields.update(ab.default_map())
+            fields["vendor"] = ab.vendor
+            fields["catalog"] = ab.catalog
+            fields["description"] = ab.summary or fields.get("description", "")
+            suggestion = DeviceSuggestion(
+                type_id=type_id,
+                catalog_id=ab.id,
+                stock=True,
+                reason=f"Allen-Bradley part from the starter library ({ab.catalog}).",
+                wire_role=suggestion.wire_role,
+                fields=fields,
+            )
+            catalog_number, vendor, name = catalog_label(library, ab.id)
+            catalog_id = ab.id
+        else:
+            fields = dict(suggestion.fields)
+            # Never invent an Allen-Bradley number. Keep other library defaults (HP, RPM, …).
+            fields["catalog"] = CATALOG_NOT_IDENTIFIED
+            if not fields.get("vendor"):
+                fields["vendor"] = "Generic / Modbus"
+            fields = _fill_class_defaults(type_id, fields, interview)
+            suggestion = DeviceSuggestion(
+                type_id=type_id,
+                catalog_id=None,
+                stock=False,
+                reason="No Allen-Bradley catalog for this class in the library.",
+                wire_role=suggestion.wire_role,
+                fields=fields,
+            )
+            catalog_id = None
+            catalog_number = CATALOG_NOT_IDENTIFIED
+            vendor = fields.get("vendor") or ""
+            name = library.types[type_id].label
+        equipment = library.types[type_id]
+        out.append(
+            RecommendedDevice(
+                type_id=type_id,
+                label=equipment.label,
+                catalog_id=catalog_id,
+                catalog_number=catalog_number,
+                vendor=vendor,
+                name=name or equipment.label,
+                reason=suggestion.reason,
+                suggestion=suggestion,
+            )
+        )
+    return out
+
+
+def apply_recommendations(
+    library: Library,
+    project: Project,
+    recommendations: list[RecommendedDevice],
+    *,
+    selected_type_ids: set[str] | None = None,
+    profile: StandardsProfile | None = None,
+) -> Project:
+    """Place confirmed recommendations onto a project with wiring continuity filled."""
+    from cabinet_studio.services.suggestions import enrich_with_wiring_assist
+    from cabinet_studio.services.wiring_assist import remember_device_fields
+    from cabinet_studio.services.standards import default_profile
+
+    keep = selected_type_ids
+    standards = profile or default_profile()
+    for rec in recommendations:
+        if keep is not None and rec.type_id not in keep:
+            continue
+        suggestion = rec.suggestion
+        fields = dict(suggestion.fields)
+        fields = enrich_with_wiring_assist(
+            library,
+            standards,
+            project,
+            rec.type_id,
+            fields,
+            interview=project.interview,
+        )
+        # Re-pull continuity fields so IP / parent / next I/O bit advance device-to-device.
+        from cabinet_studio.services.wiring_assist import suggest_field
+
+        continuity_keys = ["io_address", "wire_color"]
+        if rec.type_id in {"plc", "hmi", "ethernet_switch", "vfd"}:
+            continuity_keys.append("ip_address")
+        if rec.type_id == "io_module":
+            continuity_keys.extend(["parent_tag", "slot"])
+        for key in continuity_keys:
+            assist = suggest_field(
+                project,
+                library,
+                standards,
+                type_id=rec.type_id,
+                field_key=key,
+                prior=fields,
+                interview=project.interview,
+            )
+            if assist.value:
+                fields[key] = assist.value
+        # Drop stray continuity keys that do not belong on this class.
+        if rec.type_id != "io_module":
+            fields.pop("slot", None)
+            fields.pop("parent_tag", None)
+        if rec.type_id not in {"plc", "hmi", "ethernet_switch", "vfd"}:
+            if rec.type_id != "plc":
+                pass
+            if rec.type_id not in {"plc", "hmi", "ethernet_switch", "vfd"}:
+                fields.pop("ip_address", None)
+        fields = _fill_class_defaults(rec.type_id, fields, project.interview)
+        x, y = next_free_position(project, library, rec.type_id)
+        project.items.append(
+            PlacedItem(
+                id=new_id(),
+                library_id=suggestion.catalog_id,
+                type_id=rec.type_id,
+                x=x,
+                y=y,
+                fields=fields,
+            )
+        )
+        standards = remember_device_fields(
+            project,
+            standards,
+            type_id=rec.type_id,
+            fields=fields,
+            interview=project.interview,
+        )
+    return project
+
+
+
+
+def _fill_class_defaults(type_id: str, fields: dict[str, str], interview: dict[str, str]) -> dict[str, str]:
+    """Fill common blank ratings without inventing catalog numbers."""
+    out = dict(fields)
+    supply = (interview.get("supply_voltage") or "").strip()
+    control = (interview.get("control_voltage") or "").strip() or "24 VDC"
+
+    def blank(key: str) -> bool:
+        return not str(out.get(key, "")).strip()
+
+    if type_id == "motor":
+        if blank("horsepower"):
+            out["horsepower"] = "5 HP" if "480" in supply or "460" in supply else "1 HP"
+        if blank("rpm"):
+            out["rpm"] = "1750"
+        if blank("voltage"):
+            out["voltage"] = supply or "460 VAC"
+        if blank("fla"):
+            out["fla"] = "7.6 A" if "5 HP" in out.get("horsepower", "") else "3.0 A"
+        if blank("torque"):
+            out["torque"] = "15 lb-ft" if "5 HP" in out.get("horsepower", "") else "3 lb-ft"
+        if blank("pinout"):
+            out["pinout"] = "T1 T2 T3 / PE"
+    elif type_id == "vfd":
+        if blank("horsepower"):
+            out["horsepower"] = "5 HP" if "480" in supply or "460" in supply else "1 HP"
+        if blank("voltage"):
+            out["voltage"] = supply or "480 VAC"
+        if blank("fla"):
+            out["fla"] = "10.5 A" if "5 HP" in out.get("horsepower", "") else "4.2 A"
+        if blank("control_mode"):
+            out["control_mode"] = "V/Hz"
+        if blank("comms"):
+            out["comms"] = "EtherNet/IP"
+    elif type_id == "power_supply":
+        if blank("input_voltage"):
+            out["input_voltage"] = supply or "480 VAC"
+        if blank("output_voltage"):
+            out["output_voltage"] = control
+        if blank("output_current"):
+            out["output_current"] = "10 A"
+        if blank("phases"):
+            out["phases"] = "3" if "480" in (supply or "") or "3" in (supply or "") else "1"
+    elif type_id == "contactor":
+        if blank("coil_voltage"):
+            out["coil_voltage"] = control
+        if blank("poles"):
+            out["poles"] = "3"
+        if blank("amp_rating"):
+            out["amp_rating"] = "25 A"
+    elif type_id == "pushbutton":
+        if blank("function"):
+            out["function"] = "Start"
+        if blank("contact"):
+            out["contact"] = "NO"
+        if blank("color"):
+            out["color"] = "Green"
+        if blank("voltage"):
+            out["voltage"] = control
+    elif type_id == "estop":
+        if blank("contact_config"):
+            out["contact_config"] = "2 NC"
+        if blank("reset_style"):
+            out["reset_style"] = "Twist to release"
+        if blank("voltage"):
+            out["voltage"] = control
+    elif type_id == "hmi":
+        if blank("screen_size"):
+            out["screen_size"] = "7 in"
+        if blank("protocol"):
+            out["protocol"] = "EtherNet/IP"
+    elif type_id == "plc":
+        if blank("slot_count"):
+            out["slot_count"] = "8"
+        if blank("protocol"):
+            out["protocol"] = "EtherNet/IP"
+    return out
+
+def project_name_from_answers(answers: dict[str, str]) -> str:
+    name = (answers.get("project_name") or "").strip()
+    return name or "AI cabinet build"

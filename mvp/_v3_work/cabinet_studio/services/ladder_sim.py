@@ -1,0 +1,311 @@
+"""Educational scan-cycle simulator for Cabinet Studio ladder IR.
+
+Evaluates NO/NC contacts, series/parallel (OR), and coils once per scan.
+Forces override BOOL tags for teaching I/O. Not a live PLC; not a vendor engine.
+"""
+
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import Any
+
+from cabinet_studio.services.ladder_ir import (
+    collect_tags,
+    normalize_ladder_ir,
+    program_to_ladder_ir,
+)
+
+
+class ScanSimulator:
+    """In-process educational soft scan over ladder IR."""
+
+    def __init__(
+        self,
+        ladder: dict[str, Any] | None = None,
+        *,
+        cycle_ms: int = 50,
+    ) -> None:
+        self.ladder = normalize_ladder_ir(ladder or {})
+        self.cycle_ms = max(1, int(cycle_ms))
+        self.vars: dict[str, bool] = {}
+        self.forces: dict[str, bool] = {}
+        self.timers: dict[str, dict[str, Any]] = {}
+        self.scan_count = 0
+        self.last_energized: dict[str, bool] = {}  # rung_id -> path true?
+        self.last_contact_state: dict[str, bool] = {}  # "rung|idx|var" conducting
+        self._init_vars()
+
+    def _init_vars(self) -> None:
+        inputs, outputs, all_tags = collect_tags(self.ladder)
+        for tag in all_tags:
+            self.vars.setdefault(tag, False)
+        for var in self.ladder.get("variables") or []:
+            name = str(var.get("name") or "").strip()
+            if not name:
+                continue
+            self.vars.setdefault(name, False)
+            if str(var.get("type") or "").upper() in {"TON", "TOF", "RTO"} or str(
+                var.get("class") or ""
+            ).lower() == "timer":
+                self.timers[name] = {
+                    "block": str(var.get("type") or var.get("block") or "TON").upper(),
+                    "pt_ms": int(var.get("pt_ms") or 0),
+                    "acc_ms": 0,
+                    "q": False,
+                    "tt": False,
+                }
+        self._input_tags = set(inputs)
+        self._output_tags = set(outputs)
+
+    @classmethod
+    def from_program(
+        cls,
+        program: dict[str, Any] | None,
+        *,
+        project_name: str = "",
+        devices: list[dict[str, str]] | None = None,
+        cycle_ms: int = 50,
+    ) -> "ScanSimulator":
+        ir = program_to_ladder_ir(program, project_name=project_name, devices=devices)
+        return cls(ir, cycle_ms=cycle_ms)
+
+    def reset(self) -> None:
+        for tag in list(self.vars):
+            self.vars[tag] = False
+        for tmr in self.timers.values():
+            tmr["acc_ms"] = 0
+            tmr["q"] = False
+            tmr["tt"] = False
+        self.forces.clear()
+        self.scan_count = 0
+        self.last_energized.clear()
+        self.last_contact_state.clear()
+
+    def set_force(self, tag: str, value: bool | None) -> None:
+        """Force a tag True/False, or None to clear the force."""
+        name = (tag or "").strip()
+        if not name:
+            return
+        if value is None:
+            self.forces.pop(name, None)
+        else:
+            self.forces[name] = bool(value)
+            self.vars[name] = bool(value)
+
+    def toggle_force(self, tag: str) -> bool:
+        name = (tag or "").strip()
+        if not name:
+            return False
+        current = self.read(name)
+        self.set_force(name, not current)
+        return self.read(name)
+
+    def read(self, tag: str) -> bool:
+        name = (tag or "").strip()
+        if name in self.forces:
+            return bool(self.forces[name])
+        if name in self.timers:
+            return bool(self.timers[name].get("q"))
+        return bool(self.vars.get(name, False))
+
+    def _eval_contact(self, el: dict[str, Any], path_key: str) -> bool:
+        tag = (el.get("var") or "").strip()
+        form = str(el.get("form") or "NO").upper()
+        value = self.read(tag)
+        conducting = (not value) if form == "NC" else bool(value)
+        self.last_contact_state[path_key] = conducting
+        return conducting
+
+    def _eval_series(self, elements: list[dict[str, Any]], key_prefix: str) -> bool:
+        if not elements:
+            return True
+        for index, el in enumerate(elements):
+            if not self._eval_element(el, f"{key_prefix}|{index}"):
+                # Still record remaining contacts as not conducting for UI clarity.
+                for j in range(index + 1, len(elements)):
+                    rest = elements[j]
+                    if (rest.get("kind") or "").lower() == "contact":
+                        self.last_contact_state[f"{key_prefix}|{j}"] = False
+                return False
+        return True
+
+    def _eval_element(self, el: dict[str, Any], path_key: str) -> bool:
+        kind = (el.get("kind") or "").lower()
+        if kind == "contact":
+            return self._eval_contact(el, path_key)
+        if kind == "or":
+            branches = list(el.get("branches") or [])
+            if not branches:
+                return False
+            any_true = False
+            for bi, branch in enumerate(branches):
+                ok = self._eval_series(list(branch), f"{path_key}|b{bi}")
+                any_true = any_true or ok
+            return any_true
+        if kind == "timer":
+            # IN power from left path is handled by caller; here treat Q as contact-like.
+            tag = (el.get("var") or "").strip()
+            return bool(self.timers.get(tag, {}).get("q"))
+        if kind == "coil":
+            # Coils do not affect left-to-right continuity for further series (end of rung).
+            return True
+        return False
+
+    def _apply_coil(self, el: dict[str, Any], energized: bool) -> None:
+        tag = (el.get("var") or "").strip()
+        if not tag:
+            return
+        form = str(el.get("form") or "normal").lower()
+        if tag in self.forces and form in {"normal", "negated"}:
+            # Forced tags stay forced; educational note: force wins over coil.
+            return
+        if form in {"set", "s"}:
+            if energized:
+                self.vars[tag] = True
+        elif form in {"reset", "r"}:
+            if energized:
+                self.vars[tag] = False
+        elif form in {"negated", "not", "nc"}:
+            self.vars[tag] = not energized
+        else:
+            self.vars[tag] = bool(energized)
+
+    def _update_timer(self, name: str, block: str, inn: bool) -> None:
+        tmr = self.timers.setdefault(
+            name,
+            {"block": block or "TON", "pt_ms": 0, "acc_ms": 0, "q": False, "tt": False},
+        )
+        block = (block or tmr.get("block") or "TON").upper()
+        pt = int(tmr.get("pt_ms") or 0)
+        if block == "TOF":
+            if inn:
+                tmr["acc_ms"] = 0
+                tmr["q"] = True
+                tmr["tt"] = False
+            else:
+                if tmr.get("q"):
+                    tmr["acc_ms"] = int(tmr.get("acc_ms") or 0) + self.cycle_ms
+                    tmr["tt"] = True
+                    if tmr["acc_ms"] >= pt:
+                        tmr["q"] = False
+                        tmr["tt"] = False
+                        tmr["acc_ms"] = pt
+                else:
+                    tmr["tt"] = False
+        else:  # TON / RTO-ish educational
+            if inn:
+                tmr["acc_ms"] = int(tmr.get("acc_ms") or 0) + self.cycle_ms
+                tmr["tt"] = tmr["acc_ms"] < pt
+                tmr["q"] = tmr["acc_ms"] >= pt
+                if tmr["q"]:
+                    tmr["acc_ms"] = max(tmr["acc_ms"], pt)
+                    tmr["tt"] = False
+            else:
+                if block != "RTO":
+                    tmr["acc_ms"] = 0
+                tmr["q"] = False
+                tmr["tt"] = False
+        self.vars[name] = bool(tmr["q"])
+
+    def scan_once(self, forces: dict[str, bool] | None = None) -> dict[str, Any]:
+        """One scan cycle. Optional forces merge into sticky force table for this call."""
+        if forces:
+            for tag, value in forces.items():
+                self.set_force(str(tag), bool(value))
+
+        # Apply forces into vars snapshot
+        for tag, value in self.forces.items():
+            self.vars[tag] = bool(value)
+
+        self.last_contact_state.clear()
+        self.last_energized.clear()
+        energized_paths: dict[str, bool] = {}
+
+        for rung in self.ladder.get("rungs") or []:
+            rid = str(rung.get("id") or "")
+            elements = list(rung.get("elements") or [])
+            # Split: logic elements then trailing coils/timers-as-blocks
+            logic: list[dict[str, Any]] = []
+            actuators: list[dict[str, Any]] = []
+            for el in elements:
+                kind = (el.get("kind") or "").lower()
+                if kind in {"coil", "timer"}:
+                    actuators.append(el)
+                else:
+                    # Timer can appear mid-rung as a contact-like block in some sketches;
+                    # if block key present and kind timer after contacts, treat as actuator.
+                    logic.append(el)
+
+            path_ok = self._eval_series(logic, f"{rid}|L") if logic else True
+            # If no explicit coil and last logic was empty, still false unless empty rung
+            if not elements:
+                path_ok = False
+
+            self.last_energized[rid] = path_ok
+            energized_paths[rid] = path_ok
+
+            if not actuators and elements:
+                # Coil may have been classified into logic if missing — find trailing coils
+                pass
+
+            for el in actuators:
+                kind = (el.get("kind") or "").lower()
+                if kind == "coil":
+                    self._apply_coil(el, path_ok)
+                elif kind == "timer":
+                    name = (el.get("var") or "").strip()
+                    block = str(el.get("block") or "TON").upper()
+                    if name:
+                        if name not in self.timers:
+                            self.timers[name] = {
+                                "block": block,
+                                "pt_ms": 0,
+                                "acc_ms": 0,
+                                "q": False,
+                                "tt": False,
+                            }
+                        self._update_timer(name, block, path_ok)
+
+        self.scan_count += 1
+        return {
+            "vars": {k: bool(v) for k, v in self.vars.items()},
+            "forces": {k: bool(v) for k, v in self.forces.items()},
+            "energized_paths": energized_paths,
+            "contact_state": dict(self.last_contact_state),
+            "timers": deepcopy(self.timers),
+            "scan_count": self.scan_count,
+            "cycle_ms": self.cycle_ms,
+        }
+
+    def input_tags(self) -> list[str]:
+        return sorted(self._input_tags)
+
+    def output_tags(self) -> list[str]:
+        return sorted(self._output_tags)
+
+    def active_tags(self) -> set[str]:
+        """Tags that are logically TRUE this scan (for ladder highlight)."""
+        return {tag for tag, value in self.vars.items() if value}
+
+
+def scan_once(
+    ladder_or_program: dict[str, Any],
+    forces: dict[str, bool] | None = None,
+    *,
+    from_program: bool = False,
+    project_name: str = "",
+    devices: list[dict[str, str]] | None = None,
+) -> dict[str, Any]:
+    """Functional helper matching the brief API: scan_once(forces) → result."""
+    if from_program or (
+        isinstance(ladder_or_program, dict)
+        and "rungs" in ladder_or_program
+        and ladder_or_program.get("format") != "cabinet-studio-ladder"
+        and "answers" in ladder_or_program
+    ):
+        sim = ScanSimulator.from_program(
+            ladder_or_program, project_name=project_name, devices=devices
+        )
+    else:
+        sim = ScanSimulator(ladder_or_program)
+    return sim.scan_once(forces)

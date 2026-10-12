@@ -1,0 +1,1605 @@
+"""Programming screen: questions, visual ladder, editable PLC/HMI text (not a download)."""
+
+from __future__ import annotations
+
+import html
+import os
+import tempfile
+import tkinter as tk
+import webbrowser
+from pathlib import Path as _Path
+
+import customtkinter as ctk
+
+from cabinet_studio.models.project import Project
+from cabinet_studio.services.programming import (
+    LEARNING_NOTE,
+    PROGRAM_QUESTIONS,
+    add_rung,
+    build_starter_program,
+    cabinet_device_tags,
+    default_design_answers,
+    delete_rung,
+    device_hover_detail,
+    devices_by_tag,
+    edit_rung,
+    empty_program,
+    flatten_contacts,
+    format_hmi_text,
+    format_plc_text,
+    program_from_dict,
+    program_looks_edited,
+    program_to_dict,
+    refresh_plc_text,
+    rung_has_seal_in,
+    simulation_rung_tags,
+)
+from cabinet_studio.ui.dialogs import ask_choice
+from cabinet_studio.ui.theme import (
+    BG,
+    BORDER,
+    CYAN,
+    ENTRY,
+    MUTED,
+    ORANGE,
+    PANEL,
+    TEXT,
+    ghost_button,
+    primary_button,
+    section_label,
+)
+from cabinet_studio.ui.util import (
+    apply_saved_geometry,
+    bind_geometry_autosave,
+    remember_window_geometry,
+)
+
+# Pop-out canvas geometry key (saves/ui_window_geometry.json)
+_PROG_CANVAS_GEOM_KEY = "programming_canvas"
+_PROG_CANVAS_MIN = (1000, 700)
+_PROG_CANVAS_DEFAULT = (1280, 860)
+
+# Ladder drawing palette (light sheet on dark chrome, like shop prints).
+LADDER_BG = "#d8d4cc"
+LADDER_RAIL = "#1a1a22"
+LADDER_WIRE = "#2a2a32"
+LADDER_SYMBOL = "#0d0d0f"
+LADDER_LABEL = "#1c1c22"
+LADDER_MUTED = "#5a5a66"
+LADDER_SELECT = "#2f6bff"
+LADDER_COIL = "#0b5e4a"
+LADDER_ACTIVE = "#f5a623"
+LADDER_ACTIVE_FILL = "#ffe6a8"
+LADDER_PULSE = "#ff3b5c"
+
+# Expanded clearances so device tags / type captions never sit under rails, wires, or symbols.
+CONTACT_HALF_H = 18          # contact bar half-height (| |)
+CONTACT_GAP = 16             # gap between contact bars
+COIL_RADIUS = 18
+TAG_CLEAR_ABOVE = 24         # tag baseline offset above symbol top
+CAPTION_CLEAR_BELOW = 22     # caption baseline offset below symbol bottom
+BRANCH_ROW_H = 128           # vertical pitch between parallel branch wires
+TITLE_BAND = 64              # room for "Rung N: comment" above first wire
+BOTTOM_PAD = 40              # room under lowest tag/symbol before rail end
+INTER_RUNG_GAP = 118         # space between rung blocks (never overlap after hover declutter)
+CONTACT_COL_W = 136          # x step for contacts in a parallel branch (>=2)
+MIN_SERIES_W = 140           # minimum series contact column width
+RAIL_INSET = 68              # left/right rail inset from content edges
+SERIES_AFTER_PARALLEL = 72   # gap from parallel bus to first series contact
+COIL_INSET = 84              # coil center inset from right rail
+SEAL_IN_GAP = 12             # seal-in label clear of right rail
+
+
+class ProgrammingViewer(ctk.CTkToplevel):
+    """Ask simple questions, show a real ladder canvas, keep copyable PLC/HMI text."""
+
+    def __init__(self, master, fonts, project: Project, on_change) -> None:
+        super().__init__(master, fg_color=BG)
+        self.fonts = fonts
+        self.project = project
+        self.on_change = on_change
+        self.program = program_from_dict(project.program or {})
+        self._q_index = 0
+        self._answers: dict[str, str] = dict(self.program.get("answers") or {})
+        self._asking = False
+        self._selected_rung_id: str | None = None
+        self._device_map = devices_by_tag(project)
+        self._hover_targets: list[tuple[float, float, float, float, str]] = []
+        self._hover_tip: ctk.CTkToplevel | None = None
+        self._hover_after: str | None = None
+        self._hover_key: str | None = None
+        self._sim_running = False
+        self._sim_after: str | None = None
+        self._sim_index = -1
+        self._sim_flash_on = False
+        self._sim_flash_count = 0
+        self._sim_active_tags: set[str] = set()
+        self._sim_pulse_tags: set[str] = set()
+        self._sim_status_var = None  # set after widgets
+        self.title(f"Programming - {project.name}")
+        self.minsize(1100, 720)
+        self.protocol("WM_DELETE_WINDOW", self.close)
+
+        # Full-screen workspace so the ladder is readable without crowding the cabinet UI.
+        self._open_maximized()
+
+        header = ctk.CTkFrame(self, fg_color=BG, corner_radius=0)
+        header.pack(fill="x", padx=14, pady=(10, 2))
+        section_label(header, "PROGRAMMING", fonts.tiny).pack(side="left")
+        self.meta = ctk.CTkLabel(
+            header,
+            text=f"{project.name}  |  Learning program - not a live PLC download",
+            font=fonts.small,
+            text_color=CYAN,
+            anchor="e",
+        )
+        self.meta.pack(side="right")
+
+        self.hint = ctk.CTkLabel(
+            self,
+            text=LEARNING_NOTE,
+            font=fonts.tiny,
+            text_color=ORANGE,
+            anchor="w",
+        )
+        self.hint.pack(fill="x", padx=14, pady=(0, 4))
+
+        # Question strip (one at a time)
+        self.q_frame = ctk.CTkFrame(self, fg_color=PANEL, corner_radius=4, border_width=1, border_color=BORDER)
+        self.q_frame.pack(fill="x", padx=12, pady=(0, 6))
+        self.q_label = ctk.CTkLabel(
+            self.q_frame,
+            text="",
+            font=fonts.body,
+            text_color=TEXT,
+            anchor="w",
+            justify="left",
+            wraplength=1200,
+        )
+        self.q_label.pack(fill="x", padx=12, pady=(8, 4))
+        self.q_choices = ctk.CTkFrame(self.q_frame, fg_color="transparent")
+        self.q_choices.pack(fill="x", padx=8, pady=(0, 8))
+
+        # Tools
+        tools = ctk.CTkFrame(self, fg_color=BG, corner_radius=0)
+        tools.pack(fill="x", padx=12, pady=(0, 4))
+        # Pack RIGHT slaves FIRST so Tk does not clip them behind left overflow.
+        self._popout_btn = ghost_button(
+            tools, "Pop out view", self._toggle_canvas_popout, fonts.small, width=120
+        )
+        self._popout_btn.pack(side="right", padx=4)
+        self.tab_label = ctk.CTkLabel(tools, text="LADDER", font=fonts.small, text_color=MUTED, anchor="e")
+        self.tab_label.pack(side="right", padx=8)
+        primary_button(tools, "Ask questions", self.start_questions, fonts.small, width=130).pack(side="left", padx=4)
+        primary_button(
+            tools, "Build starter program", self._build_starter_program, fonts.small, width=180
+        ).pack(side="left", padx=4)
+        ghost_button(
+            tools, "Build from drawings", self._build_from_drawings, fonts.small, width=160
+        ).pack(side="left", padx=4)
+        ghost_button(tools, "Ladder", lambda: self._show_tab("ladder"), fonts.small, width=90).pack(side="left", padx=4)
+        ghost_button(tools, "PLC text", lambda: self._show_tab("plc"), fonts.small, width=100).pack(side="left", padx=4)
+        ghost_button(tools, "HMI text", lambda: self._show_tab("hmi"), fonts.small, width=100).pack(side="left", padx=4)
+        ghost_button(tools, "Copy PLC", self.copy_plc, fonts.small, width=100).pack(side="left", padx=4)
+        ghost_button(tools, "Copy HMI", self.copy_hmi, fonts.small, width=100).pack(side="left", padx=4)
+        ghost_button(tools, "Print", self.print_ladder, fonts.small, width=90).pack(side="left", padx=4)
+        ghost_button(tools, "Export Ladder", self.export_ladder_artifact, fonts.small, width=120).pack(side="left", padx=4)
+
+        # Dedicated simulation strip — always visible above the ladder canvas.
+        sim_bar = ctk.CTkFrame(self, fg_color=PANEL, corner_radius=4, border_width=1, border_color=BORDER)
+        sim_bar.pack(fill="x", padx=12, pady=(0, 6))
+        # Pack Pop out ladder on the RIGHT first so it stays visible on every width.
+        self._sim_popout_btn = primary_button(
+            sim_bar, "Pop out ladder", self._toggle_canvas_popout, fonts.body, width=150
+        )
+        self._sim_popout_btn.pack(side="right", padx=(4, 10), pady=6)
+        ctk.CTkLabel(
+            sim_bar,
+            text="PROGRAM SIMULATION",
+            font=fonts.small,
+            text_color=MUTED,
+            anchor="w",
+        ).pack(side="left", padx=(10, 8), pady=8)
+        primary_button(sim_bar, "▶  Simulate", self._sim_toggle_run, fonts.body, width=140).pack(side="left", padx=6, pady=6)
+        ghost_button(sim_bar, "Step", self._sim_step, fonts.body, width=90).pack(side="left", padx=4, pady=6)
+        ghost_button(sim_bar, "Stop", self._sim_stop, fonts.body, width=90).pack(side="left", padx=4, pady=6)
+        self._sim_status = ctk.CTkLabel(
+            sim_bar,
+            text="Sim off (educational — not a live PLC). Run the ladder program here.",
+            font=fonts.small,
+            text_color=MUTED,
+            anchor="w",
+        )
+        self._sim_status.pack(side="left", padx=12, pady=8)
+
+        # Body: ladder canvas (top) + text (bottom) for ladder/plc; hmi uses editor only
+        self.body = ctk.CTkFrame(self, fg_color=PANEL, corner_radius=4, border_width=1, border_color=BORDER)
+        self.body.pack(fill="both", expand=True, padx=12, pady=(0, 6))
+
+        self._canvas_popout: ctk.CTkToplevel | None = None
+        self._canvas_geom_flush = None
+        self._canvas_placeholder = ctk.CTkLabel(
+            self.body,
+            text="Ladder view popped out — drag that window to another monitor. Controls here still drive sim / rungs.\n"
+            "Click Dock view (or close the pop-out) to bring the canvas back.",
+            font=fonts.small,
+            text_color=MUTED,
+            anchor="center",
+            justify="center",
+        )
+        self._mount_ladder_canvas(self.body)
+
+        self.editor = ctk.CTkTextbox(
+            self.body,
+            font=fonts.mono_small,
+            fg_color=ENTRY,
+            text_color=TEXT,
+            border_color=BORDER,
+            border_width=0,
+            corner_radius=4,
+            wrap="word",
+            height=180,
+        )
+        self.editor.bind("<KeyRelease>", self._on_typed)
+
+        # Rung editor bar
+        rung_bar = ctk.CTkFrame(self, fg_color=BG, corner_radius=0)
+        rung_bar.pack(fill="x", padx=12, pady=(0, 4))
+        section_label(rung_bar, "RUNG EDITOR", fonts.tiny).pack(side="left", padx=(4, 8))
+        ctk.CTkLabel(rung_bar, text="Contact", font=fonts.tiny, text_color=MUTED).pack(side="left")
+        self.contact_var = ctk.StringVar(value="")
+        self.contact_menu = ctk.CTkOptionMenu(
+            rung_bar,
+            values=self._tag_choices(),
+            variable=self.contact_var,
+            font=fonts.tiny,
+            dropdown_font=fonts.tiny,
+            width=150,
+            height=28,
+            fg_color=ENTRY,
+            button_color="#2f6bff",
+            button_hover_color="#2457d6",
+            dropdown_fg_color=PANEL,
+            dropdown_hover_color="#243044",
+            dropdown_text_color=TEXT,
+            text_color=TEXT,
+        )
+        self.contact_menu.pack(side="left", padx=4)
+        self.nc_var = ctk.StringVar(value="NO")
+        ctk.CTkOptionMenu(
+            rung_bar,
+            values=["NO", "NC"],
+            variable=self.nc_var,
+            font=fonts.tiny,
+            dropdown_font=fonts.tiny,
+            width=70,
+            height=28,
+            fg_color=ENTRY,
+            button_color="#2f6bff",
+            button_hover_color="#2457d6",
+            dropdown_fg_color=PANEL,
+            dropdown_hover_color="#243044",
+            dropdown_text_color=TEXT,
+            text_color=TEXT,
+        ).pack(side="left", padx=4)
+        ctk.CTkLabel(rung_bar, text="Coil", font=fonts.tiny, text_color=MUTED).pack(side="left", padx=(8, 0))
+        self.coil_var = ctk.StringVar(value="")
+        self.coil_menu = ctk.CTkOptionMenu(
+            rung_bar,
+            values=self._tag_choices(),
+            variable=self.coil_var,
+            font=fonts.tiny,
+            dropdown_font=fonts.tiny,
+            width=150,
+            height=28,
+            fg_color=ENTRY,
+            button_color="#2f6bff",
+            button_hover_color="#2457d6",
+            dropdown_fg_color=PANEL,
+            dropdown_hover_color="#243044",
+            dropdown_text_color=TEXT,
+            text_color=TEXT,
+        )
+        self.coil_menu.pack(side="left", padx=4)
+        self.comment_entry = ctk.CTkEntry(
+            rung_bar,
+            placeholder_text="Short comment",
+            font=fonts.tiny,
+            width=220,
+            height=28,
+            fg_color=ENTRY,
+            border_color=BORDER,
+            text_color=TEXT,
+        )
+        self.comment_entry.pack(side="left", padx=4)
+        ghost_button(rung_bar, "Add rung", self._add_rung, fonts.tiny, width=90).pack(side="left", padx=4)
+        ghost_button(rung_bar, "Add series contact", self._add_series_contact, fonts.tiny, width=140).pack(
+            side="left", padx=4
+        )
+        ghost_button(rung_bar, "Delete rung", self._delete_selected_rung, fonts.tiny, width=100).pack(
+            side="left", padx=4
+        )
+
+        nav = ctk.CTkFrame(self, fg_color=BG, corner_radius=0)
+        nav.pack(fill="x", padx=12, pady=(0, 12))
+        ghost_button(nav, "Export .txt", self.export_txt, fonts.body, width=120).pack(side="left", padx=4)
+        ghost_button(nav, "Sync text from ladder", self._sync_text_from_ladder, fonts.body, width=170).pack(
+            side="left", padx=4
+        )
+        self.status = ctk.CTkLabel(nav, text="", font=fonts.tiny, text_color=MUTED, anchor="w")
+        self.status.pack(side="left", padx=12)
+        primary_button(nav, "Done - return to cabinet", self.close, fonts.body, width=200).pack(side="right", padx=4)
+        ghost_button(nav, "Close", self.close, fonts.body, width=90).pack(side="right", padx=4)
+
+        self._tab = "ladder"
+        self._rung_hitboxes: list[tuple[str, float, float, float, float]] = []
+        self._apply_tab_layout()
+        self._load_editor()
+        self._draw_ladder()
+        self._show_idle_question_prompt()
+        self.bind("<Escape>", lambda _e: self.close())
+        self.after(40, self._arm)
+        self.after(120, self._offer_starter_if_empty)
+
+
+    def _mount_ladder_canvas(self, parent) -> None:
+        """Create ladder canvas + scrollbars under parent (home body or pop-out)."""
+        self.ladder_wrap = ctk.CTkFrame(parent, fg_color=PANEL, corner_radius=0)
+        self.canvas = tk.Canvas(self.ladder_wrap, background=LADDER_BG, highlightthickness=0)
+        self.vbar = ctk.CTkScrollbar(self.ladder_wrap, orientation="vertical", command=self.canvas.yview)
+        self.hbar = ctk.CTkScrollbar(self.ladder_wrap, orientation="horizontal", command=self.canvas.xview)
+        self.canvas.configure(yscrollcommand=self.vbar.set, xscrollcommand=self.hbar.set)
+        self.vbar.pack(side="right", fill="y")
+        self.hbar.pack(side="bottom", fill="x")
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.canvas.bind("<Configure>", self._on_canvas_configure)
+        self.canvas.bind("<Button-1>", self._on_canvas_click)
+        self.canvas.bind("<Motion>", self._on_canvas_motion)
+        self.canvas.bind("<Leave>", self._hide_hover_tip)
+        self.canvas.bind("<MouseWheel>", self._wheel)
+        self.canvas.bind("<Shift-MouseWheel>", self._wheel_x)
+        self.canvas.bind("<Button-4>", lambda _e: self.canvas.yview_scroll(-1, "units"))
+        self.canvas.bind("<Button-5>", lambda _e: self.canvas.yview_scroll(1, "units"))
+        self.ladder_wrap.bind("<MouseWheel>", self._wheel)
+        self.ladder_wrap.bind("<Shift-MouseWheel>", self._wheel_x)
+        self.vbar.bind("<MouseWheel>", self._wheel)
+        self.hbar.bind("<MouseWheel>", self._wheel_x)
+
+    def _sync_popout_button_labels(self, *, popped: bool) -> None:
+        """Keep tools-row and sim-bar pop-out labels in sync."""
+        tools_txt = "Dock view" if popped else "Pop out view"
+        sim_txt = "Dock ladder" if popped else "Pop out ladder"
+        try:
+            self._popout_btn.configure(text=tools_txt)
+        except Exception:
+            pass
+        try:
+            self._sim_popout_btn.configure(text=sim_txt)
+        except Exception:
+            pass
+
+    def _toggle_canvas_popout(self) -> None:
+        if self._canvas_popout is not None:
+            self._dock_ladder_canvas()
+        else:
+            self._pop_out_ladder_canvas()
+
+    def _pop_out_ladder_canvas(self) -> None:
+        if self._canvas_popout is not None:
+            return
+        self._hide_hover_tip()
+        try:
+            self.ladder_wrap.pack_forget()
+        except Exception:
+            pass
+        try:
+            self.ladder_wrap.destroy()
+        except Exception:
+            pass
+
+        win = ctk.CTkToplevel(self, fg_color=BG)
+        win.title(f"Ladder view - {self.project.name}")
+        win.minsize(*_PROG_CANVAS_MIN)
+        # Free-float: no transient so it can sit on a second monitor.
+        apply_saved_geometry(
+            win,
+            _PROG_CANVAS_GEOM_KEY,
+            default_w=_PROG_CANVAS_DEFAULT[0],
+            default_h=_PROG_CANVAS_DEFAULT[1],
+            min_w=_PROG_CANVAS_MIN[0],
+            min_h=_PROG_CANVAS_MIN[1],
+            parent=self,
+            center_fallback=False,
+        )
+        win.protocol("WM_DELETE_WINDOW", self._dock_ladder_canvas)
+        self._canvas_popout = win
+        self._canvas_geom_flush = bind_geometry_autosave(
+            win, _PROG_CANVAS_GEOM_KEY, min_w=_PROG_CANVAS_MIN[0], min_h=_PROG_CANVAS_MIN[1]
+        )
+        self._mount_ladder_canvas(win)
+        self.ladder_wrap.pack(fill="both", expand=True, padx=8, pady=8)
+        self._sync_popout_button_labels(popped=True)
+        self._apply_tab_layout()
+        try:
+            win.update_idletasks()
+        except Exception:
+            pass
+        self._draw_ladder(preserve_scroll=False)
+        # Second draw after the pop-out has a real pixel size (first pass may see ~1px).
+        try:
+            win.after(40, lambda: self._draw_ladder(False))
+        except Exception:
+            pass
+        try:
+            win.lift()
+        except Exception:
+            pass
+
+    def _dock_ladder_canvas(self) -> None:
+        """Return ladder canvas to the home Programming window; keep sim state."""
+        win = self._canvas_popout
+        if win is None:
+            return
+        self._hide_hover_tip()
+        if self._canvas_geom_flush:
+            try:
+                self._canvas_geom_flush()
+            except Exception:
+                pass
+            self._canvas_geom_flush = None
+        else:
+            remember_window_geometry(
+                win, _PROG_CANVAS_GEOM_KEY, min_w=_PROG_CANVAS_MIN[0], min_h=_PROG_CANVAS_MIN[1]
+            )
+        self._canvas_popout = None
+        try:
+            win.destroy()
+        except Exception:
+            pass
+        self._mount_ladder_canvas(self.body)
+        self._sync_popout_button_labels(popped=False)
+        self._apply_tab_layout()
+        try:
+            self.update_idletasks()
+        except Exception:
+            pass
+        self._draw_ladder(preserve_scroll=False)
+        try:
+            self.after(40, lambda: self._draw_ladder(False))
+        except Exception:
+            pass
+
+    def _open_maximized(self) -> None:
+        """Use nearly the full screen so ladder symbols and device labels stay readable."""
+        try:
+            self.update_idletasks()
+            sw = int(self.winfo_screenwidth())
+            sh = int(self.winfo_screenheight())
+            # Leave a thin margin so Windows taskbar / title chrome stay usable.
+            margin = 8
+            self.geometry(f"{max(1100, sw - margin * 2)}x{max(720, sh - margin * 2 - 40)}+{margin}+{margin}")
+        except Exception:
+            self.geometry("1280x860+40+20")
+        try:
+            self.state("zoomed")
+        except Exception:
+            try:
+                self.attributes("-zoomed", True)
+            except Exception:
+                pass
+
+    def _arm(self) -> None:
+        try:
+            self.lift()
+            self.focus_force()
+            self._open_maximized()
+        except Exception:
+            return
+
+    def _tag_choices(self) -> list[str]:
+        tags = [d["tag"] for d in cabinet_device_tags(self.project)]
+        return tags if tags else ["(no device tags)"]
+
+    def _show_idle_question_prompt(self) -> None:
+        self._asking = False
+        for child in self.q_choices.winfo_children():
+            child.destroy()
+        has_rungs = bool(self.program.get("rungs"))
+        if has_rungs and program_looks_edited(self.program):
+            self.q_label.configure(
+                text="A program is already saved with this cabinet. Press Ask questions to rebuild it "
+                "(you will be asked before anything is replaced), or edit the ladder / text below."
+            )
+        elif not has_rungs:
+            self.q_label.configure(
+                text="No rungs yet — answer the questions or click Build starter program. "
+                "Build from drawings uses the devices and wires already on this cabinet (no invented tags)."
+            )
+        else:
+            self.q_label.configure(
+                text="Press Ask questions. We will ask a few easy questions one at a time, "
+                "then draw a real ladder you can edit and copy."
+            )
+        if not has_rungs:
+            primary_button(
+                self.q_choices, "Build starter program", self._build_starter_program, self.fonts.small, width=180
+            ).pack(side="left", padx=4)
+            ghost_button(
+                self.q_choices, "Build from drawings", self._build_from_drawings, self.fonts.small, width=160
+            ).pack(side="left", padx=4)
+        ghost_button(self.q_choices, "Ask questions", self.start_questions, self.fonts.small, width=140).pack(
+            side="left", padx=4
+        )
+
+    def _offer_starter_if_empty(self) -> None:
+        """When Programming opens with no rungs, auto-offer a starter so the ladder is not blank."""
+        try:
+            if not self.winfo_exists():
+                return
+        except Exception:
+            return
+        if self._asking or (self.program.get("rungs") or []):
+            return
+        answer = ask_choice(
+            self,
+            self.fonts,
+            "No rungs yet",
+            "No rungs yet — answer the questions or click Build starter program. "
+            "Build a starter now from the devices already on this cabinet?",
+            [
+                ("build", "Build starter program", "primary"),
+                ("questions", "Ask questions", "ghost"),
+                ("later", "Later", ""),
+            ],
+        )
+        if answer == "build":
+            self._build_starter_program(confirm=False)
+        elif answer == "questions":
+            self.start_questions()
+
+    def _confirm_replace_program(self) -> bool:
+        if not program_looks_edited(self.program):
+            return True
+        if not (self.program.get("rungs") or []):
+            return True
+        answer = ask_choice(
+            self,
+            self.fonts,
+            "Replace program?",
+            "You already edited or saved a program for this cabinet. "
+            "Replace it with a new starter from the cabinet devices?",
+            [("yes", "Replace", "primary"), ("no", "Keep mine", "ghost")],
+        )
+        return answer == "yes"
+
+    def _apply_built_program(self, program: dict, status: str) -> None:
+        self.program = program
+        self.program["text_edited"] = False
+        self._answers = dict(self.program.get("answers") or {})
+        self._device_map = devices_by_tag(self.project)
+        if self.program.get("rungs"):
+            self._selected_rung_id = self.program["rungs"][0]["id"]
+        else:
+            self._selected_rung_id = None
+        self._commit(status=status)
+        self._show_tab("ladder")
+        self._show_idle_question_prompt()
+
+    def _build_starter_program(self, confirm: bool = True) -> None:
+        """Build a starter ladder from design defaults (cabinet device tags only)."""
+        if confirm and not self._confirm_replace_program():
+            self.status.configure(text="Kept your existing program.")
+            return
+        answers = default_design_answers(self.project)
+        program = build_starter_program(self.project, answers)
+        if not program.get("rungs"):
+            self._apply_built_program(
+                program,
+                status="No rungs yet — this cabinet has no start/stop/coil tags to wire. "
+                "Add devices on the panel, or answer the questions / Add rung.",
+            )
+            return
+        self._apply_built_program(
+            program,
+            status="Starter ladder built from cabinet devices. Edit symbols or text, then Save the cabinet.",
+        )
+
+    def _build_from_drawings(self) -> None:
+        """Same as starter-from-design: use devices/wires already on the cabinet (no invented tags)."""
+        self._build_starter_program(confirm=True)
+
+    def start_questions(self) -> None:
+        if program_looks_edited(self.program):
+            answer = ask_choice(
+                self,
+                self.fonts,
+                "Replace program?",
+                "You already edited or saved a program for this cabinet. "
+                "Replace it with a new starter from the questions?",
+                [("yes", "Replace", "primary"), ("no", "Keep mine", "ghost")],
+            )
+            if answer != "yes":
+                self.status.configure(text="Kept your existing program.")
+                return
+        self._answers = {}
+        self._q_index = 0
+        self._asking = True
+        self._show_current_question()
+
+    def _show_current_question(self) -> None:
+        for child in self.q_choices.winfo_children():
+            child.destroy()
+        if self._q_index >= len(PROGRAM_QUESTIONS):
+            self._finish_questions()
+            return
+        key, prompt, options = PROGRAM_QUESTIONS[self._q_index]
+        step = f"Question {self._q_index + 1} of {len(PROGRAM_QUESTIONS)}"
+        self.q_label.configure(text=f"{step}: {prompt}")
+        for option in options:
+            ghost_button(
+                self.q_choices,
+                option,
+                lambda chosen=option, answer_key=key: self._answer(answer_key, chosen),
+                self.fonts.small,
+                width=min(420, 40 + 7 * len(option)),
+            ).pack(side="left", padx=4, pady=2)
+
+    def _answer(self, key: str, value: str) -> None:
+        self._answers[key] = value
+        self._q_index += 1
+        self._show_current_question()
+
+    def _finish_questions(self) -> None:
+        self._asking = False
+        self.program = build_starter_program(self.project, self._answers)
+        self.program["text_edited"] = False
+        self._device_map = devices_by_tag(self.project)
+        if self.program.get("rungs"):
+            self._selected_rung_id = self.program["rungs"][0]["id"]
+        self._commit(status="Starter ladder built from your answers. Edit symbols or text, then Save the cabinet.")
+        self._show_tab("ladder")
+        self._show_idle_question_prompt()
+
+    def _show_tab(self, tab: str) -> None:
+        self._flush_editor_to_program()
+        self._tab = tab
+        label = {"ladder": "LADDER", "plc": "PLC TEXT", "hmi": "HMI"}.get(tab, tab.upper())
+        self.tab_label.configure(text=label)
+        self._apply_tab_layout()
+        self._load_editor()
+        if tab in {"ladder", "plc"}:
+            self._draw_ladder()
+
+    def _apply_tab_layout(self) -> None:
+        """Pack home-body widgets for the active tab.
+
+        When the ladder is popped out, never pack_forget ladder_wrap — that would
+        unpack it from the free-float window and leave a black blank pop-out.
+        Only manage the home body (placeholder + editor); keep/ensure ladder_wrap
+        packed on the pop-out.
+        """
+        popped = self._canvas_popout is not None
+        try:
+            self._canvas_placeholder.pack_forget()
+        except Exception:
+            pass
+        self.editor.pack_forget()
+
+        if popped:
+            # Ladder stays in the pop-out window — re-assert pack, do not forget.
+            try:
+                self.ladder_wrap.pack(fill="both", expand=True, padx=8, pady=8)
+            except Exception:
+                pass
+            if self._tab in {"ladder", "plc"}:
+                self._canvas_placeholder.pack(fill="both", expand=True, padx=4, pady=(4, 2))
+                if self._tab == "ladder":
+                    self.editor.configure(height=160)
+                    self.editor.pack(fill="x", expand=False, padx=4, pady=(2, 4))
+                else:
+                    self.editor.configure(height=220)
+                    self.editor.pack(fill="both", expand=True, padx=4, pady=(2, 4))
+            else:
+                self.editor.configure(height=400)
+                self.editor.pack(fill="both", expand=True, padx=4, pady=4)
+            return
+
+        # Docked: ladder lives in home body.
+        try:
+            self.ladder_wrap.pack_forget()
+        except Exception:
+            pass
+        if self._tab == "ladder":
+            self.ladder_wrap.pack(fill="both", expand=True, padx=4, pady=(4, 2))
+            self.editor.configure(height=160)
+            self.editor.pack(fill="x", expand=False, padx=4, pady=(2, 4))
+        elif self._tab == "plc":
+            self.ladder_wrap.pack(fill="both", expand=True, padx=4, pady=(4, 2))
+            self.editor.configure(height=220)
+            self.editor.pack(fill="both", expand=True, padx=4, pady=(2, 4))
+        else:
+            self.editor.configure(height=400)
+            self.editor.pack(fill="both", expand=True, padx=4, pady=4)
+
+    def _load_editor(self) -> None:
+        if self._tab == "hmi":
+            text = self.program.get("hmi_text", "") or format_hmi_text(self.program.get("hmi_items") or [])
+        else:
+            text = self.program.get("plc_text", "")
+            if not (text or "").strip():
+                text = format_plc_text(self.program.get("rungs") or [], cabinet_device_tags(self.project))
+        self.editor.delete("1.0", "end")
+        self.editor.insert("1.0", text)
+
+    def _on_typed(self, _event=None) -> None:
+        self.program["text_edited"] = True
+        self._flush_editor_to_program()
+        self._commit(status="Program text edited by hand. Sync text from ladder will warn before overwrite.", mark_dirty_only=True)
+
+    def _flush_editor_to_program(self) -> None:
+        content = self.editor.get("1.0", "end-1c")
+        if self._tab == "hmi":
+            self.program["hmi_text"] = content
+        else:
+            self.program["plc_text"] = content
+
+    def _commit(self, status: str = "", mark_dirty_only: bool = False) -> None:
+        self.project.program = program_to_dict(self.program)
+        if self.on_change:
+            self.on_change(status or "Program updated")
+        if status:
+            self.status.configure(text=status)
+        self._draw_ladder()
+
+    def copy_plc(self) -> None:
+        self._flush_editor_to_program()
+        if not self.program.get("text_edited"):
+            self.program = refresh_plc_text(self.program, self.project)
+        text = self.program.get("plc_text") or ""
+        self.clipboard_clear()
+        self.clipboard_append(text)
+        self.status.configure(text="PLC text copied. Paste it into your real PLC programmer.")
+
+    def copy_hmi(self) -> None:
+        self._flush_editor_to_program()
+        text = self.program.get("hmi_text") or ""
+        self.clipboard_clear()
+        self.clipboard_append(text)
+        self.status.configure(text="HMI text copied.")
+
+    def export_txt(self) -> None:
+        from pathlib import Path
+        from tkinter import filedialog
+
+        self._flush_editor_to_program()
+        chosen = filedialog.asksaveasfilename(
+            parent=self,
+            defaultextension=".txt",
+            filetypes=[("Text", "*.txt"), ("JSON", "*.json"), ("All files", "*.*")],
+            initialfile="cabinet-program.txt",
+        )
+        if not chosen:
+            return
+        path = Path(chosen)
+        if path.suffix.lower() == ".json":
+            import json
+
+            path.write_text(json.dumps(program_to_dict(self.program), indent=2) + "\n", encoding="utf-8")
+        else:
+            body = (
+                self.program.get("plc_text", "")
+                + "\n\n========== HMI ==========\n\n"
+                + self.program.get("hmi_text", "")
+            )
+            path.write_text(body, encoding="utf-8")
+        self.status.configure(text=f"Exported {path.name}")
+
+    def _sync_text_from_ladder(self) -> None:
+        if self.program.get("text_edited"):
+            answer = ask_choice(
+                self,
+                self.fonts,
+                "Overwrite hand-edited text?",
+                "You edited the PLC text by hand. Regenerate it from the visual ladder? "
+                "Your typed changes will be replaced.",
+                [("yes", "Overwrite from ladder", "primary"), ("no", "Keep my text", "ghost")],
+            )
+            if answer != "yes":
+                self.status.configure(text="Kept your hand-edited PLC text.")
+                return
+        self.program = refresh_plc_text(self.program, self.project)
+        self.program["text_edited"] = False
+        if self._tab != "hmi":
+            self._load_editor()
+        self._commit(status="PLC text regenerated from the visual ladder.")
+
+    def _add_rung(self) -> None:
+        contact = self.contact_var.get().strip()
+        coil = self.coil_var.get().strip()
+        if not contact or contact.startswith("(") or not coil or coil.startswith("("):
+            self.status.configure(text="Pick contact and coil tags from devices on this cabinet.")
+            return
+        comment = self.comment_entry.get().strip()
+        self.program = add_rung(
+            self.program,
+            contact_tag=contact,
+            coil_tag=coil,
+            normally_closed=self.nc_var.get() == "NC",
+            comment=comment,
+        )
+        # Keep device captions in regenerated text.
+        self.program = refresh_plc_text(self.program, self.project)
+        self.program["text_edited"] = True
+        self._selected_rung_id = self.program["rungs"][-1]["id"]
+        self._show_tab("ladder")
+        self._commit(status=f"Added rung {contact} -> {coil}")
+
+    def _add_series_contact(self) -> None:
+        rungs = self.program.get("rungs") or []
+        if not rungs:
+            self.status.configure(text="Add a rung first, then add series contacts.")
+            return
+        rung_id = self._selected_rung_id or rungs[-1]["id"]
+        contact = self.contact_var.get().strip()
+        if not contact or contact.startswith("("):
+            self.status.configure(text="Pick a contact tag from devices on this cabinet.")
+            return
+        target = next((r for r in rungs if r["id"] == rung_id), None)
+        if target is None:
+            self.status.configure(text="Selected rung not found.")
+            return
+        series = list(target.get("series") or [])
+        series.append({"tag": contact, "normally_closed": self.nc_var.get() == "NC"})
+        self.program = edit_rung(self.program, rung_id, series=series)
+        self.program = refresh_plc_text(self.program, self.project)
+        self.program["text_edited"] = True
+        self._selected_rung_id = rung_id
+        self._show_tab("ladder")
+        self._commit(status=f"Added series contact {contact} on selected rung.")
+
+    def _delete_selected_rung(self) -> None:
+        rungs = self.program.get("rungs") or []
+        if not rungs:
+            self.status.configure(text="No rungs to delete.")
+            return
+        rung_id = self._selected_rung_id or rungs[-1]["id"]
+        self.program = delete_rung(self.program, rung_id)
+        self.program = refresh_plc_text(self.program, self.project)
+        self.program["text_edited"] = True
+        self._selected_rung_id = (self.program.get("rungs") or [{}])[-1].get("id") if self.program.get("rungs") else None
+        self._show_tab("ladder")
+        self._commit(status="Deleted rung.")
+
+    def _wheel(self, event) -> None:
+        delta = -1 if getattr(event, "delta", 0) > 0 else 1
+        # Windows often sends multiples of 120; step a bit faster for long ladders.
+        steps = 1
+        raw = abs(int(getattr(event, "delta", 0) or 0))
+        if raw >= 120:
+            steps = max(1, raw // 120)
+        self.canvas.yview_scroll(delta * steps, "units")
+        return "break"
+
+    def _wheel_x(self, event) -> None:
+        delta = -1 if getattr(event, "delta", 0) > 0 else 1
+        self.canvas.xview_scroll(delta, "units")
+        return "break"
+
+    def _on_canvas_configure(self, _event=None) -> None:
+        # Redraw on size change but keep the user's scroll position.
+        self._draw_ladder(preserve_scroll=True)
+
+    def _on_canvas_click(self, event) -> None:
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        for rung_id, x0, y0, x1, y1 in self._rung_hitboxes:
+            if x0 <= x <= x1 and y0 <= y <= y1:
+                self._selected_rung_id = rung_id
+                self._draw_ladder(preserve_scroll=True)
+                self.status.configure(text=f"Selected rung {rung_id[:6]}...")
+                return
+
+    def export_ladder_artifact(self) -> None:
+        """Write ladder-logic.txt/.html under saves/drawings/{slug}/ (separate from schematics)."""
+        from cabinet_studio.services.drawings import default_drawings_folder
+        from cabinet_studio.services.programming import write_ladder_logic
+
+        self._flush_editor_to_program()
+        self.project.program = program_to_dict(self.program)
+        cabinet_path = getattr(self, "cabinet_path", None)
+        if cabinet_path is None and getattr(self.master, "path", None):
+            cabinet_path = self.master.path
+        folder = default_drawings_folder(self.project, cabinet_path)
+        try:
+            written = write_ladder_logic(self.project, folder, program=self.program)
+        except OSError as exc:
+            self.status.configure(text=f"Could not export ladder: {exc}")
+            return
+        names = ", ".join(p.name for p in written)
+        self.status.configure(text=f"Exported ladder artifact(s): {names} → {folder}")
+
+    def print_ladder(self) -> None:
+        """Open the system print dialog for a clean ladder page (HTML+SVG)."""
+        self._flush_editor_to_program()
+        rungs = self.program.get("rungs") or []
+        title = html.escape(self.project.name or "Cabinet program")
+        svg_body, svg_w, svg_h = self._ladder_svg(rungs)
+        plc = self.program.get("plc_text") or format_plc_text(
+            rungs, cabinet_device_tags(self.project)
+        )
+        plc_html = html.escape(plc)
+        doc = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<title>Ladder - {title}</title>
+<style>
+  @page {{ margin: 0.6in; }}
+  body {{ font-family: Segoe UI, Arial, sans-serif; color: #111; background: #fff; }}
+  h1 {{ font-size: 16pt; margin: 0 0 4px 0; }}
+  .meta {{ color: #444; font-size: 10pt; margin-bottom: 12px; }}
+  .sheet {{ background: #d8d4cc; padding: 8px; border: 1px solid #888; overflow: auto; }}
+  pre {{ font-family: Consolas, monospace; font-size: 9pt; white-space: pre-wrap;
+         border-top: 1px solid #ccc; padding-top: 12px; margin-top: 16px; }}
+  @media print {{
+    .noprint {{ display: none; }}
+    body {{ margin: 0; }}
+  }}
+</style></head><body>
+<h1>Ladder — {title}</h1>
+<div class="meta">Learning program — not a live PLC download. Print from this dialog, then close the tab.</div>
+<p class="noprint"><button onclick="window.print()">Print…</button>
+  <button onclick="window.close()">Close</button></p>
+<div class="sheet">
+<svg xmlns="http://www.w3.org/2000/svg" width="{svg_w}" height="{svg_h}" viewBox="0 0 {svg_w} {svg_h}">
+{svg_body}
+</svg>
+</div>
+<pre>{plc_html}</pre>
+<script>
+window.addEventListener("load", function () {{
+  setTimeout(function () {{ window.print(); }}, 250);
+}});
+</script>
+</body></html>
+"""
+        tmp = _Path(tempfile.gettempdir()) / "cabinet_studio_ladder_print.html"
+        tmp.write_text(doc, encoding="utf-8")
+        opened = False
+        try:
+            # Windows: prefer default browser / associated app.
+            os.startfile(str(tmp))  # type: ignore[attr-defined]
+            opened = True
+        except Exception:
+            opened = webbrowser.open(tmp.as_uri())
+        if opened:
+            self.status.configure(text="Print dialog opened for ladder page.")
+        else:
+            self.status.configure(text=f"Could not open print page. Saved at {tmp}")
+
+    def _ladder_svg(self, rungs: list) -> tuple[str, int, int]:
+        """Build a print-oriented SVG of the same ladder symbols (no selection chrome)."""
+        width = 1000
+        left = RAIL_INSET
+        right = width - RAIL_INSET
+        parts: list[str] = [
+            f'<rect x="0" y="0" width="{width}" height="9999" fill="{LADDER_BG}"/>',
+            f'<text x="{left}" y="18" fill="{LADDER_MUTED}" font-size="11" '
+            f'font-family="Segoe UI, Arial">Ladder view  |  [ ] NO   [/] NC   ( ) coil  |  hover for details</text>',
+        ]
+        if not rungs:
+            parts.append(
+                f'<text x="{width // 2}" y="120" text-anchor="middle" fill="{LADDER_MUTED}" '
+                f'font-size="14">No rungs yet — answer the questions or click Build starter program</text>'
+            )
+            return "\n".join(parts), width, 240
+
+        y = 36.0
+        for index, rung in enumerate(rungs, start=1):
+            block_h = self._rung_block_height(rung)
+            parts.extend(self._svg_rung(rung, index, left, right, y))
+            y += block_h + INTER_RUNG_GAP
+        height = int(y + 40)
+        # Fix background height
+        parts[0] = f'<rect x="0" y="0" width="{width}" height="{height}" fill="{LADDER_BG}"/>'
+        return "\n".join(parts), width, height
+
+    def _svg_rung(self, rung: dict, index: int, left: float, right: float, y: float) -> list[str]:
+        parallel = list(rung.get("parallel") or [])
+        series = list(rung.get("series") or [])
+        coil = (rung.get("coil_tag") or "").strip()
+        coil_neg = bool(rung.get("coil_negated"))
+        comment = (rung.get("comment") or "").strip()
+        block_h = self._rung_block_height(rung)
+        out: list[str] = [
+            f'<line x1="{left}" y1="{y}" x2="{left}" y2="{y + block_h}" '
+            f'stroke="{LADDER_RAIL}" stroke-width="4"/>',
+            f'<line x1="{right}" y1="{y}" x2="{right}" y2="{y + block_h}" '
+            f'stroke="{LADDER_RAIL}" stroke-width="4"/>',
+        ]
+        title = f"Rung {index}"
+        if comment:
+            title = f"Rung {index}: {comment[:90]}"
+        out.append(
+            f'<text x="{left + 10}" y="{y + 16}" fill="{LADDER_MUTED}" font-size="11" '
+            f'font-family="Segoe UI, Arial">{html.escape(title)}</text>'
+        )
+        n_series = len(series)
+        n_par = max((len(b) for b in parallel), default=0) if parallel else 0
+        col_w = CONTACT_COL_W if n_par >= 2 else max(CONTACT_COL_W - 6, 130)
+        series_w = max(MIN_SERIES_W, int((right - left - 220 - COIL_INSET) // max(1, n_series + 1)))
+        par_zone_right = left + max(180, 24 + n_par * col_w + 40)
+        series_start = par_zone_right + SERIES_AFTER_PARALLEL
+        coil_x = right - COIL_INSET
+
+        if parallel:
+            count = len(parallel)
+            start_y = y + TITLE_BAND + BRANCH_ROW_H / 2
+            branch_ys = [start_y + bi * BRANCH_ROW_H for bi in range(count)]
+            for bi, branch in enumerate(parallel):
+                by = branch_ys[bi]
+                out.append(
+                    f'<line x1="{left}" y1="{by}" x2="{left + 24}" y2="{by}" '
+                    f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+                )
+                cx = left + 80
+                for contact in branch:
+                    out.extend(self._svg_contact(cx, by, contact))
+                    cx += col_w
+                out.append(
+                    f'<line x1="{cx - col_w + CONTACT_GAP / 2 + 2}" y1="{by}" '
+                    f'x2="{par_zone_right}" y2="{by}" stroke="{LADDER_WIRE}" stroke-width="2"/>'
+                )
+            if len(branch_ys) > 1:
+                out.append(
+                    f'<line x1="{par_zone_right}" y1="{branch_ys[0]}" '
+                    f'x2="{par_zone_right}" y2="{branch_ys[-1]}" '
+                    f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+                )
+                bus_y = (branch_ys[0] + branch_ys[-1]) / 2
+            else:
+                bus_y = branch_ys[0]
+            out.append(
+                f'<line x1="{par_zone_right}" y1="{bus_y}" x2="{series_start - 10}" y2="{bus_y}" '
+                f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+            )
+        else:
+            bus_y = y + TITLE_BAND + BRANCH_ROW_H / 2
+            out.append(
+                f'<line x1="{left}" y1="{bus_y}" x2="{series_start - 10}" y2="{bus_y}" '
+                f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+            )
+
+        x = series_start
+        for contact in series:
+            out.append(
+                f'<line x1="{x - 10}" y1="{bus_y}" x2="{x - CONTACT_GAP / 2 - 2}" y2="{bus_y}" '
+                f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+            )
+            out.extend(self._svg_contact(x, bus_y, contact))
+            x += series_w
+
+        if series:
+            wire_from = x - series_w + CONTACT_GAP / 2 + 2
+        elif parallel:
+            wire_from = par_zone_right
+        else:
+            wire_from = left
+        out.append(
+            f'<line x1="{wire_from}" y1="{bus_y}" x2="{coil_x - COIL_RADIUS}" y2="{bus_y}" '
+            f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+        )
+        out.extend(self._svg_coil(coil_x, bus_y, coil, coil_neg))
+        out.append(
+            f'<line x1="{coil_x + COIL_RADIUS}" y1="{bus_y}" x2="{right}" y2="{bus_y}" '
+            f'stroke="{LADDER_WIRE}" stroke-width="2"/>'
+        )
+        if rung_has_seal_in(rung):
+            out.append(
+                f'<text x="{right - SEAL_IN_GAP}" y="{y + 16}" text-anchor="end" fill="{LADDER_COIL}" '
+                f'font-size="10" font-weight="bold" font-family="Segoe UI, Arial">seal-in</text>'
+            )
+        return out
+
+    def _svg_contact(self, x: float, y: float, contact: dict) -> list[str]:
+        tag = (contact.get("tag") or "").strip()
+        nc = bool(contact.get("normally_closed"))
+        h = CONTACT_HALF_H
+        gap = CONTACT_GAP
+        out = [
+            f'<line x1="{x - gap / 2}" y1="{y - h}" x2="{x - gap / 2}" y2="{y + h}" '
+            f'stroke="{LADDER_SYMBOL}" stroke-width="3"/>',
+            f'<line x1="{x + gap / 2}" y1="{y - h}" x2="{x + gap / 2}" y2="{y + h}" '
+            f'stroke="{LADDER_SYMBOL}" stroke-width="3"/>',
+        ]
+        if nc:
+            out.append(
+                f'<line x1="{x - gap / 2 - 2}" y1="{y + h - 2}" x2="{x + gap / 2 + 2}" '
+                f'y2="{y - h + 2}" stroke="{LADDER_SYMBOL}" stroke-width="2"/>'
+            )
+        tip = device_hover_detail(
+            self._device_map.get(tag), tag, kind="contact", normally_closed=nc
+        )
+        out.insert(0, f"<g><title>{html.escape(tip)}</title>")
+        out.append(
+            f'<text x="{x}" y="{y - h - TAG_CLEAR_ABOVE + 10}" text-anchor="middle" '
+            f'fill="{LADDER_LABEL}" font-size="11" font-weight="bold" '
+            f'font-family="Consolas, monospace">{html.escape(tag or "?")}</text>'
+        )
+        out.append("</g>")
+        return out
+
+    def _svg_coil(self, x: float, y: float, tag: str, negated: bool = False) -> list[str]:
+        r = COIL_RADIUS
+        out = [
+            f'<circle cx="{x}" cy="{y}" r="{r}" fill="{LADDER_BG}" stroke="{LADDER_COIL}" '
+            f'stroke-width="3"/>'
+        ]
+        if negated:
+            out.append(
+                f'<line x1="{x - r + 3}" y1="{y + r - 3}" x2="{x + r - 3}" y2="{y - r + 3}" '
+                f'stroke="{LADDER_COIL}" stroke-width="2"/>'
+            )
+        tip = device_hover_detail(self._device_map.get(tag), tag, kind="coil")
+        out.insert(0, f"<g><title>{html.escape(tip)}</title>")
+        out.append(
+            f'<text x="{x}" y="{y - r - TAG_CLEAR_ABOVE + 10}" text-anchor="middle" '
+            f'fill="{LADDER_COIL}" font-size="11" font-weight="bold" '
+            f'font-family="Consolas, monospace">{html.escape(tag or "?")}</text>'
+        )
+        out.append("</g>")
+        return out
+
+    # --- Visual ladder -----------------------------------------------------
+
+    def _draw_ladder(self, preserve_scroll: bool = False) -> None:
+        if not hasattr(self, "canvas"):
+            return
+        y_frac = self.canvas.yview()[0] if preserve_scroll else 0.0
+        x_frac = self.canvas.xview()[0] if preserve_scroll else 0.0
+        self.canvas.delete("all")
+        self._hide_hover_tip()
+        self._rung_hitboxes = []
+        self._hover_targets = []
+        rungs = self.program.get("rungs") or []
+        width = max(int(self.canvas.winfo_width()), 900)
+        # content_w grows with series count so contacts are not crushed (horizontal scroll).
+        max_series = max((len(r.get("series") or []) for r in rungs), default=0)
+        max_par = max(
+            (max((len(b) for b in (r.get("parallel") or [])), default=0) for r in rungs),
+            default=0,
+        )
+        need = RAIL_INSET * 2 + max(180, max_par * CONTACT_COL_W + 80) + SERIES_AFTER_PARALLEL + max_series * MIN_SERIES_W + COIL_INSET + 80
+        content_w = max(width, 900, int(need))
+        left = RAIL_INSET
+        right = content_w - RAIL_INSET
+        top = 36
+        self.canvas.create_text(
+            left,
+            14,
+            anchor="w",
+            fill=LADDER_MUTED,
+            font=(self.fonts.ui_family, 10),
+            text="Ladder view  |  [ ] NO   [/] NC   ( ) coil   tags only  |  hover for details  |  scroll to read",
+        )
+        if not rungs:
+            self.canvas.create_text(
+                content_w // 2,
+                120,
+                fill=LADDER_LABEL,
+                font=(self.fonts.ui_family, 16, "bold"),
+                text="No rungs yet — answer the questions or click Build starter program",
+            )
+            self.canvas.create_text(
+                content_w // 2,
+                156,
+                fill=LADDER_MUTED,
+                font=(self.fonts.ui_family, 12),
+                text="Use Build starter program / Build from drawings above (cabinet tags only), or Add rung.",
+            )
+            self.canvas.configure(scrollregion=(0, 0, content_w, 260))
+            return
+
+        y = top
+        for index, rung in enumerate(rungs, start=1):
+            block_h = self._rung_block_height(rung)
+            selected = rung.get("id") == self._selected_rung_id
+            if selected:
+                self.canvas.create_rectangle(
+                    left - 18,
+                    y - 10,
+                    right + 18,
+                    y + block_h + 10,
+                    outline=LADDER_SELECT,
+                    width=2,
+                    fill="#cfd8f0",
+                )
+            self._draw_rung(rung, index, left, right, y)
+            self._rung_hitboxes.append((rung["id"], left - 18, y - 10, right + 18, y + block_h + 10))
+            y += block_h + INTER_RUNG_GAP
+
+        self.canvas.configure(scrollregion=(0, 0, content_w, y + 48))
+        if preserve_scroll:
+            self.canvas.yview_moveto(y_frac)
+            self.canvas.xview_moveto(x_frac)
+
+    def _rung_block_height(self, rung: dict) -> int:
+        parallel = rung.get("parallel") or []
+        branches = max(1, len(parallel) if parallel else 1)
+        # Title band + one full row per OR branch + caption clearance under last wire.
+        return TITLE_BAND + branches * BRANCH_ROW_H + BOTTOM_PAD
+
+    def _draw_rung(self, rung: dict, index: int, left: float, right: float, y: float) -> None:
+        parallel = list(rung.get("parallel") or [])
+        series = list(rung.get("series") or [])
+        coil = (rung.get("coil_tag") or "").strip()
+        coil_neg = bool(rung.get("coil_negated"))
+        comment = (rung.get("comment") or "").strip()
+
+        block_h = self._rung_block_height(rung)
+        rail_top = y
+        rail_bot = y + block_h
+        self.canvas.create_line(left, rail_top, left, rail_bot, fill=LADDER_RAIL, width=4)
+        self.canvas.create_line(right, rail_top, right, rail_bot, fill=LADDER_RAIL, width=4)
+
+        title = f"Rung {index}"
+        if comment:
+            title = f"Rung {index}: {comment[:90]}"
+        self.canvas.create_text(
+            left + 10,
+            y + 14,
+            anchor="w",
+            fill=LADDER_MUTED,
+            font=(self.fonts.ui_family, 10),
+            text=title,
+        )
+
+        n_series = len(series)
+        n_par = max((len(b) for b in parallel), default=0) if parallel else 0
+        col_w = CONTACT_COL_W if n_par >= 2 else max(CONTACT_COL_W - 6, 130)
+        series_w = max(MIN_SERIES_W, int((right - left - 220 - COIL_INSET) // max(1, n_series + 1)))
+        par_zone_right = left + max(180, 24 + n_par * col_w + 40)
+        series_start = par_zone_right + SERIES_AFTER_PARALLEL
+        coil_x = right - COIL_INSET
+
+        if parallel:
+            count = len(parallel)
+            start_y = y + TITLE_BAND + BRANCH_ROW_H / 2
+            branch_ys = []
+            for bi, branch in enumerate(parallel):
+                by = start_y + bi * BRANCH_ROW_H
+                branch_ys.append(by)
+                self.canvas.create_line(left, by, left + 24, by, fill=LADDER_WIRE, width=2)
+                cx = left + 80
+                for contact in branch:
+                    self._draw_contact(cx, by, contact, rung_comment=comment)
+                    cx += col_w
+                self.canvas.create_line(
+                    cx - col_w + CONTACT_GAP / 2 + 2,
+                    by,
+                    par_zone_right,
+                    by,
+                    fill=LADDER_WIRE,
+                    width=2,
+                )
+            if len(branch_ys) > 1:
+                self.canvas.create_line(
+                    par_zone_right,
+                    branch_ys[0],
+                    par_zone_right,
+                    branch_ys[-1],
+                    fill=LADDER_WIRE,
+                    width=2,
+                )
+                bus_y = (branch_ys[0] + branch_ys[-1]) / 2
+            else:
+                bus_y = branch_ys[0]
+            self.canvas.create_line(
+                par_zone_right, bus_y, series_start - 10, bus_y, fill=LADDER_WIRE, width=2
+            )
+        else:
+            bus_y = y + TITLE_BAND + BRANCH_ROW_H / 2
+            self.canvas.create_line(left, bus_y, series_start - 10, bus_y, fill=LADDER_WIRE, width=2)
+
+        x = float(series_start)
+        for contact in series:
+            self.canvas.create_line(
+                x - 10, bus_y, x - CONTACT_GAP / 2 - 2, bus_y, fill=LADDER_WIRE, width=2
+            )
+            self._draw_contact(x, bus_y, contact, rung_comment=comment)
+            x += series_w
+
+        if series:
+            wire_from = x - series_w + CONTACT_GAP / 2 + 2
+        elif parallel:
+            wire_from = par_zone_right
+        else:
+            wire_from = left
+        self.canvas.create_line(wire_from, bus_y, coil_x - COIL_RADIUS, bus_y, fill=LADDER_WIRE, width=2)
+
+        self._draw_coil(coil_x, bus_y, coil, coil_neg, rung_comment=comment)
+        self.canvas.create_line(coil_x + COIL_RADIUS, bus_y, right, bus_y, fill=LADDER_WIRE, width=2)
+
+        if rung_has_seal_in(rung):
+            self.canvas.create_text(
+                right - SEAL_IN_GAP,
+                y + 14,
+                anchor="e",
+                fill="#0b5e4a",
+                font=(self.fonts.ui_family, 9, "bold"),
+                text="seal-in",
+            )
+
+    def _draw_contact(self, x: float, y: float, contact: dict, *, rung_comment: str = "") -> None:
+        tag = (contact.get("tag") or "").strip()
+        nc = bool(contact.get("normally_closed"))
+        h = CONTACT_HALF_H
+        gap = CONTACT_GAP
+        active = bool(tag) and tag in self._sim_active_tags and self._sim_flash_on
+        color = LADDER_ACTIVE if active else LADDER_SYMBOL
+        width = 5 if active else 3
+        if active:
+            self.canvas.create_rectangle(
+                x - gap / 2 - 8,
+                y - h - 6,
+                x + gap / 2 + 8,
+                y + h + 6,
+                fill=LADDER_ACTIVE_FILL,
+                outline=LADDER_ACTIVE,
+                width=2,
+            )
+        # Vertical bars for contact  | |
+        self.canvas.create_line(x - gap / 2, y - h, x - gap / 2, y + h, fill=color, width=width)
+        self.canvas.create_line(x + gap / 2, y - h, x + gap / 2, y + h, fill=color, width=width)
+        if nc:
+            # diagonal slash for NC  |/|
+            self.canvas.create_line(
+                x - gap / 2 - 2, y + h - 2, x + gap / 2 + 2, y - h + 2, fill=color, width=2
+            )
+        # Short tag only — full type / wires / I/O / why live on hover.
+        self.canvas.create_text(
+            x,
+            y - h - TAG_CLEAR_ABOVE + 6,
+            fill=LADDER_ACTIVE if active else LADDER_LABEL,
+            font=(self.fonts.mono_family, 10, "bold"),
+            text=tag or "?",
+        )
+        tip = device_hover_detail(
+            self._device_map.get(tag),
+            tag,
+            kind="contact",
+            normally_closed=nc,
+            rung_comment=rung_comment,
+        )
+        pad = 14
+        self._hover_targets.append((x - gap / 2 - pad, y - h - pad, x + gap / 2 + pad, y + h + pad, tip))
+
+    def _draw_coil(self, x: float, y: float, tag: str, negated: bool = False, *, rung_comment: str = "") -> None:
+        r = COIL_RADIUS
+        active = bool(tag) and tag in self._sim_active_tags and self._sim_flash_on
+        pulse = bool(tag) and tag in self._sim_pulse_tags and self._sim_flash_on
+        outline = LADDER_PULSE if pulse else (LADDER_ACTIVE if active else LADDER_COIL)
+        fill = LADDER_ACTIVE_FILL if (active or pulse) else LADDER_BG
+        width = 5 if (active or pulse) else 3
+        self.canvas.create_oval(x - r, y - r, x + r, y + r, outline=outline, width=width, fill=fill)
+        if negated:
+            self.canvas.create_line(x - r + 3, y + r - 3, x + r - 3, y - r + 3, fill=outline, width=2)
+        self.canvas.create_text(
+            x,
+            y - r - TAG_CLEAR_ABOVE + 6,
+            fill=outline,
+            font=(self.fonts.mono_family, 10, "bold"),
+            text=tag or "?",
+        )
+        tip = device_hover_detail(
+            self._device_map.get(tag),
+            tag,
+            kind="coil",
+            normally_closed=False,
+            rung_comment=rung_comment,
+        )
+        pad = 10
+        self._hover_targets.append((x - r - pad, y - r - pad, x + r + pad, y + r + pad, tip))
+
+    def _on_canvas_motion(self, event) -> None:
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        tip = None
+        for x0, y0, x1, y1, text in reversed(self._hover_targets):
+            if x0 <= x <= x1 and y0 <= y <= y1:
+                tip = text
+                break
+        key = tip or ""
+        if key == (self._hover_key or ""):
+            return
+        self._hover_key = key
+        if self._hover_after is not None:
+            try:
+                self.after_cancel(self._hover_after)
+            except Exception:
+                pass
+            self._hover_after = None
+        if not tip:
+            self._hide_hover_tip()
+            return
+        # Slight delay so scrubbing the ladder does not flash popups.
+        self._hover_after = self.after(180, lambda t=tip, ex=event.x_root, ey=event.y_root: self._show_hover_tip(t, ex, ey))
+
+    def _show_hover_tip(self, text: str, root_x: int, root_y: int) -> None:
+        self._hover_after = None
+        self._hide_hover_tip(clear_key=False)
+        tip = ctk.CTkToplevel(self)
+        tip.withdraw()
+        tip.overrideredirect(True)
+        tip.attributes("-topmost", True)
+        frame = ctk.CTkFrame(tip, fg_color="#1e2430", corner_radius=6, border_width=1, border_color="#3a4558")
+        frame.pack(fill="both", expand=True)
+        ctk.CTkLabel(
+            frame,
+            text=text,
+            font=self.fonts.tiny,
+            text_color="#e8ecf4",
+            justify="left",
+            anchor="w",
+            wraplength=360,
+        ).pack(padx=10, pady=8)
+        tip.update_idletasks()
+        tip.geometry(f"+{root_x + 16}+{root_y + 16}")
+        tip.deiconify()
+        self._hover_tip = tip
+
+    def _hide_hover_tip(self, _event=None, *, clear_key: bool = True) -> None:
+        if self._hover_after is not None:
+            try:
+                self.after_cancel(self._hover_after)
+            except Exception:
+                pass
+            self._hover_after = None
+        if clear_key:
+            self._hover_key = None
+        if self._hover_tip is not None:
+            try:
+                self._hover_tip.destroy()
+            except Exception:
+                pass
+            self._hover_tip = None
+
+    # --- Educational ladder simulation (not a live PLC) --------------------
+
+    def _sim_rungs(self) -> list[dict]:
+        return list(self.program.get("rungs") or [])
+
+    def _sim_set_status(self, text: str) -> None:
+        try:
+            self._sim_status.configure(text=text)
+        except Exception:
+            pass
+
+    def _sim_toggle_run(self) -> None:
+        self._show_tab("ladder")
+        if self._sim_running:
+            self._sim_stop()
+            return
+        if not self._sim_rungs():
+            self._sim_set_status("Sim: no rungs to run")
+            return
+        self._sim_running = True
+        if self._sim_index < 0:
+            self._sim_index = 0
+        self._sim_set_status("Sim RUN (educational only)")
+        self._sim_apply_rung(flash_cycles=6, then_advance=True)
+
+    def _sim_step(self) -> None:
+        self._show_tab("ladder")
+        self._sim_cancel_timer()
+        self._sim_running = False
+        rungs = self._sim_rungs()
+        if not rungs:
+            self._sim_set_status("Sim: no rungs to step")
+            return
+        self._sim_index = (self._sim_index + 1) % len(rungs)
+        self._sim_apply_rung(flash_cycles=8, then_advance=False)
+
+    def _sim_stop(self) -> None:
+        self._sim_cancel_timer()
+        self._sim_running = False
+        self._sim_index = -1
+        self._sim_flash_on = False
+        self._sim_flash_count = 0
+        self._sim_active_tags = set()
+        self._sim_pulse_tags = set()
+        self._sim_set_status("Sim off (educational — not a live PLC)")
+        self._draw_ladder(preserve_scroll=True)
+
+    def _sim_cancel_timer(self) -> None:
+        if self._sim_after is not None:
+            try:
+                self.after_cancel(self._sim_after)
+            except Exception:
+                pass
+            self._sim_after = None
+
+    def _sim_collect_tags(self, rung: dict) -> tuple[set[str], set[str]]:
+        return simulation_rung_tags(rung)
+
+    def _sim_apply_rung(self, *, flash_cycles: int, then_advance: bool) -> None:
+        rungs = self._sim_rungs()
+        if not rungs:
+            self._sim_stop()
+            return
+        if self._sim_index < 0 or self._sim_index >= len(rungs):
+            self._sim_index = 0
+        rung = rungs[self._sim_index]
+        self._selected_rung_id = rung.get("id")
+        self._sim_active_tags, self._sim_pulse_tags = self._sim_collect_tags(rung)
+        coil = (rung.get("coil_tag") or "").strip() or "?"
+        comment = (rung.get("comment") or "").strip()
+        rung_name = comment.split(".")[0].strip() if comment else coil
+        if len(rung_name) > 36:
+            rung_name = rung_name[:33] + "..."
+        bit = f"Rung {self._sim_index + 1}/{len(rungs)} · {rung_name} → {coil}"
+        # Tiny ON strip for weld-place Place / Welder outputs when this rung lights them.
+        on_bits: list[str] = []
+        for tag in sorted(self._sim_pulse_tags):
+            upper = tag.upper().replace("-", "_")
+            if upper in {"PLACE_RELAY", "PLACE"} or upper.startswith("PLACE_"):
+                on_bits.append("Place ON")
+            elif upper in {"WELDER_RELAY", "WELDER"} or "WELDER" in upper:
+                on_bits.append("Welder ON")
+            else:
+                on_bits.append(f"{tag} ON")
+        # Dedupe while preserving order
+        seen: set[str] = set()
+        on_bits = [b for b in on_bits if not (b in seen or seen.add(b))]
+        on_strip = ("  ·  " + "  ·  ".join(on_bits)) if on_bits else ""
+        mode = "RUN" if self._sim_running or then_advance else "STEP"
+        self._sim_set_status(f"Sim {mode}: {bit}{on_strip}  · educational only")
+        self._sim_flash_count = max(1, flash_cycles)
+        self._sim_flash_on = True
+        self._draw_ladder(preserve_scroll=True)
+        self._sim_cancel_timer()
+        self._sim_after = self.after(
+            220, lambda adv=then_advance: self._sim_flash_tick(advance_when_done=adv)
+        )
+
+    def _sim_flash_tick(self, *, advance_when_done: bool) -> None:
+        self._sim_after = None
+        self._sim_flash_on = not self._sim_flash_on
+        self._sim_flash_count -= 1
+        self._draw_ladder(preserve_scroll=True)
+        if self._sim_flash_count > 0:
+            self._sim_after = self.after(
+                180, lambda adv=advance_when_done: self._sim_flash_tick(advance_when_done=adv)
+            )
+            return
+        # End of flash for this rung.
+        self._sim_flash_on = True
+        self._draw_ladder(preserve_scroll=True)
+        if not advance_when_done and not self._sim_running:
+            return
+        rungs = self._sim_rungs()
+        if not rungs:
+            self._sim_stop()
+            return
+        self._sim_index = (self._sim_index + 1) % len(rungs)
+        if self._sim_index == 0 and not self._sim_running:
+            # Completed one pass in a one-shot run.
+            self._sim_set_status("Sim pass complete (educational — not a live PLC)")
+            return
+        if self._sim_running or advance_when_done:
+            # Brief pause then next rung.
+            self._sim_after = self.after(350, lambda: self._sim_apply_rung(flash_cycles=6, then_advance=self._sim_running))
+
+
+    def close(self) -> None:
+        self._sim_stop()
+        self._hide_hover_tip()
+        if self._canvas_popout is not None:
+            self._dock_ladder_canvas()
+        self._flush_editor_to_program()
+        self.project.program = program_to_dict(self.program)
+        if self.on_change:
+            self.on_change("Programming closed - back to cabinet")
+        try:
+            self.state("normal")
+        except Exception:
+            pass
+        self.destroy()

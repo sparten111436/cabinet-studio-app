@@ -1,0 +1,1161 @@
+"""Learning PLC/HMI program for the open cabinet (cut-and-paste text, not a download)."""
+
+from __future__ import annotations
+
+import uuid
+from pathlib import Path
+from typing import Any
+
+from cabinet_studio.models.project import Project
+
+LEARNING_NOTE = "Learning program for this cabinet. Not a download to a live PLC."
+
+# One question at a time. Plain words a 14-year-old can follow.
+PROGRAM_QUESTIONS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    (
+        "on_start",
+        "What should happen when Start is pressed?",
+        (
+            "The motor should run",
+            "The motor should run forward",
+            "Nothing yet - I will write it myself",
+        ),
+    ),
+    (
+        "on_stop",
+        "What should happen when Stop is pressed?",
+        (
+            "The motor should stop",
+            "The motor should stop and stay stopped until Start again",
+            "Nothing yet - I will write it myself",
+        ),
+    ),
+    (
+        "on_estop",
+        "What must the e-stop do?",
+        (
+            "Stop the motor right away and keep it stopped",
+            "Stop everything that moves",
+            "Nothing yet - I will write it myself",
+        ),
+    ),
+    (
+        "direction",
+        "Does the motor run forward only, or also reverse?",
+        (
+            "Forward only",
+            "Forward and reverse",
+        ),
+    ),
+    (
+        "hmi_show",
+        "What should the HMI show?",
+        (
+            "Running, Stopped, and Fault",
+            "Running and Stopped only",
+            "Running, Stopped, Fault, Start, and Stop",
+        ),
+    ),
+)
+
+TYPE_ROLE_NAMES: dict[str, str] = {
+    "pushbutton": "PB",
+    "estop": "E-Stop",
+    "contactor": "Motor Contactor",
+    "safety_relay": "Safety Relay",
+    "motor": "Motor",
+    "vfd": "VFD",
+    "sensor": "Sensor",
+    "light": "Light",
+    "solenoid": "Solenoid",
+    "valve": "Valve",
+    "plc": "PLC",
+    "hmi": "HMI",
+    "io_module": "I/O Module",
+    "power_supply": "Power Supply",
+    "transmitter": "Transmitter",
+    "ethernet_switch": "Ethernet Switch",
+}
+
+
+def new_rung_id() -> str:
+    return uuid.uuid4().hex[:10]
+
+
+def empty_program() -> dict[str, Any]:
+    return {
+        "answers": {},
+        "rungs": [],
+        "hmi_items": [],
+        "plc_text": "",
+        "hmi_text": "",
+        "text_edited": False,
+    }
+
+
+
+def default_design_answers(project: Project | None = None) -> dict[str, str]:
+    """Starter answers from the cabinet design (devices/wires already placed).
+
+    Same defaults the AI-build / "Build from drawings" path uses. Does not invent
+    tags — build_starter_program only wires tags that already exist on the panel.
+    """
+    answers = {
+        "on_start": "The motor should run",
+        "on_stop": "The motor should stop and stay stopped until Start again",
+        "on_estop": "Stop everything that moves",
+        "direction": "Forward only",
+        "hmi_show": "Running, Stopped, and Fault",
+    }
+    interview = getattr(project, "interview", None) or {}
+    if isinstance(interview, dict):
+        start_stop = str(interview.get("start_stop") or "").lower()
+        if "touch" in start_stop or "hmi" in start_stop:
+            answers["hmi_show"] = "Running, Stopped, Fault, Start, and Stop"
+        direction = str(interview.get("direction") or interview.get("motor_direction") or "").lower()
+        if "reverse" in direction:
+            answers["direction"] = "Forward and reverse"
+    return answers
+
+
+
+def plc_text_looks_stale_empty(plc_text: str, rungs: list[Any] | None = None) -> bool:
+    """True when saved PLC text still says no rungs but structured rungs exist (or text blank)."""
+    text = (plc_text or "").strip()
+    if not text:
+        return True
+    if rungs and "(No rungs yet" in text:
+        # Stale empty banner left over after rungs were added/saved without refreshing text.
+        return True
+    return False
+
+
+def program_has_content(program: dict[str, Any] | None) -> bool:
+    if not program:
+        return False
+    if (program.get("plc_text") or "").strip():
+        return True
+    if (program.get("hmi_text") or "").strip():
+        return True
+    if program.get("rungs"):
+        return True
+    if program.get("hmi_items"):
+        return True
+    if any(str(v).strip() for v in (program.get("answers") or {}).values()):
+        return True
+    return False
+
+
+def program_looks_edited(program: dict[str, Any] | None) -> bool:
+    """True when the user already has a program we should not silently replace."""
+    if not program:
+        return False
+    if program.get("text_edited"):
+        return True
+    return program_has_content(program)
+
+
+def _as_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "nc"}
+
+
+def _normalize_contact(raw: object, index: int) -> dict[str, Any]:
+    if not isinstance(raw, dict):
+        raise ValueError(f"Contact {index} must be an object.")
+    tag = raw.get("tag", raw.get("contact_tag", ""))
+    if not isinstance(tag, str):
+        raise ValueError(f"Contact {index} tag must be text.")
+    nc = _as_bool(raw.get("normally_closed", False))
+    return {"tag": tag.strip(), "normally_closed": bool(nc)}
+
+
+def _normalize_timer(raw: object) -> dict[str, Any] | None:
+    """Optional educational timer block on a rung (TON/TOF/RTO)."""
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("Rung timer must be an object.")
+    tag = raw.get("tag", raw.get("var", ""))
+    if not isinstance(tag, str):
+        raise ValueError("Rung timer tag must be text.")
+    tag = tag.strip()
+    if not tag:
+        return None
+    block = str(raw.get("block") or "TON").upper().strip()
+    if block not in {"TON", "TOF", "RTO"}:
+        block = "TON"
+    try:
+        pt_ms = max(0, int(raw.get("pt_ms") or 0))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Rung timer pt_ms must be an integer.") from exc
+    return {"tag": tag, "block": block, "pt_ms": pt_ms}
+
+
+def flatten_contacts(rung: dict[str, Any]) -> list[dict[str, Any]]:
+    """All contacts on a rung in draw order (parallel branches, then series)."""
+    out: list[dict[str, Any]] = []
+    for branch in rung.get("parallel") or []:
+        for contact in branch:
+            out.append(dict(contact))
+    for contact in rung.get("series") or []:
+        out.append(dict(contact))
+    return out
+
+
+def _legacy_fields_from_rung(rung: dict[str, Any]) -> dict[str, Any]:
+    contacts = flatten_contacts(rung)
+    first = contacts[0] if contacts else {"tag": "", "normally_closed": False}
+    return {
+        "contact_tag": first.get("tag", ""),
+        "normally_closed": bool(first.get("normally_closed")),
+    }
+
+
+def rung_has_seal_in(rung: dict[str, Any]) -> bool:
+    """True when a normally-open coil-tag contact sits in parallel with another branch."""
+    coil = (rung.get("coil_tag") or "").strip()
+    if not coil:
+        return False
+    parallel = rung.get("parallel") or []
+    if len(parallel) < 2:
+        return False
+    for branch in parallel:
+        for contact in branch:
+            if (contact.get("tag") or "").strip() == coil and not contact.get("normally_closed"):
+                return True
+    return False
+
+
+def _normalize_rung(raw: object, index: int) -> dict[str, Any]:
+    if not isinstance(raw, dict):
+        raise ValueError(f"Rung {index} must be an object.")
+    comment = raw.get("comment", "")
+    coil = raw.get("coil_tag", "")
+    if not isinstance(coil, str) or not isinstance(comment, str):
+        raise ValueError(f"Rung {index} fields must be text.")
+    coil_negated = _as_bool(raw.get("coil_negated", False))
+    rung_id = raw.get("id") or new_rung_id()
+    if not isinstance(rung_id, str) or not rung_id.strip():
+        rung_id = new_rung_id()
+    parallel_raw = raw.get("parallel")
+    series_raw = raw.get("series")
+    if parallel_raw is None and series_raw is None and "contact_tag" in raw:
+        contact = _normalize_contact(
+            {
+                "tag": raw.get("contact_tag", ""),
+                "normally_closed": raw.get("normally_closed", False),
+            },
+            index,
+        )
+        parallel: list[list[dict[str, Any]]] = [[contact]] if contact["tag"] else []
+        series: list[dict[str, Any]] = []
+    else:
+        if parallel_raw is None:
+            parallel_raw = []
+        if series_raw is None:
+            series_raw = []
+        if not isinstance(parallel_raw, list):
+            raise ValueError(f"Rung {index} parallel must be a list of branches.")
+        if not isinstance(series_raw, list):
+            raise ValueError(f"Rung {index} series must be a list of contacts.")
+        parallel = []
+        for bi, branch in enumerate(parallel_raw, start=1):
+            if not isinstance(branch, list):
+                raise ValueError(f"Rung {index} parallel branch {bi} must be a list.")
+            contacts = [_normalize_contact(c, bi * 100 + ci) for ci, c in enumerate(branch, start=1)]
+            contacts = [c for c in contacts if c["tag"]]
+            if contacts:
+                parallel.append(contacts)
+        series = [_normalize_contact(c, index * 1000 + ci) for ci, c in enumerate(series_raw, start=1)]
+        series = [c for c in series if c["tag"]]
+    rung = {
+        "id": rung_id.strip(),
+        "parallel": parallel,
+        "series": series,
+        "coil_tag": coil.strip(),
+        "coil_negated": bool(coil_negated),
+        "comment": comment.strip(),
+    }
+    timer = _normalize_timer(raw.get("timer"))
+    if timer:
+        rung["timer"] = timer
+    legacy = _legacy_fields_from_rung(rung)
+    rung["contact_tag"] = legacy["contact_tag"]
+    rung["normally_closed"] = legacy["normally_closed"]
+    return rung
+
+
+def _normalize_hmi_item(raw: object, index: int) -> dict[str, str]:
+    if not isinstance(raw, dict):
+        raise ValueError(f"HMI item {index} must be an object.")
+    item_id = raw.get("id") or new_rung_id()
+    kind = raw.get("kind", "indicator")
+    label = raw.get("label", "")
+    if not isinstance(item_id, str) or not isinstance(kind, str) or not isinstance(label, str):
+        raise ValueError(f"HMI item {index} fields must be text.")
+    return {"id": item_id.strip() or new_rung_id(), "kind": kind.strip() or "indicator", "label": label.strip()}
+
+
+def program_from_dict(raw: object) -> dict[str, Any]:
+    """Parse a program block. Missing or empty is fine (older cabinets)."""
+    if raw is None:
+        return empty_program()
+    if not isinstance(raw, dict):
+        raise ValueError("Program must be an object.")
+    answers_raw = raw.get("answers", {})
+    if answers_raw is None:
+        answers_raw = {}
+    if not isinstance(answers_raw, dict):
+        raise ValueError("Program answers must be an object.")
+    answers: dict[str, str] = {}
+    for key, value in answers_raw.items():
+        if not isinstance(key, str):
+            raise ValueError("Program answer names must be text.")
+        if isinstance(value, (dict, list)):
+            raise ValueError(f"Program answer {key} must be a single value.")
+        answers[key] = "" if value is None else str(value)
+    rungs_raw = raw.get("rungs", [])
+    if rungs_raw is None:
+        rungs_raw = []
+    if not isinstance(rungs_raw, list):
+        raise ValueError("Program rungs must be a list.")
+    rungs = [_normalize_rung(item, i) for i, item in enumerate(rungs_raw, start=1)]
+    hmi_raw = raw.get("hmi_items", [])
+    if hmi_raw is None:
+        hmi_raw = []
+    if not isinstance(hmi_raw, list):
+        raise ValueError("Program hmi_items must be a list.")
+    hmi_items = [_normalize_hmi_item(item, i) for i, item in enumerate(hmi_raw, start=1)]
+    plc_text = raw.get("plc_text", "")
+    hmi_text = raw.get("hmi_text", "")
+    if plc_text is None:
+        plc_text = ""
+    if hmi_text is None:
+        hmi_text = ""
+    if not isinstance(plc_text, str) or not isinstance(hmi_text, str):
+        raise ValueError("Program plc_text and hmi_text must be text.")
+    text_edited = bool(raw.get("text_edited", False))
+    program = {
+        "answers": answers,
+        "rungs": rungs,
+        "hmi_items": hmi_items,
+        "plc_text": plc_text,
+        "hmi_text": hmi_text,
+        "text_edited": text_edited,
+    }
+    if rungs and (not text_edited) and plc_text_looks_stale_empty(plc_text, rungs):
+        program["plc_text"] = format_plc_text(rungs)
+    elif rungs and not plc_text.strip():
+        program["plc_text"] = format_plc_text(rungs)
+    if hmi_items and not hmi_text.strip():
+        program["hmi_text"] = format_hmi_text(hmi_items)
+    return program
+
+
+def program_to_dict(program: dict[str, Any] | None) -> dict[str, Any]:
+    data = program_from_dict(program or {})
+    rungs_out = []
+    for rung in data["rungs"]:
+        entry = {
+            "id": rung["id"],
+            "parallel": [[dict(c) for c in branch] for branch in rung.get("parallel") or []],
+            "series": [dict(c) for c in rung.get("series") or []],
+            "coil_tag": rung.get("coil_tag", ""),
+            "coil_negated": bool(rung.get("coil_negated", False)),
+            "comment": rung.get("comment", ""),
+            "contact_tag": rung.get("contact_tag", ""),
+            "normally_closed": bool(rung.get("normally_closed", False)),
+        }
+        if isinstance(rung.get("timer"), dict) and rung["timer"].get("tag"):
+            entry["timer"] = {
+                "tag": str(rung["timer"].get("tag") or "").strip(),
+                "block": str(rung["timer"].get("block") or "TON").upper(),
+                "pt_ms": max(0, int(rung["timer"].get("pt_ms") or 0)),
+            }
+        rungs_out.append(entry)
+    return {
+        "answers": dict(data["answers"]),
+        "rungs": rungs_out,
+        "hmi_items": [dict(item) for item in data["hmi_items"]],
+        "plc_text": data["plc_text"],
+        "hmi_text": data["hmi_text"],
+        "text_edited": bool(data["text_edited"]),
+    }
+
+
+def cabinet_device_tags(project: Project) -> list[dict[str, str]]:
+    """Tags and I/O already on the cabinet. Never invent catalog numbers or tags."""
+    devices: list[dict[str, str]] = []
+    for item in project.items:
+        tag = (item.fields.get("tag") or "").strip()
+        if not tag:
+            continue
+        devices.append(
+            {
+                "tag": tag,
+                "type_id": item.type_id,
+                "function": (item.fields.get("function") or "").strip(),
+                "description": (item.fields.get("description") or "").strip(),
+                "io_direction": (item.fields.get("io_direction") or "").strip(),
+                "io_address": (item.fields.get("io_address") or "").strip(),
+                "wire_numbers": (item.fields.get("wire_numbers") or "").strip(),
+                "terminal_landings": (item.fields.get("terminal_landings") or "").strip(),
+            }
+        )
+    return devices
+
+
+def devices_by_tag(project: Project) -> dict[str, dict[str, str]]:
+    return {d["tag"]: d for d in cabinet_device_tags(project)}
+
+
+def _haystack(device: dict[str, str]) -> str:
+    return " ".join(
+        [
+            device.get("tag", ""),
+            device.get("function", ""),
+            device.get("description", ""),
+            device.get("type_id", ""),
+        ]
+    ).lower()
+
+
+def device_role_label(device: dict[str, str] | None, *, normally_closed: bool = False) -> str:
+    """Plain hardware role for ladder captions, e.g. Start PB, E-Stop, Motor Contactor."""
+    if not device:
+        return "Device"
+    type_id = (device.get("type_id") or "").strip()
+    function = (device.get("function") or "").strip()
+    hay = _haystack(device)
+    if type_id == "pushbutton":
+        role = function or (
+            "Start"
+            if "start" in hay
+            else "Stop"
+            if "stop" in hay and "e-stop" not in hay and "estop" not in hay
+            else "Reverse"
+            if "reverse" in hay or "rev" in hay.split()
+            else "Forward"
+            if "forward" in hay or "fwd" in hay.split()
+            else "Pushbutton"
+        )
+        if role.lower() == "pushbutton":
+            base = "PB"
+        elif role.lower().endswith(" pb"):
+            base = role
+        else:
+            base = f"{role} PB"
+    elif type_id == "estop":
+        base = "E-Stop"
+    elif type_id == "contactor":
+        if "reverse" in hay or "rev" in device.get("tag", "").lower():
+            base = "Reverse Contactor"
+        elif "forward" in hay or "fwd" in device.get("tag", "").lower():
+            base = "Forward Contactor"
+        else:
+            base = "Motor Contactor"
+    elif type_id == "safety_relay":
+        base = "Safety Relay"
+    else:
+        base = TYPE_ROLE_NAMES.get(type_id, type_id.replace("_", " ").title() or "Device")
+    if normally_closed and type_id in {"pushbutton", "estop", "contactor", "safety_relay"}:
+        if " NC" not in base:
+            return f"{base} NC"
+    return base
+
+
+def device_caption(device: dict[str, str] | None, tag: str, *, normally_closed: bool = False) -> str:
+    """Tag plus role, e.g. HS_START (Start PB)."""
+    role = device_role_label(device, normally_closed=normally_closed)
+    clean = (tag or "").strip() or "(no tag)"
+    return f"{clean} ({role})"
+
+
+def device_hover_detail(
+    device: dict[str, str] | None,
+    tag: str,
+    *,
+    kind: str = "contact",
+    normally_closed: bool = False,
+    wire_hint: str = "",
+    rung_comment: str = "",
+) -> str:
+    """Multi-line popup text for ladder hover (device type, tag, wires, from/to, I/O, why)."""
+    role = device_role_label(device, normally_closed=normally_closed)
+    clean = (tag or "").strip() or "(no tag)"
+    symbol = "NC contact" if normally_closed and kind == "contact" else (
+        "NO contact" if kind == "contact" else ("Negated coil" if kind == "coil" else "Coil")
+    )
+    if kind == "wire":
+        symbol = "Wire"
+    lines = [f"{symbol}: {clean}", f"Type: {role}"]
+    if device:
+        desc = (device.get("description") or "").strip()
+        if desc:
+            lines.append(f"Why: {desc}")
+        wires = (device.get("wire_numbers") or "").strip()
+        if wires:
+            lines.append(f"Wires: {wires}")
+        land = (device.get("terminal_landings") or "").strip()
+        if land:
+            lines.append(f"From/to: {land}")
+        io_bits = [
+            (device.get("io_direction") or "").strip(),
+            (device.get("io_address") or "").strip(),
+        ]
+        io_line = " ".join(bit for bit in io_bits if bit)
+        if io_line:
+            lines.append(f"I/O: {io_line}")
+        func = (device.get("function") or "").strip()
+        if func and func.lower() not in (desc or "").lower():
+            lines.append(f"Function: {func}")
+    if wire_hint:
+        lines.append(f"Net: {wire_hint}")
+    if rung_comment:
+        lines.append(f"Rung: {rung_comment}")
+    return "\n".join(lines)
+
+
+def find_start_tag(devices: list[dict[str, str]]) -> str | None:
+    for device in devices:
+        if device["type_id"] == "pushbutton" and "start" in _haystack(device):
+            hay = _haystack(device)
+            if "reverse" in hay or device["tag"].upper().endswith("_REV"):
+                continue
+            return device["tag"]
+    for device in devices:
+        if "start" in _haystack(device) and device["type_id"] in {"pushbutton", "io_module"}:
+            return device["tag"]
+    return None
+
+
+def find_stop_tag(devices: list[dict[str, str]]) -> str | None:
+    for device in devices:
+        if device["type_id"] == "pushbutton" and "stop" in _haystack(device) and "e-stop" not in _haystack(device) and "estop" not in _haystack(device):
+            return device["tag"]
+    for device in devices:
+        hay = _haystack(device)
+        if "stop" in hay and "e-stop" not in hay and "estop" not in hay and device["type_id"] == "pushbutton":
+            return device["tag"]
+    return None
+
+
+def find_estop_tag(devices: list[dict[str, str]]) -> str | None:
+    for device in devices:
+        if device["type_id"] == "estop":
+            return device["tag"]
+    for device in devices:
+        hay = _haystack(device)
+        if "e-stop" in hay or "estop" in hay or "e stop" in hay:
+            return device["tag"]
+    return None
+
+
+def find_motor_coil_tag(devices: list[dict[str, str]]) -> str | None:
+    for device in devices:
+        if device["type_id"] == "contactor":
+            hay = _haystack(device)
+            if "reverse" in hay or device["tag"].upper().endswith("_REV"):
+                continue
+            return device["tag"]
+    for device in devices:
+        if device["type_id"] == "contactor":
+            return device["tag"]
+    for device in devices:
+        if device["type_id"] == "motor":
+            return device["tag"]
+    for device in devices:
+        if device["type_id"] == "vfd":
+            return device["tag"]
+    return None
+
+
+def find_reverse_tag(devices: list[dict[str, str]]) -> str | None:
+    for device in devices:
+        hay = _haystack(device)
+        tag_u = device["tag"].upper()
+        if device["type_id"] == "pushbutton" and ("reverse" in hay or tag_u.endswith("_REV") or tag_u.endswith("-REV") or tag_u.startswith("HS_REV")):
+            return device["tag"]
+    for device in devices:
+        if "reverse" in _haystack(device) or device["tag"].upper().endswith("_REV") or "REV" in device["tag"].upper():
+            if device["type_id"] in {"pushbutton", "io_module"}:
+                return device["tag"]
+    return None
+
+
+def find_reverse_coil_tag(devices: list[dict[str, str]], forward_coil: str | None) -> str | None:
+    for device in devices:
+        if device["type_id"] != "contactor":
+            continue
+        hay = _haystack(device)
+        tag_u = device["tag"].upper()
+        if "reverse" in hay or tag_u.endswith("_REV") or tag_u.endswith("-REV") or "REV" in tag_u:
+            if forward_coil and device["tag"] == forward_coil:
+                continue
+            return device["tag"]
+    contactors = [d["tag"] for d in devices if d["type_id"] == "contactor"]
+    if forward_coil and len(contactors) >= 2:
+        for tag in contactors:
+            if tag != forward_coil:
+                return tag
+    return None
+
+
+def _contact_mark(tag: str, nc: bool) -> str:
+    clean = tag or "(no tag)"
+    return f"[/{clean}]" if nc else f"[{clean}]"
+
+
+def _coil_mark(tag: str, negated: bool = False) -> str:
+    clean = tag or "(no coil)"
+    return f"(/{clean})" if negated else f"({clean})"
+
+
+def format_plc_text(rungs: list[dict[str, Any]], devices: list[dict[str, str]] | None = None) -> str:
+    by_tag = {d["tag"]: d for d in (devices or [])}
+    lines = [
+        LEARNING_NOTE,
+        "",
+        "PLC ladder (plain text you can copy into your real PLC programmer)",
+        "Symbols: [TAG]=NO contact  [/TAG]=NC contact  (TAG)=coil  (/TAG)=negated coil  TON/TOF/RTO=timer",
+        "Real ladder order: Start NO seals with contactor NO, Stop NC and E-Stop NC in series, coil = contactor.",
+        "",
+    ]
+    if not rungs:
+        lines.append("(No rungs yet. Answer the questions or type your own ladder below.)")
+        lines.append("")
+        return "\n".join(lines)
+    for index, rung in enumerate(rungs, start=1):
+        comment = (rung.get("comment") or "").strip()
+        coil = (rung.get("coil_tag") or "").strip()
+        coil_neg = bool(rung.get("coil_negated"))
+        parallel = rung.get("parallel") or []
+        series = rung.get("series") or []
+        title = f"Rung {index}" + (f" - {comment}" if comment else "")
+        lines.append(title)
+        series_marks = [_contact_mark(c.get("tag", ""), bool(c.get("normally_closed"))) for c in series]
+        series_bit = "----".join(series_marks) if series_marks else ""
+        coil_bit = _coil_mark(coil, coil_neg) if coil else ""
+        tmr = rung.get("timer") if isinstance(rung.get("timer"), dict) else None
+        timer_bit = ""
+        if tmr and (tmr.get("tag") or "").strip():
+            timer_bit = f"{str(tmr.get('block') or 'TON').upper()}[{(tmr.get('tag') or '').strip()}/{int(tmr.get('pt_ms') or 0)}ms]"
+        actuator_bits = [b for b in (timer_bit, coil_bit) if b]
+        actuator = "----".join(actuator_bits) if actuator_bits else "()"
+        if parallel:
+            branch_marks = []
+            for branch in parallel:
+                marks = [_contact_mark(c.get("tag", ""), bool(c.get("normally_closed"))) for c in branch]
+                branch_marks.append("----".join(marks) if marks else "[ ]")
+            width = max(len(b) for b in branch_marks)
+            pad_branches = [b.ljust(width) for b in branch_marks]
+            after = f"----{series_bit}----{actuator}" if series_bit else f"----{actuator}"
+            if len(pad_branches) == 1:
+                lines.append(f"  |----{pad_branches[0]}{after}----|")
+            else:
+                lines.append(f"  |----{pad_branches[0]}----+{after}----|")
+                pad = " " * (len(after) + 3)
+                for branch in pad_branches[1:]:
+                    lines.append(f"  |----{branch}----+{pad}|")
+        else:
+            body = "----".join(series_marks + actuator_bits) if series_marks else actuator
+            lines.append(f"  |----{body}----|")
+        for branch in parallel:
+            for contact in branch:
+                tag = contact.get("tag", "")
+                cap = device_caption(by_tag.get(tag), tag, normally_closed=bool(contact.get("normally_closed")))
+                form = "NC" if contact.get("normally_closed") else "NO"
+                seal = "  (seal-in)" if tag == coil and not contact.get("normally_closed") else ""
+                lines.append(f"  Contact: {_contact_mark(tag, bool(contact.get('normally_closed')))}  ({form})  {cap}{seal}")
+        for contact in series:
+            tag = contact.get("tag", "")
+            cap = device_caption(by_tag.get(tag), tag, normally_closed=bool(contact.get("normally_closed")))
+            form = "NC" if contact.get("normally_closed") else "NO"
+            lines.append(f"  Contact: {_contact_mark(tag, bool(contact.get('normally_closed')))}  ({form})  {cap}")
+        tmr = rung.get("timer") if isinstance(rung.get("timer"), dict) else None
+        if tmr and (tmr.get("tag") or "").strip():
+            t_tag = (tmr.get("tag") or "").strip()
+            blk = str(tmr.get("block") or "TON").upper()
+            pt = int(tmr.get("pt_ms") or 0)
+            lines.append(f"  Timer:   {blk}({t_tag}) PT={pt}ms")
+        if coil:
+            coil_cap = device_caption(by_tag.get(coil), coil)
+            lines.append(f"  Coil:    {_coil_mark(coil, coil_neg)}  {coil_cap}")
+        if comment:
+            lines.append(f"  Note:    {comment}")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def format_hmi_text(items: list[dict[str, str]]) -> str:
+    lines = [
+        LEARNING_NOTE,
+        "",
+        "HMI screens and indicators (edit the names, then copy into your HMI software)",
+        "",
+        "Screen: Main",
+    ]
+    if not items:
+        lines.append("  (No indicators yet.)")
+        lines.append("")
+        return "\n".join(lines)
+    for item in items:
+        kind = (item.get("kind") or "indicator").strip()
+        label = (item.get("label") or "").strip() or "(unnamed)"
+        lines.append(f"  - [{kind}] {label}")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def refresh_plc_text(program: dict[str, Any], project: Project | None = None) -> dict[str, Any]:
+    data = program_from_dict(program)
+    devices = cabinet_device_tags(project) if project is not None else []
+    data["plc_text"] = format_plc_text(data["rungs"], devices)
+    return data
+
+
+def edit_rung(program: dict[str, Any], rung_id: str, **changes: Any) -> dict[str, Any]:
+    """Update one rung and refresh plc_text. Used by tests and the editor."""
+    data = program_from_dict(program)
+    found = False
+    for rung in data["rungs"]:
+        if rung["id"] != rung_id:
+            continue
+        found = True
+        if "comment" in changes and changes["comment"] is not None:
+            rung["comment"] = str(changes["comment"]).strip()
+        if "coil_tag" in changes and changes["coil_tag"] is not None:
+            rung["coil_tag"] = str(changes["coil_tag"]).strip()
+        if "coil_negated" in changes and changes["coil_negated"] is not None:
+            rung["coil_negated"] = bool(changes["coil_negated"])
+        if "normally_closed" in changes and changes["normally_closed"] is not None:
+            nc = bool(changes["normally_closed"])
+            rung["normally_closed"] = nc
+            if rung.get("parallel") and rung["parallel"][0]:
+                rung["parallel"][0][0]["normally_closed"] = nc
+            elif rung.get("series"):
+                rung["series"][0]["normally_closed"] = nc
+        if "contact_tag" in changes and changes["contact_tag"] is not None:
+            tag = str(changes["contact_tag"]).strip()
+            rung["contact_tag"] = tag
+            if rung.get("parallel") and rung["parallel"][0]:
+                rung["parallel"][0][0]["tag"] = tag
+            elif rung.get("series"):
+                rung["series"][0]["tag"] = tag
+            else:
+                rung["parallel"] = [[{"tag": tag, "normally_closed": bool(rung.get("normally_closed"))}]]
+        if "parallel" in changes and changes["parallel"] is not None:
+            rung["parallel"] = changes["parallel"]
+        if "series" in changes and changes["series"] is not None:
+            rung["series"] = changes["series"]
+        if "timer" in changes:
+            timer = _normalize_timer(changes["timer"])
+            if timer:
+                rung["timer"] = timer
+            else:
+                rung.pop("timer", None)
+        legacy = _legacy_fields_from_rung(rung)
+        rung["contact_tag"] = legacy["contact_tag"]
+        rung["normally_closed"] = legacy["normally_closed"]
+        break
+    if not found:
+        raise KeyError(f"No rung with id {rung_id}")
+    data["plc_text"] = format_plc_text(data["rungs"])
+    data["text_edited"] = True
+    return data
+
+
+def add_rung(
+    program: dict[str, Any],
+    *,
+    contact_tag: str,
+    coil_tag: str,
+    normally_closed: bool = False,
+    comment: str = "",
+    series: list[dict[str, Any]] | None = None,
+    parallel: list[list[dict[str, Any]]] | None = None,
+    coil_negated: bool = False,
+) -> dict[str, Any]:
+    data = program_from_dict(program)
+    if parallel is None and series is None:
+        contact = {"tag": contact_tag.strip(), "normally_closed": bool(normally_closed)}
+        parallel = [[contact]] if contact["tag"] else []
+        series = []
+    rung = {
+        "id": new_rung_id(),
+        "parallel": parallel or [],
+        "series": series or [],
+        "coil_tag": coil_tag.strip(),
+        "coil_negated": bool(coil_negated),
+        "comment": comment.strip(),
+    }
+    legacy = _legacy_fields_from_rung(rung)
+    rung["contact_tag"] = legacy["contact_tag"]
+    rung["normally_closed"] = legacy["normally_closed"]
+    data["rungs"].append(rung)
+    data["plc_text"] = format_plc_text(data["rungs"])
+    data["text_edited"] = True
+    return data
+
+
+def set_rung_timer(
+    program: dict[str, Any],
+    rung_id: str,
+    *,
+    tag: str,
+    block: str = "TON",
+    pt_ms: int = 1000,
+) -> dict[str, Any]:
+    """Attach or replace an educational timer on an existing rung."""
+    data = program_from_dict(program)
+    timer = _normalize_timer({"tag": tag, "block": block, "pt_ms": pt_ms})
+    if not timer:
+        raise ValueError("Timer tag is required.")
+    found = False
+    for rung in data["rungs"]:
+        if rung["id"] != rung_id:
+            continue
+        rung["timer"] = timer
+        found = True
+        break
+    if not found:
+        raise KeyError(f"No rung with id {rung_id}")
+    data["plc_text"] = format_plc_text(data["rungs"])
+    data["text_edited"] = True
+    return data
+
+
+def add_timer_rung(
+    program: dict[str, Any],
+    *,
+    contact_tag: str,
+    timer_tag: str,
+    block: str = "TON",
+    pt_ms: int = 1000,
+    normally_closed: bool = False,
+    coil_tag: str = "",
+    comment: str = "",
+) -> dict[str, Any]:
+    """Add a rung with contact(s) energizing a TON/TOF/RTO timer (optional coil after)."""
+    data = add_rung(
+        program,
+        contact_tag=contact_tag,
+        coil_tag=coil_tag or "",
+        normally_closed=normally_closed,
+        comment=comment or f"{str(block or 'TON').upper()} {timer_tag.strip()}",
+    )
+    rid = data["rungs"][-1]["id"]
+    return set_rung_timer(data, rid, tag=timer_tag, block=block, pt_ms=pt_ms)
+
+
+def delete_rung(program: dict[str, Any], rung_id: str) -> dict[str, Any]:
+    data = program_from_dict(program)
+    data["rungs"] = [rung for rung in data["rungs"] if rung["id"] != rung_id]
+    data["plc_text"] = format_plc_text(data["rungs"])
+    data["text_edited"] = True
+    return data
+
+
+def _make_run_rung(
+    *,
+    start: str | None,
+    stop: str | None,
+    estop: str | None,
+    coil: str,
+    comment: str,
+    interlock_nc: str | None = None,
+    include_start: bool = True,
+    include_seal: bool = True,
+    include_stop: bool = True,
+    include_estop: bool = True,
+) -> dict[str, Any]:
+    """One real ladder run rung: (Start NO || Seal NO) - Stop NC - E-Stop NC - (interlock NC) - (Coil)."""
+    parallel: list[list[dict[str, Any]]] = []
+    if include_start and start:
+        parallel.append([{"tag": start, "normally_closed": False}])
+    if include_seal and coil and parallel:
+        parallel.append([{"tag": coil, "normally_closed": False}])
+    series: list[dict[str, Any]] = []
+    if include_stop and stop:
+        series.append({"tag": stop, "normally_closed": True})
+    if include_estop and estop:
+        series.append({"tag": estop, "normally_closed": True})
+    if interlock_nc:
+        series.append({"tag": interlock_nc, "normally_closed": True})
+    rung = {
+        "id": new_rung_id(),
+        "parallel": parallel,
+        "series": series,
+        "coil_tag": coil,
+        "coil_negated": False,
+        "comment": comment,
+    }
+    legacy = _legacy_fields_from_rung(rung)
+    rung["contact_tag"] = legacy["contact_tag"]
+    rung["normally_closed"] = legacy["normally_closed"]
+    return rung
+
+
+
+def simulation_rung_tags(rung: dict[str, Any]) -> tuple[set[str], set[str]]:
+    """Tags lit for one educational sim step: (active contacts+coil, optional pulse coils).
+
+    Pulse set highlights Place_Relay / Welder-style outputs on weld-place-cell.
+    Educational only — not live PLC evaluation.
+    """
+    active: set[str] = set()
+    for contact in flatten_contacts(rung):
+        tag = (contact.get("tag") or "").strip()
+        if tag:
+            active.add(tag)
+    coil = (rung.get("coil_tag") or "").strip()
+    if coil:
+        active.add(coil)
+    pulse: set[str] = set()
+    for name in active:
+        upper = name.upper().replace("-", "_")
+        if (
+            upper in {"PLACE_RELAY", "WELDER_RELAY", "WELDER", "PLACE"}
+            or "WELDER" in upper
+            or upper.startswith("PLACE_")
+        ):
+            pulse.add(name)
+    return active, pulse
+
+
+def build_starter_program(project: Project, answers: dict[str, str]) -> dict[str, Any]:
+    """Build real ladder rungs and HMI from answers + tags already on the cabinet."""
+    devices = cabinet_device_tags(project)
+    start = find_start_tag(devices)
+    stop = find_stop_tag(devices)
+    estop = find_estop_tag(devices)
+    coil = find_motor_coil_tag(devices)
+    reverse_start = find_reverse_tag(devices)
+    reverse_coil = find_reverse_coil_tag(devices, coil)
+
+    rungs: list[dict[str, Any]] = []
+    on_start = (answers.get("on_start") or "").strip()
+    on_stop = (answers.get("on_stop") or "").strip()
+    on_estop = (answers.get("on_estop") or "").strip()
+    direction = (answers.get("direction") or "").strip()
+    hmi_show = (answers.get("hmi_show") or "").strip()
+
+    skip_start = "nothing yet" in on_start.lower()
+    skip_stop = "nothing yet" in on_stop.lower()
+    skip_estop = "nothing yet" in on_estop.lower()
+    want_reverse = "reverse" in direction.lower()
+
+    if coil and not skip_start:
+        if start or (not skip_stop and stop) or (not skip_estop and estop):
+            note_parts = []
+            if start and not skip_start:
+                note_parts.append(on_start or "Start runs the motor")
+            if stop and not skip_stop:
+                note_parts.append(on_stop or "Stop opens the rung")
+            if estop and not skip_estop:
+                note_parts.append(on_estop or "E-stop must stop the motor")
+            if want_reverse and reverse_coil:
+                note_parts.append("Forward rung - interlocked against reverse")
+            comment = "; ".join(note_parts) if note_parts else "Motor run"
+            if start and not skip_start:
+                comment = (comment + " (seal-in holds the contactor after Start is released).").strip()
+            rungs.append(
+                _make_run_rung(
+                    start=start if not skip_start else None,
+                    stop=stop if not skip_stop else None,
+                    estop=estop if not skip_estop else None,
+                    coil=coil,
+                    comment=comment if not want_reverse else f"Forward: {comment}",
+                    interlock_nc=reverse_coil if (want_reverse and reverse_coil) else None,
+                    include_start=not skip_start,
+                    include_seal=bool(start) and not skip_start,
+                    include_stop=not skip_stop,
+                    include_estop=not skip_estop,
+                )
+            )
+    elif coil and (not skip_stop or not skip_estop):
+        rungs.append(
+            _make_run_rung(
+                start=None,
+                stop=stop if not skip_stop else None,
+                estop=estop if not skip_estop else None,
+                coil=coil,
+                comment="; ".join(p for p in [on_stop if not skip_stop else "", on_estop if not skip_estop else ""] if p) or "Stop / e-stop permissive",
+                include_start=False,
+                include_seal=False,
+                include_stop=not skip_stop,
+                include_estop=not skip_estop,
+            )
+        )
+
+    if want_reverse and coil:
+        rev_coil = reverse_coil
+        rev_pb = reverse_start
+        if rev_coil or rev_pb:
+            use_coil = rev_coil or coil
+            if rev_coil:
+                use_coil = rev_coil
+            rungs.append(
+                _make_run_rung(
+                    start=rev_pb,
+                    stop=stop if not skip_stop else None,
+                    estop=estop if not skip_estop else None,
+                    coil=use_coil,
+                    comment="Reverse: seal-in with interlocking so Forward and Reverse cannot both be on.",
+                    interlock_nc=coil if (rev_coil and coil and rev_coil != coil) else None,
+                    include_start=bool(rev_pb),
+                    include_seal=bool(rev_pb),
+                    include_stop=not skip_stop,
+                    include_estop=not skip_estop,
+                )
+            )
+
+    hmi_items: list[dict[str, str]] = []
+    if hmi_show == "Running, Stopped, Fault, Start, and Stop":
+        wanted = [
+            ("indicator", "Running"),
+            ("indicator", "Stopped"),
+            ("indicator", "Fault"),
+            ("button", "Start"),
+            ("button", "Stop"),
+        ]
+    elif hmi_show == "Running and Stopped only":
+        wanted = [("indicator", "Running"), ("indicator", "Stopped")]
+    elif hmi_show == "Running, Stopped, and Fault" or hmi_show:
+        wanted = [("indicator", "Running"), ("indicator", "Stopped"), ("indicator", "Fault")]
+    else:
+        wanted = []
+    for kind, label in wanted:
+        hmi_items.append({"id": new_rung_id(), "kind": kind, "label": label})
+
+    plc_text = format_plc_text(rungs, devices)
+    if want_reverse and not reverse_coil and not reverse_start:
+        plc_text = (
+            plc_text.rstrip()
+            + "\n\nNote: You chose forward and reverse, but this cabinet has no reverse start or reverse "
+            "contactor tag yet.\nAdd a reverse device on the panel before naming a reverse rung.\n"
+        )
+
+    if devices:
+        legend = ["", "Devices on this cabinet (from the panel - do not invent tags):"]
+        for device in devices:
+            addr = device.get("io_address") or ""
+            wires = device.get("wire_numbers") or ""
+            role = device_role_label(device)
+            bits = [device["tag"], f"({role})", device["type_id"]]
+            if addr and addr.lower() != "n/a":
+                bits.append(f"I/O {addr}")
+            if wires:
+                bits.append(f"wires {wires}")
+            legend.append("  - " + " | ".join(bits))
+        legend.append("")
+        plc_text = plc_text.rstrip() + "\n" + "\n".join(legend)
+
+    return {
+        "answers": {key: str(answers.get(key, "") or "") for key, _q, _opts in PROGRAM_QUESTIONS},
+        "rungs": rungs,
+        "hmi_items": hmi_items,
+        "plc_text": plc_text,
+        "hmi_text": format_hmi_text(hmi_items),
+        "text_edited": False,
+    }
+
+
+def format_ladder_txt(program: dict[str, Any] | None, *, cabinet_name: str = "") -> str:
+    """Plain-text ladder document (separate from schematic SVGs)."""
+    data = program_from_dict(program or {})
+    lines: list[str] = []
+    title = (cabinet_name or "Cabinet").strip() or "Cabinet"
+    lines.append(f"LADDER LOGIC — {title}")
+    lines.append(LEARNING_NOTE)
+    lines.append("Separate artifact from schematic drawings. Design aid only.")
+    lines.append("")
+    rungs = data.get("rungs") or []
+    if not rungs:
+        lines.append("(No rungs yet.)")
+        lines.append("")
+    for index, rung in enumerate(rungs, start=1):
+        comment = (rung.get("comment") or "").strip()
+        lines.append(f"R{index}" + (f" — {comment}" if comment else ""))
+        parallel = rung.get("parallel") or []
+        if parallel:
+            branch_bits = []
+            for branch in parallel:
+                contacts = []
+                for c in branch:
+                    tag = (c.get("tag") or "?").strip()
+                    contacts.append(f"[/{tag}]" if c.get("normally_closed") else f"[{tag}]")
+                branch_bits.append(" — ".join(contacts) if contacts else "(empty)")
+            lines.append("  PARALLEL: " + "  ||  ".join(branch_bits))
+        series = rung.get("series") or []
+        if series:
+            contacts = []
+            for c in series:
+                tag = (c.get("tag") or "?").strip()
+                contacts.append(f"[/{tag}]" if c.get("normally_closed") else f"[{tag}]")
+            lines.append("  SERIES:   " + " — ".join(contacts))
+        coil = (rung.get("coil_tag") or "").strip() or "?"
+        lines.append(f"  COIL:     (/{coil})" if rung.get("coil_negated") else f"  COIL:     ({coil})")
+        lines.append("")
+    plc = (data.get("plc_text") or "").strip()
+    if plc:
+        lines.append("========== PLC TEXT ==========")
+        lines.append(plc)
+        lines.append("")
+    hmi = (data.get("hmi_text") or "").strip()
+    if hmi:
+        lines.append("========== HMI TEXT ==========")
+        lines.append(hmi)
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def format_ladder_html(program: dict[str, Any] | None, *, cabinet_name: str = "") -> str:
+    import html as _html
+    title = _html.escape((cabinet_name or "Cabinet").strip() or "Cabinet")
+    pre = _html.escape(format_ladder_txt(program, cabinet_name=cabinet_name))
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<title>Ladder Logic — {title}</title>
+<style>
+  @page {{ margin: 0.6in; }}
+  body {{ font-family: Segoe UI, Arial, sans-serif; color: #111; background: #fff; }}
+  h1 {{ font-size: 16pt; margin: 0 0 6px 0; }}
+  .meta {{ color: #444; font-size: 10pt; margin-bottom: 12px; }}
+  pre {{ font-family: Consolas, Liberation Mono, monospace; font-size: 10pt;
+         white-space: pre-wrap; border: 1px solid #ccc; padding: 12px; background: #fafafa; }}
+  @media print {{ .noprint {{ display: none; }} }}
+</style></head><body>
+<h1>Ladder Logic — {title}</h1>
+<div class="meta">{_html.escape(LEARNING_NOTE)} Separate from schematic SVGs. Design aid only.</div>
+<p class="noprint"><button onclick="window.print()">Print…</button></p>
+<pre>{pre}</pre>
+</body></html>
+"""
+
+
+def write_ladder_logic(
+    project: Project,
+    folder: Path | str,
+    *,
+    program: dict[str, Any] | None = None,
+) -> list[Path]:
+    """Write ladder-logic.txt and ladder-logic.html under the drawings folder."""
+    target = Path(folder)
+    target.mkdir(parents=True, exist_ok=True)
+    prog = program if program is not None else getattr(project, "program", None)
+    name = getattr(project, "name", "") or "Cabinet"
+    txt_path = target / "ladder-logic.txt"
+    html_path = target / "ladder-logic.html"
+    txt_path.write_text(format_ladder_txt(prog, cabinet_name=name), encoding="utf-8")
+    html_path.write_text(format_ladder_html(prog, cabinet_name=name), encoding="utf-8")
+    return [txt_path, html_path]
+
+
+def program_ladder_ir(program, *, project_name: str = "", devices=None):
+    """v3 helper: project.program → educational ladder IR (does not mutate)."""
+    from cabinet_studio.services.ladder_ir import program_to_ladder_ir
+
+    return program_to_ladder_ir(program, project_name=project_name, devices=devices)

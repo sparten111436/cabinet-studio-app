@@ -1,0 +1,1251 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "identity",
+      "title": "Identity",
+      "prompt": "Name the device so the schematic, the HMI, and the PLC all use the same tag."
+    },
+    {
+      "id": "specifications",
+      "title": "Specifications",
+      "prompt": "Capture the ratings that change protection, wiring, and the program."
+    },
+    {
+      "id": "wiring",
+      "title": "Wiring",
+      "prompt": "Landings and wire numbers are how the panel gets built without a phone call."
+    },
+    {
+      "id": "plc_io",
+      "title": "PLC I/O",
+      "prompt": "Every device the PLC supervises needs an I/O or network placeholder before it is forgotten."
+    },
+    {
+      "id": "notes",
+      "title": "Notes",
+      "prompt": "Write down what the next person must not have to rediscover."
+    }
+  ],
+  "common_fields": [
+    {
+      "key": "tag",
+      "label": "Tag / name",
+      "type": "text",
+      "required": true,
+      "group": "identity",
+      "help": "Unique tag used on the schematic, HMI, and PLC.",
+      "placeholder": "MTR1"
+    },
+    {
+      "key": "description",
+      "label": "Description",
+      "type": "text",
+      "required": true,
+      "group": "identity",
+      "help": "What this device does in the process, in one line.",
+      "placeholder": "Conveyor drive motor"
+    },
+    {
+      "key": "vendor",
+      "label": "Vendor",
+      "type": "choice",
+      "required": true,
+      "group": "identity",
+      "help": "Use Generic / Modbus when the brand is not chosen or the device speaks Modbus.",
+      "placeholder": "",
+      "options": [
+        "Allen-Bradley",
+        "Siemens",
+        "Generic / Modbus",
+        "Hoffman",
+        "Saginaw",
+        "Hammond"
+      ]
+    },
+    {
+      "key": "catalog",
+      "label": "Catalog / part number",
+      "type": "text",
+      "required": false,
+      "group": "identity",
+      "help": "Catalog number if it is known. Leave it blank until the BOM is firm.",
+      "placeholder": "25B-D6P0N104"
+    },
+    {
+      "key": "mounting",
+      "label": "Mounting",
+      "type": "choice",
+      "required": false,
+      "group": "identity",
+      "help": "Where the device lives. Field devices still belong on the layout so they are not forgotten.",
+      "placeholder": "",
+      "options": [
+        "In cabinet",
+        "On door",
+        "Field device",
+        "Wall",
+        "Freestanding"
+      ]
+    },
+    {
+      "key": "terminal_landings",
+      "label": "Terminal landings",
+      "type": "multiline",
+      "required": true,
+      "group": "wiring",
+      "help": "Where each conductor lands. Example: TB1-14 to VFD T1, PE to ground bar.",
+      "placeholder": ""
+    },
+    {
+      "key": "wire_numbers",
+      "label": "Wire numbers",
+      "type": "text",
+      "required": true,
+      "group": "wiring",
+      "help": "Numbers to print on the conductors. Example: W101, W102, PE.",
+      "placeholder": "W101, W102, PE"
+    },
+    {
+      "key": "wire_color",
+      "label": "Wire color",
+      "type": "text",
+      "required": false,
+      "group": "wiring",
+      "help": "Shop color for this circuit. A suggestion can fill it. Change it when the circuit is special.",
+      "placeholder": "Black"
+    },
+    {
+      "key": "wire_gauge",
+      "label": "Wire gauge",
+      "type": "text",
+      "required": false,
+      "group": "wiring",
+      "help": "Conductor size (AWG). Suggestion uses US industrial panel defaults; confirm against the load.",
+      "placeholder": "18 AWG"
+    },
+    {
+      "key": "io_direction",
+      "label": "PLC I/O direction",
+      "type": "choice",
+      "required": true,
+      "group": "plc_io",
+      "help": "How the PLC supervises this device. Pick network if there is no discrete point.",
+      "placeholder": "",
+      "options": [
+        "Input",
+        "Output",
+        "Input and Output",
+        "Network / no discrete I/O"
+      ]
+    },
+    {
+      "key": "io_address",
+      "label": "PLC I/O address",
+      "type": "text",
+      "required": true,
+      "group": "plc_io",
+      "help": "Address placeholder. Use a rack/slot/bit, a %I address, or a Modbus reference. For a networked device, enter the IP or tag and say so in notes.",
+      "placeholder": "Local:1:I.Data.0"
+    },
+    {
+      "key": "notes",
+      "label": "Notes",
+      "type": "multiline",
+      "required": false,
+      "group": "notes",
+      "help": "Anything install, programming, or the next shift must not forget.",
+      "placeholder": ""
+    }
+  ],
+  "types": [
+    {
+      "id": "plc",
+      "label": "PLC",
+      "category": "Control",
+      "accent": "#3d8bfd",
+      "supervised": true,
+      "tile_w": 220,
+      "tile_h": 104,
+      "descriptor_keys": [
+        "catalog",
+        "protocol"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true,
+          "help": "CPU catalog number is required so the rack and firmware stay matched."
+        }
+      },
+      "fields": [
+        {
+          "key": "ip_address",
+          "label": "IP address",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Controller IP on the machine network.",
+          "placeholder": "192.168.1.10"
+        },
+        {
+          "key": "slot_count",
+          "label": "Slots / local I/O",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Rack slots, or a note such as embedded I/O only.",
+          "placeholder": "8"
+        },
+        {
+          "key": "protocol",
+          "label": "Network protocol",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the PLC talks to drives, HMIs, and remote I/O.",
+          "placeholder": "",
+          "options": [
+            "EtherNet/IP",
+            "PROFINET",
+            "Modbus TCP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hmi",
+      "label": "HMI",
+      "category": "Operator",
+      "accent": "#2ee6d6",
+      "supervised": true,
+      "tile_w": 200,
+      "tile_h": 100,
+      "descriptor_keys": [
+        "screen_size",
+        "protocol"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true,
+          "help": "Panel catalog number keeps the screen and runtime matched."
+        }
+      },
+      "fields": [
+        {
+          "key": "screen_size",
+          "label": "Screen size",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Operator screen size.",
+          "placeholder": "7 in"
+        },
+        {
+          "key": "ip_address",
+          "label": "IP address",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "HMI IP, or the PLC port it is plugged into.",
+          "placeholder": "192.168.1.20"
+        },
+        {
+          "key": "protocol",
+          "label": "Network protocol",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Protocol the panel uses to reach the PLC.",
+          "placeholder": "",
+          "options": [
+            "EtherNet/IP",
+            "PROFINET",
+            "Modbus TCP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vfd",
+      "label": "VFD",
+      "category": "Motion",
+      "accent": "#ff8a1f",
+      "supervised": true,
+      "tile_w": 210,
+      "tile_h": 104,
+      "descriptor_keys": [
+        "horsepower",
+        "voltage",
+        "comms"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true
+        }
+      },
+      "fields": [
+        {
+          "key": "horsepower",
+          "label": "HP / kW",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Drive rating in HP or kW.",
+          "placeholder": "5 HP"
+        },
+        {
+          "key": "voltage",
+          "label": "Voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Supply voltage and phase.",
+          "placeholder": "480 VAC"
+        },
+        {
+          "key": "fla",
+          "label": "Output amps (FLA)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Drive output current used for wire and protection.",
+          "placeholder": "7.6 A"
+        },
+        {
+          "key": "control_mode",
+          "label": "Control mode",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the drive produces torque.",
+          "placeholder": "",
+          "options": [
+            "V/Hz",
+            "Sensorless vector",
+            "Flux vector",
+            "Servo"
+          ]
+        },
+        {
+          "key": "comms",
+          "label": "Communications",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the PLC commands the drive.",
+          "placeholder": "",
+          "options": [
+            "EtherNet/IP",
+            "PROFINET",
+            "Modbus TCP",
+            "Hardwired I/O"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "motor",
+      "label": "Motor",
+      "category": "Motion",
+      "accent": "#ffb020",
+      "supervised": true,
+      "tile_w": 190,
+      "tile_h": 100,
+      "descriptor_keys": [
+        "horsepower",
+        "voltage",
+        "rpm"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "horsepower",
+          "label": "HP / kW",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Nameplate power in HP or kW.",
+          "placeholder": "5 HP"
+        },
+        {
+          "key": "rpm",
+          "label": "RPM",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Nameplate speed.",
+          "placeholder": "1750"
+        },
+        {
+          "key": "torque",
+          "label": "Torque",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Required torque, or the nameplate torque if that is all you have.",
+          "placeholder": "15 lb-ft"
+        },
+        {
+          "key": "voltage",
+          "label": "Voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Nameplate voltage.",
+          "placeholder": "460 VAC"
+        },
+        {
+          "key": "fla",
+          "label": "Full load amps (FLA)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Nameplate full-load current.",
+          "placeholder": "6.5 A"
+        },
+        {
+          "key": "pinout",
+          "label": "Pinout / motor leads",
+          "type": "multiline",
+          "required": true,
+          "group": "wiring",
+          "help": "Lead map. Example: T1 T2 T3 to drive U V W, heater H1 H2.",
+          "placeholder": "T1-U, T2-V, T3-W"
+        }
+      ]
+    },
+    {
+      "id": "contactor",
+      "label": "Contactor",
+      "category": "Power",
+      "accent": "#c084fc",
+      "supervised": true,
+      "tile_w": 168,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "amp_rating",
+        "coil_voltage"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "coil_voltage",
+          "label": "Coil voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Coil voltage that the PLC output or interposing relay must match.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "poles",
+          "label": "Poles",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Power poles.",
+          "placeholder": "",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "key": "amp_rating",
+          "label": "Amp rating",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Contactor continuous or IEC AC-3 rating.",
+          "placeholder": "9 A"
+        }
+      ]
+    },
+    {
+      "id": "estop",
+      "label": "E-stop",
+      "category": "Safety",
+      "accent": "#ff5a5a",
+      "supervised": true,
+      "tile_w": 156,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "contact_config",
+        "reset_style"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "contact_config",
+          "label": "Contact configuration",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Safety contacts. Dual-channel is the usual machine e-stop.",
+          "placeholder": "",
+          "options": [
+            "1NC",
+            "2NC",
+            "2NC + 1NO"
+          ]
+        },
+        {
+          "key": "voltage",
+          "label": "Circuit voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Voltage of the safety circuit this device opens.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "reset_style",
+          "label": "Reset style",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the operator releases the actuator.",
+          "placeholder": "",
+          "options": [
+            "Pull",
+            "Twist",
+            "Key"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethernet_switch",
+      "label": "Ethernet switch",
+      "category": "Network",
+      "accent": "#5eead4",
+      "supervised": true,
+      "tile_w": 186,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "port_count",
+        "managed"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "port_count",
+          "label": "Port count",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Copper ports available for PLC, HMI, drives, and the uplink.",
+          "placeholder": "8"
+        },
+        {
+          "key": "managed",
+          "label": "Managed",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Unmanaged switches have no IP. Say so in the address field.",
+          "placeholder": "",
+          "options": [
+            "Unmanaged",
+            "Managed"
+          ]
+        },
+        {
+          "key": "ip_address",
+          "label": "IP address",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Switch IP, or type n/a \u2014 unmanaged if it has no address.",
+          "placeholder": "192.168.1.2"
+        }
+      ]
+    },
+    {
+      "id": "power_supply",
+      "label": "Power supply",
+      "category": "Power",
+      "accent": "#f5d76e",
+      "supervised": true,
+      "tile_w": 186,
+      "tile_h": 100,
+      "descriptor_keys": [
+        "output_voltage",
+        "output_current"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "input_voltage",
+          "label": "Input voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Mains feeding this supply.",
+          "placeholder": "120/240 VAC"
+        },
+        {
+          "key": "output_voltage",
+          "label": "Output voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Control voltage this supply creates.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "output_current",
+          "label": "Output current",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Rated output current. Keep spare capacity in notes.",
+          "placeholder": "10 A"
+        },
+        {
+          "key": "phases",
+          "label": "Input phases",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Mains phases feeding the supply.",
+          "placeholder": "",
+          "options": [
+            "1",
+            "3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sensor",
+      "label": "Sensor",
+      "category": "Process",
+      "accent": "#34d399",
+      "supervised": true,
+      "tile_w": 168,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "sensor_kind",
+        "signal"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "sensor_kind",
+          "label": "Sensor type",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "What this device senses.",
+          "placeholder": "",
+          "options": [
+            "Proximity",
+            "Photoeye",
+            "Encoder",
+            "Limit switch",
+            "Pressure",
+            "Temperature",
+            "Level",
+            "Flow",
+            "Other"
+          ]
+        },
+        {
+          "key": "signal",
+          "label": "Signal",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Electrical signal the PLC input must match.",
+          "placeholder": "",
+          "options": [
+            "PNP",
+            "NPN",
+            "Dry contact",
+            "4-20 mA",
+            "0-10 V",
+            "Other"
+          ]
+        },
+        {
+          "key": "range_span",
+          "label": "Range / sensing distance",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Sensing distance or engineering range.",
+          "placeholder": "10 mm"
+        },
+        {
+          "key": "wiring_style",
+          "label": "Wiring",
+          "type": "text",
+          "required": true,
+          "group": "wiring",
+          "help": "Cable, connector, and lead colors. Example: M12, 4-pin, brown +24, blue 0V, black signal.",
+          "placeholder": "M12 4-pin"
+        }
+      ]
+    },
+    {
+      "id": "valve",
+      "label": "Valve",
+      "category": "Process",
+      "accent": "#60a5fa",
+      "supervised": true,
+      "tile_w": 168,
+      "tile_h": 96,
+      "descriptor_keys": [
+        "size",
+        "solenoid_voltage"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "size",
+          "label": "Size",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Port size and connection.",
+          "placeholder": "1/2 in NPT"
+        },
+        {
+          "key": "solenoid_voltage",
+          "label": "Solenoid voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Voltage the output must supply.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "ports",
+          "label": "Ports",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Valve function.",
+          "placeholder": "",
+          "options": [
+            "2-way",
+            "3-way",
+            "4-way",
+            "5-way"
+          ]
+        },
+        {
+          "key": "fail_position",
+          "label": "Fail position",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Where the valve goes when the coil drops out.",
+          "placeholder": "",
+          "options": [
+            "Closed",
+            "Open",
+            "Last"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "solenoid",
+      "label": "Solenoid",
+      "category": "Process",
+      "accent": "#a78bfa",
+      "supervised": true,
+      "tile_w": 156,
+      "tile_h": 88,
+      "descriptor_keys": [
+        "voltage",
+        "duty"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "voltage",
+          "label": "Voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Coil voltage.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "duty",
+          "label": "Duty",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Continuous coils can stay energized. Intermittent coils cannot.",
+          "placeholder": "",
+          "options": [
+            "Continuous",
+            "Intermittent"
+          ]
+        },
+        {
+          "key": "va_rating",
+          "label": "VA / watt rating",
+          "type": "text",
+          "required": false,
+          "group": "specifications",
+          "help": "Coil burden, if the nameplate lists it.",
+          "placeholder": "5 W"
+        }
+      ]
+    },
+    {
+      "id": "light",
+      "label": "Light",
+      "category": "Operator",
+      "accent": "#fbbf24",
+      "supervised": true,
+      "tile_w": 156,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "color",
+        "voltage"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "color",
+          "label": "Color",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Lens color, or multi-color for a stack.",
+          "placeholder": "",
+          "options": [
+            "Red",
+            "Green",
+            "Amber",
+            "Blue",
+            "White",
+            "Multi-color stack"
+          ]
+        },
+        {
+          "key": "voltage",
+          "label": "Voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Lamp or stack supply voltage.",
+          "placeholder": "24 VDC"
+        },
+        {
+          "key": "function",
+          "label": "Function",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "What this lamp means to the operator.",
+          "placeholder": "",
+          "options": [
+            "Run",
+            "Stop",
+            "Fault",
+            "Warning",
+            "Stack",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "safety_relay",
+      "label": "Safety relay",
+      "category": "Safety",
+      "accent": "#fb7185",
+      "supervised": true,
+      "tile_w": 186,
+      "tile_h": 100,
+      "descriptor_keys": [
+        "channels",
+        "reset_type"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "safety_function",
+          "label": "Safety function",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "What this relay monitors. Example: e-stop, guard door, light curtain.",
+          "placeholder": "E-stop monitoring"
+        },
+        {
+          "key": "channels",
+          "label": "Channels",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Single or dual-channel input.",
+          "placeholder": "",
+          "options": [
+            "Single",
+            "Dual"
+          ]
+        },
+        {
+          "key": "reset_type",
+          "label": "Reset",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the safety circuit resets after a demand.",
+          "placeholder": "",
+          "options": [
+            "Manual",
+            "Automatic",
+            "Monitored manual"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transmitter",
+      "label": "Analog transmitter",
+      "category": "Process",
+      "accent": "#22d3ee",
+      "supervised": true,
+      "tile_w": 186,
+      "tile_h": 100,
+      "descriptor_keys": [
+        "measured_variable",
+        "signal"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "measured_variable",
+          "label": "Measured variable",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Process variable. Example: pressure, temperature, level, flow.",
+          "placeholder": "Pressure"
+        },
+        {
+          "key": "range_span",
+          "label": "Range",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Calibrated range in engineering units.",
+          "placeholder": "0-100 psi"
+        },
+        {
+          "key": "signal",
+          "label": "Signal",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Analog signal the PLC input must accept.",
+          "placeholder": "",
+          "options": [
+            "4-20 mA",
+            "0-10 V",
+            "HART",
+            "Other"
+          ]
+        },
+        {
+          "key": "loop_power",
+          "label": "Loop power",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "How the transmitter is powered.",
+          "placeholder": "",
+          "options": [
+            "Loop-powered",
+            "3-wire",
+            "4-wire"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "io_module",
+      "label": "I/O module",
+      "category": "Control",
+      "accent": "#818cf8",
+      "supervised": true,
+      "tile_w": 176,
+      "tile_h": 92,
+      "descriptor_keys": [
+        "io_kind",
+        "point_count"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true,
+          "help": "Module catalog number is required so the point map matches the hardware."
+        }
+      },
+      "fields": [
+        {
+          "key": "io_kind",
+          "label": "I/O type",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Point type on this module.",
+          "placeholder": "",
+          "options": [
+            "DI",
+            "DO",
+            "AI",
+            "AO",
+            "Mixed"
+          ]
+        },
+        {
+          "key": "point_count",
+          "label": "Point count",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Number of points, or a mix such as 16 DI / 16 DO.",
+          "placeholder": "16"
+        },
+        {
+          "key": "parent_tag",
+          "label": "Parent PLC tag",
+          "type": "text",
+          "required": true,
+          "group": "plc_io",
+          "help": "Tag of the PLC or rack this module belongs to.",
+          "placeholder": "PLC1"
+        },
+        {
+          "key": "slot",
+          "label": "Slot",
+          "type": "text",
+          "required": true,
+          "group": "plc_io",
+          "help": "Slot in the rack, or the Modbus unit id.",
+          "placeholder": "1"
+        }
+      ]
+    },
+    {
+      "id": "pushbutton",
+      "label": "Pushbutton",
+      "category": "Operator",
+      "accent": "#94a3b8",
+      "supervised": true,
+      "tile_w": 156,
+      "tile_h": 88,
+      "descriptor_keys": [
+        "function",
+        "color"
+      ],
+      "field_overrides": {},
+      "fields": [
+        {
+          "key": "color",
+          "label": "Color",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Cap color.",
+          "placeholder": "",
+          "options": [
+            "Red",
+            "Green",
+            "Amber",
+            "Blue",
+            "Black",
+            "White"
+          ]
+        },
+        {
+          "key": "function",
+          "label": "Function",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "What the operator expects this button to do.",
+          "placeholder": "",
+          "options": [
+            "Start",
+            "Stop",
+            "Reset",
+            "Jog",
+            "Hand",
+            "Auto",
+            "Other"
+          ]
+        },
+        {
+          "key": "contact",
+          "label": "Contact",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "Contact action the input is wired to.",
+          "placeholder": "",
+          "options": [
+            "NO momentary",
+            "NC momentary",
+            "Maintained"
+          ]
+        },
+        {
+          "key": "voltage",
+          "label": "Voltage",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Voltage on the contact circuit.",
+          "placeholder": "24 VDC"
+        }
+      ]
+    },
+    {
+      "id": "enclosure",
+      "label": "Enclosure",
+      "category": "Enclosure",
+      "accent": "#6b7280",
+      "supervised": false,
+      "tile_w": 240,
+      "tile_h": 160,
+      "descriptor_keys": [
+        "catalog",
+        "vendor"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true,
+          "help": "Enclosure catalog (maker wall-mount / freestanding number)."
+        },
+        "mounting": {
+          "required": false,
+          "help": "Usually wall or freestanding. The enclosure itself is the cabinet shell."
+        },
+        "io_direction": {
+          "required": false
+        },
+        "io_address": {
+          "required": false
+        },
+        "wire_numbers": {
+          "required": false
+        },
+        "terminal_landings": {
+          "required": false
+        }
+      },
+      "fields": [
+        {
+          "key": "enclosure_width_in",
+          "label": "Enclosure width (in)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Outside width in inches.",
+          "placeholder": "36"
+        },
+        {
+          "key": "enclosure_height_in",
+          "label": "Enclosure height (in)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Outside height in inches.",
+          "placeholder": "30"
+        },
+        {
+          "key": "enclosure_depth_in",
+          "label": "Enclosure depth (in)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Outside depth in inches.",
+          "placeholder": "12"
+        },
+        {
+          "key": "nema_rating",
+          "label": "NEMA rating",
+          "type": "choice",
+          "required": true,
+          "group": "specifications",
+          "help": "NEMA type for the shell. Indoor industrial defaults to NEMA 12 unless washdown.",
+          "placeholder": "",
+          "options": [
+            "NEMA 1",
+            "NEMA 12",
+            "NEMA 4",
+            "NEMA 4X",
+            "NEMA 3R"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backplate",
+      "label": "Backplate / subpanel",
+      "category": "Enclosure",
+      "accent": "#9ca3af",
+      "supervised": false,
+      "tile_w": 220,
+      "tile_h": 140,
+      "descriptor_keys": [
+        "catalog",
+        "vendor"
+      ],
+      "field_overrides": {
+        "catalog": {
+          "required": true,
+          "help": "Subpanel / backplate catalog that mates to the enclosure."
+        },
+        "mounting": {
+          "required": false,
+          "help": "Mounted inside the enclosure on the studs / rails."
+        },
+        "io_direction": {
+          "required": false
+        },
+        "io_address": {
+          "required": false
+        },
+        "wire_numbers": {
+          "required": false
+        },
+        "terminal_landings": {
+          "required": false
+        }
+      },
+      "fields": [
+        {
+          "key": "backplate_width_in",
+          "label": "Backplate width (in)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Usable subpanel width in inches (design-aid).",
+          "placeholder": "33"
+        },
+        {
+          "key": "backplate_height_in",
+          "label": "Backplate height (in)",
+          "type": "text",
+          "required": true,
+          "group": "specifications",
+          "help": "Usable subpanel height in inches (design-aid).",
+          "placeholder": "27"
+        }
+      ]
+    }
+  ]
+}

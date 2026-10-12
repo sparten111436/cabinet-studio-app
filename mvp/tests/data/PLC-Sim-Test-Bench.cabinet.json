@@ -1,0 +1,3662 @@
+{
+  "format": "cabinet-studio-project",
+  "version": 1,
+  "name": "PLC Sim Test Bench",
+  "template_id": null,
+  "subtitle": "Bottle fill & pack line - exercises every simulator instruction (educational).",
+  "notes": "TEST PROJECT for the ladder simulation. To run: force ES1_Healthy, Guard_Closed and Auto_Sel ON, press Reset_PB, then Start_PB. Sim_Parts_SW makes bottles automatically. SAFETY: E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function.",
+  "interview": {},
+  "program": {
+    "answers": {},
+    "rungs": [
+      {
+        "id": "rfb0d4b79",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "INIT 1/4: first scan only (Init_Done not yet set) - preload the tank level to 40.",
+        "contact_tag": "Init_Done",
+        "normally_closed": true,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NC"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Tank_Level",
+            "source_a": "40",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "r18c98e1b",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "INIT 2/4: default recipe = 1 (Recipe A, 3 s fill).",
+        "contact_tag": "Init_Done",
+        "normally_closed": true,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NC"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Recipe_No",
+            "source_a": "1",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rd35d6cee",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "INIT 3/4: default fill time preset 3000 ms (used by T_Fill via preset tag).",
+        "contact_tag": "Init_Done",
+        "normally_closed": true,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NC"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Fill_Time",
+            "source_a": "3000",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rbc0e365c",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Init_Done",
+        "coil_negated": false,
+        "comment": "INIT 4/4: latch Init_Done so the init rungs never run again (until Reset sim).",
+        "contact_tag": "Init_Done",
+        "normally_closed": true,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NC"
+          },
+          {
+            "kind": "coil",
+            "var": "Init_Done",
+            "form": "set"
+          }
+        ]
+      },
+      {
+        "id": "rb50fcaea",
+        "parallel": [
+          [
+            {
+              "tag": "Reset_PB",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Safety_OK",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [
+          {
+            "tag": "ES1_Healthy",
+            "normally_closed": false
+          },
+          {
+            "tag": "Guard_Closed",
+            "normally_closed": false
+          }
+        ],
+        "coil_tag": "Safety_OK",
+        "coil_negated": false,
+        "comment": "SAFETY OK seal-in: Reset_PB arms, ES1_Healthy and Guard_Closed must stay made. SAFETY: E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function.",
+        "contact_tag": "Reset_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "Reset_PB",
+                  "form": "NO"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "Safety_OK",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "contact",
+            "var": "ES1_Healthy",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Guard_Closed",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Safety_OK",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r0ca7d80e",
+        "parallel": [
+          [
+            {
+              "tag": "Reset_PB",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Reset_Pulse",
+        "coil_negated": false,
+        "comment": "Reset one-shot: Reset_PB gives a ONE-scan Reset_Pulse (ONS), no matter how long it is held.",
+        "contact_tag": "Reset_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Reset_PB",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "ONS",
+            "var": "Reset_ONS"
+          },
+          {
+            "kind": "coil",
+            "var": "Reset_Pulse",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r7af24621",
+        "parallel": [
+          [
+            {
+              "tag": "Guard_Door",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Guard_Open_Lamp",
+        "coil_negated": false,
+        "comment": "Guard door lamp - uses ALIAS Guard_Door -> Guard_Closed (NC contact).",
+        "contact_tag": "Guard_Door",
+        "normally_closed": true
+      },
+      {
+        "id": "rf20c52ed",
+        "parallel": [
+          [
+            {
+              "tag": "Auto_Sel",
+              "normally_closed": false
+            },
+            {
+              "tag": "Man_Sel",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Auto_Mode",
+        "coil_negated": false,
+        "comment": "MODE: Auto when Auto_Sel on and Man_Sel off.",
+        "contact_tag": "Auto_Sel",
+        "normally_closed": false
+      },
+      {
+        "id": "r54a365d5",
+        "parallel": [
+          [
+            {
+              "tag": "Man_Sel",
+              "normally_closed": false
+            },
+            {
+              "tag": "Auto_Sel",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Man_Mode",
+        "coil_negated": false,
+        "comment": "MODE: Manual when Man_Sel on and Auto_Sel off (both on = no mode).",
+        "contact_tag": "Man_Sel",
+        "normally_closed": false
+      },
+      {
+        "id": "r7f5be471",
+        "parallel": [
+          [
+            {
+              "tag": "Start_PB",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [
+          {
+            "tag": "Stop_PB",
+            "normally_closed": true
+          },
+          {
+            "tag": "Safety_OK",
+            "normally_closed": false
+          },
+          {
+            "tag": "Auto_Mode",
+            "normally_closed": false
+          },
+          {
+            "tag": "Jam_Alarm",
+            "normally_closed": true
+          }
+        ],
+        "coil_tag": "Sys_Run",
+        "coil_negated": false,
+        "comment": "LINE RUN seal-in: Start_PB starts, Stop_PB (NC logic) / safety / jam / leaving Auto drops it.",
+        "contact_tag": "Start_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "Start_PB",
+                  "form": "NO"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "Sys_Run",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "contact",
+            "var": "Stop_PB",
+            "form": "NC"
+          },
+          {
+            "kind": "contact",
+            "var": "Safety_OK",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Auto_Mode",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Jam_Alarm",
+            "form": "NC"
+          },
+          {
+            "kind": "coil",
+            "var": "Sys_Run",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r8254bce7",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Line_Idle",
+        "coil_negated": true,
+        "comment": "NEGATED COIL: Line_Idle is the inverse of the rung (on while Sys_Run is off).",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false
+      },
+      {
+        "id": "r7fe2fd99",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            },
+            {
+              "tag": "Auto_Mode",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Auto_Running",
+        "coil_negated": false,
+        "comment": "MID-RUNG COIL: Run_Echo follows Sys_Run; Auto_Running needs Auto_Mode as well.",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false,
+        "mid_coils": [
+          {
+            "tag": "Run_Echo",
+            "form": "normal",
+            "negated": false
+          }
+        ],
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Sys_Run",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Run_Echo",
+            "form": "normal"
+          },
+          {
+            "kind": "contact",
+            "var": "Auto_Mode",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Auto_Running",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r7b7d9936",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "START WARNING: TON T_StartDelay 2 s after Sys_Run before conveyors move.",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_StartDelay",
+          "block": "TON",
+          "pt_ms": 2000
+        }
+      },
+      {
+        "id": "re44a95e6",
+        "parallel": [
+          [
+            {
+              "tag": "T_StartDelay.TT",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Start_Warn_Horn",
+        "coil_negated": false,
+        "comment": "Start warning horn sounds while T_StartDelay is timing (.TT).",
+        "contact_tag": "T_StartDelay.TT",
+        "normally_closed": false
+      },
+      {
+        "id": "r4cf1c169",
+        "parallel": [
+          [
+            {
+              "tag": "T_StartDelay.DN",
+              "normally_closed": false
+            },
+            {
+              "tag": "Case_Full",
+              "normally_closed": true
+            }
+          ],
+          [
+            {
+              "tag": "Man_Mode",
+              "normally_closed": false
+            },
+            {
+              "tag": "Jog_PB",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Conv1_Run",
+        "coil_negated": false,
+        "comment": "INFEED CONVEYOR (nested OR): auto after delay unless jammed (or bypassed) and case not full, OR manual jog.",
+        "contact_tag": "T_StartDelay.DN",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "T_StartDelay.DN",
+                  "form": "NO"
+                },
+                {
+                  "kind": "or",
+                  "branches": [
+                    [
+                      {
+                        "kind": "contact",
+                        "var": "Jam_Alarm",
+                        "form": "NC"
+                      }
+                    ],
+                    [
+                      {
+                        "kind": "contact",
+                        "var": "Jam_Bypass_SW",
+                        "form": "NO"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "kind": "contact",
+                  "var": "Case_Full",
+                  "form": "NC"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "Man_Mode",
+                  "form": "NO"
+                },
+                {
+                  "kind": "contact",
+                  "var": "Jog_PB",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "coil",
+            "var": "Conv1_Run",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "re15e5a80",
+        "parallel": [
+          [
+            {
+              "tag": "Conv1_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "OFF-DELAY: TOF T_RunOn keeps the outfeed running 3 s after the infeed stops.",
+        "contact_tag": "Conv1_Run",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_RunOn",
+          "block": "TOF",
+          "pt_ms": 3000
+        }
+      },
+      {
+        "id": "re84c5b01",
+        "parallel": [
+          [
+            {
+              "tag": "T_RunOn.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Conv2_Run",
+        "coil_negated": false,
+        "comment": "Outfeed conveyor follows T_RunOn.DN (TOF done bit = on during run + 3 s after).",
+        "contact_tag": "T_RunOn.DN",
+        "normally_closed": false
+      },
+      {
+        "id": "r4c991503",
+        "parallel": [
+          [
+            {
+              "tag": "Conv1_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "RETENTIVE: RTO T_RunHours accumulates infeed run time (1 h preset). Click it to reset.",
+        "contact_tag": "Conv1_Run",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_RunHours",
+          "block": "RTO",
+          "pt_ms": 3600000
+        }
+      },
+      {
+        "id": "r27aa6937",
+        "parallel": [
+          [
+            {
+              "tag": "T_RunHours.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Service_Due_Lamp",
+        "coil_negated": false,
+        "comment": "Service lamp after 1 h of accumulated run time.",
+        "contact_tag": "T_RunHours.DN",
+        "normally_closed": false
+      },
+      {
+        "id": "r7775d4b0",
+        "parallel": [
+          [
+            {
+              "tag": "Sim_Parts_SW",
+              "normally_closed": false
+            },
+            {
+              "tag": "Conv1_Run",
+              "normally_closed": false
+            },
+            {
+              "tag": "T_PartGen.DN",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "PART GENERATOR (test aid): with Sim_Parts_SW on, a pulse every 1.5 s while the infeed runs.",
+        "contact_tag": "Sim_Parts_SW",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_PartGen",
+          "block": "TON",
+          "pt_ms": 1500
+        }
+      },
+      {
+        "id": "r14e32002",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Eye",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "T_PartGen.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "RISING EDGE: OSR gives Part_Pulse for one scan per bottle (photo-eye OR generator).",
+        "contact_tag": "Part_Eye",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "Part_Eye",
+                  "form": "NO"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "T_PartGen.DN",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "oneshot",
+            "block": "OSR",
+            "var": "Eye_OSR",
+            "output": "Part_Pulse"
+          }
+        ]
+      },
+      {
+        "id": "r87c0c772",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Eye",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "FALLING EDGE: OSF gives Eye_Clear_Pulse when the photo-eye clears.",
+        "contact_tag": "Part_Eye",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Part_Eye",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "OSF",
+            "var": "Eye_OSF",
+            "output": "Eye_Clear_Pulse"
+          }
+        ]
+      },
+      {
+        "id": "r1bc7418c",
+        "parallel": [
+          [
+            {
+              "tag": "Eye_Clear_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Count photo-eye clears (proves the falling edge).",
+        "contact_tag": "Eye_Clear_Pulse",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_EyeClears",
+          "block": "CTU",
+          "pv": 9999
+        }
+      },
+      {
+        "id": "r8bc24f62",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "CTU C_Case: 6 bottles per case.",
+        "contact_tag": "Part_Pulse",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Case",
+          "block": "CTU",
+          "pv": 6
+        }
+      },
+      {
+        "id": "rd81b76ae",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "CTU C_Total: total bottles this shift.",
+        "contact_tag": "Part_Pulse",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Total",
+          "block": "CTU",
+          "pv": 9999
+        }
+      },
+      {
+        "id": "r303ee725",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Bottle_Count numeric mirror (ADD) for the math rungs.",
+        "contact_tag": "Part_Pulse",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Part_Pulse",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "ADD",
+            "dest": "Bottle_Count",
+            "source_a": "Bottle_Count",
+            "source_b": "1"
+          }
+        ]
+      },
+      {
+        "id": "r24d36686",
+        "parallel": [
+          [
+            {
+              "tag": "C_Case.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Case_Full",
+        "coil_negated": false,
+        "comment": "LATCH: case full when C_Case done (OTL).",
+        "contact_tag": "C_Case.DN",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "C_Case.DN",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Case_Full",
+            "form": "set"
+          }
+        ]
+      },
+      {
+        "id": "r47c2406b",
+        "parallel": [
+          [
+            {
+              "tag": "Case_Full",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "CASE INDEX: TON T_CaseIndex 2.5 s while the case is full.",
+        "contact_tag": "Case_Full",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_CaseIndex",
+          "block": "TON",
+          "pt_ms": 2500
+        }
+      },
+      {
+        "id": "r819676d7",
+        "parallel": [
+          [
+            {
+              "tag": "Case_Full",
+              "normally_closed": false
+            },
+            {
+              "tag": "T_CaseIndex.DN",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Case_Pusher",
+        "coil_negated": false,
+        "comment": "Case pusher solenoid while indexing.",
+        "contact_tag": "Case_Full",
+        "normally_closed": false
+      },
+      {
+        "id": "r5f857431",
+        "parallel": [
+          [
+            {
+              "tag": "T_CaseIndex.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "RES: index done resets C_Case.",
+        "contact_tag": "T_CaseIndex.DN",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Case",
+          "block": "RES",
+          "pv": 0
+        }
+      },
+      {
+        "id": "r18d2bb79",
+        "parallel": [
+          [
+            {
+              "tag": "T_CaseIndex.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Case_Full",
+        "coil_negated": false,
+        "comment": "UNLATCH: index done clears Case_Full (OTU).",
+        "contact_tag": "T_CaseIndex.DN",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "T_CaseIndex.DN",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Case_Full",
+            "form": "reset"
+          }
+        ]
+      },
+      {
+        "id": "re84d768b",
+        "parallel": [
+          [
+            {
+              "tag": "Case_Full",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Cases packed: ONS on Case_Full feeding CTU C_Cases.",
+        "contact_tag": "Case_Full",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Cases",
+          "block": "CTU",
+          "pv": 9999
+        },
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Case_Full",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "ONS",
+            "var": "Case_ONS"
+          },
+          {
+            "kind": "counter",
+            "var": "C_Cases",
+            "block": "CTU",
+            "pv": 9999
+          }
+        ]
+      },
+      {
+        "id": "rd882cff8",
+        "parallel": [
+          [
+            {
+              "tag": "T_CaseIndex.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Case_Done_Pulse",
+        "coil_negated": false,
+        "comment": "Case done pulse (ONS) for the batch countdown.",
+        "contact_tag": "T_CaseIndex.DN",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "T_CaseIndex.DN",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "ONS",
+            "var": "CaseDone_ONS"
+          },
+          {
+            "kind": "coil",
+            "var": "Case_Done_Pulse",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r6d569c9e",
+        "parallel": [
+          [
+            {
+              "tag": "Load_Batch_PB",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Reset_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "LOAD: Load_Batch_PB (or Reset) loads C_Batch with 4 cases.",
+        "contact_tag": "Load_Batch_PB",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Batch",
+          "block": "LOAD",
+          "pv": 4
+        }
+      },
+      {
+        "id": "r742dddf6",
+        "parallel": [
+          [
+            {
+              "tag": "Case_Done_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "CTD: each finished case counts C_Batch down.",
+        "contact_tag": "Case_Done_Pulse",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Batch",
+          "block": "CTD",
+          "pv": 4
+        }
+      },
+      {
+        "id": "r66ed1e2c",
+        "parallel": [
+          [
+            {
+              "tag": "C_Batch.DN",
+              "normally_closed": false
+            },
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Batch_Done_Lamp",
+        "coil_negated": false,
+        "comment": "Batch complete lamp when C_Batch reaches 0 (CTD done = ACC <= 0).",
+        "contact_tag": "C_Batch.DN",
+        "normally_closed": false
+      },
+      {
+        "id": "r01f17f3f",
+        "parallel": [
+          [
+            {
+              "tag": "Reset_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Reset clears the shift counters.",
+        "contact_tag": "Reset_Pulse",
+        "normally_closed": false,
+        "counter": {
+          "tag": "C_Total",
+          "block": "RES",
+          "pv": 0
+        }
+      },
+      {
+        "id": "ra5bbb56a",
+        "parallel": [
+          [
+            {
+              "tag": "Part_Eye",
+              "normally_closed": false
+            },
+            {
+              "tag": "Conv1_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "JAM: photo-eye blocked 4 s while the infeed runs.",
+        "contact_tag": "Part_Eye",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_Jam",
+          "block": "TON",
+          "pt_ms": 4000
+        }
+      },
+      {
+        "id": "rd9e33114",
+        "parallel": [
+          [
+            {
+              "tag": "T_Jam.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Jam_Alarm",
+        "coil_negated": false,
+        "comment": "Jam alarm latch.",
+        "contact_tag": "T_Jam.DN",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "T_Jam.DN",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Jam_Alarm",
+            "form": "set"
+          }
+        ]
+      },
+      {
+        "id": "r6fae8daf",
+        "parallel": [
+          [
+            {
+              "tag": "Reset_Pulse",
+              "normally_closed": false
+            },
+            {
+              "tag": "Part_Eye",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Jam_Alarm",
+        "coil_negated": false,
+        "comment": "Jam alarm reset once the eye is clear.",
+        "contact_tag": "Reset_Pulse",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Reset_Pulse",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Part_Eye",
+            "form": "NC"
+          },
+          {
+            "kind": "coil",
+            "var": "Jam_Alarm",
+            "form": "reset"
+          }
+        ]
+      },
+      {
+        "id": "r16fb34a0",
+        "parallel": [
+          [
+            {
+              "tag": "Fill_Valve",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "TANK: fill valve open adds 4 % per pass (ADD).",
+        "contact_tag": "Fill_Valve",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Fill_Valve",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "ADD",
+            "dest": "Tank_Level",
+            "source_a": "Tank_Level",
+            "source_b": "4"
+          }
+        ]
+      },
+      {
+        "id": "rdca636db",
+        "parallel": [
+          [
+            {
+              "tag": "Filler_Valve",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Drain_SW",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "TANK: each filled bottle / Drain_SW draws 3 % per pass (SUB).",
+        "contact_tag": "Filler_Valve",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "Filler_Valve",
+                  "form": "NO"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "Drain_SW",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "math",
+            "op": "SUB",
+            "dest": "Tank_Level",
+            "source_a": "Tank_Level",
+            "source_b": "3"
+          }
+        ]
+      },
+      {
+        "id": "r45a8403f",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Clamp: never below 0 (LES then MOV).",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "LES",
+            "source_a": "Tank_Level",
+            "source_b": "0"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Tank_Level",
+            "source_a": "0",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "r78987149",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Clamp: never above 120 (GRT then MOV).",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "GRT",
+            "source_a": "Tank_Level",
+            "source_b": "120"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Tank_Level",
+            "source_a": "120",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rc9a15d75",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Level_Low",
+        "coil_negated": false,
+        "comment": "LES: low level below 20.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "LES",
+            "source_a": "Tank_Level",
+            "source_b": "20"
+          },
+          {
+            "kind": "coil",
+            "var": "Level_Low",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r723f1d0a",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Level_High",
+        "coil_negated": false,
+        "comment": "GEQ: high level at or above 90.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "GEQ",
+            "source_a": "Tank_Level",
+            "source_b": "90"
+          },
+          {
+            "kind": "coil",
+            "var": "Level_High",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r73eccb59",
+        "parallel": [
+          [
+            {
+              "tag": "Level_Low",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Fill_Valve",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [
+          {
+            "tag": "Level_High",
+            "normally_closed": true
+          },
+          {
+            "tag": "Sys_Run",
+            "normally_closed": false
+          }
+        ],
+        "coil_tag": "Fill_Valve",
+        "coil_negated": false,
+        "comment": "FILL CONTROL with hysteresis: start below 20, stop at 90, only while running.",
+        "contact_tag": "Level_Low",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "or",
+            "branches": [
+              [
+                {
+                  "kind": "contact",
+                  "var": "Level_Low",
+                  "form": "NO"
+                }
+              ],
+              [
+                {
+                  "kind": "contact",
+                  "var": "Fill_Valve",
+                  "form": "NO"
+                }
+              ]
+            ]
+          },
+          {
+            "kind": "contact",
+            "var": "Level_High",
+            "form": "NC"
+          },
+          {
+            "kind": "contact",
+            "var": "Sys_Run",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Fill_Valve",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "rf7b0ea73",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Level_In_Band",
+        "coil_negated": false,
+        "comment": "LIM: level in the 20..80 band (Test, Low, High).",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "LIM",
+            "source_a": "Tank_Level",
+            "source_b": "20",
+            "source_c": "80"
+          },
+          {
+            "kind": "coil",
+            "var": "Level_In_Band",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r7e828433",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Level_HiHi",
+        "coil_negated": false,
+        "comment": "GRT: high-high above 110.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "GRT",
+            "source_a": "Tank_Level",
+            "source_b": "110"
+          },
+          {
+            "kind": "coil",
+            "var": "Level_HiHi",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r85841b80",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Level_LoLo",
+        "coil_negated": false,
+        "comment": "LEQ: low-low at or below 5 (only after init).",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "compare",
+            "op": "LEQ",
+            "source_a": "Tank_Level",
+            "source_b": "5"
+          },
+          {
+            "kind": "coil",
+            "var": "Level_LoLo",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r8141b63b",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "CPT: level in percent of the 120 % scale.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "CPT",
+            "dest": "Level_Pct",
+            "source_a": "(Tank_Level * 100) / 120",
+            "source_b": "",
+            "expression": "(Tank_Level * 100) / 120"
+          }
+        ]
+      },
+      {
+        "id": "r2fcfba17",
+        "parallel": [
+          [
+            {
+              "tag": "Recipe_A_PB",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Recipe A select (ONS + MOV 1).",
+        "contact_tag": "Recipe_A_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Recipe_A_PB",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "ONS",
+            "var": "RecA_ONS"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Recipe_No",
+            "source_a": "1",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rd9d1a98a",
+        "parallel": [
+          [
+            {
+              "tag": "Recipe_B_PB",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Recipe B select (ONS + MOV 2).",
+        "contact_tag": "Recipe_B_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Recipe_B_PB",
+            "form": "NO"
+          },
+          {
+            "kind": "oneshot",
+            "block": "ONS",
+            "var": "RecB_ONS"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Recipe_No",
+            "source_a": "2",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rde4f3789",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Recipe_A",
+        "coil_negated": false,
+        "comment": "EQU: Recipe A active.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "EQU",
+            "source_a": "Recipe_No",
+            "source_b": "1"
+          },
+          {
+            "kind": "coil",
+            "var": "Recipe_A",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r4c1e5ecd",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Recipe_B",
+        "coil_negated": false,
+        "comment": "EQU: Recipe B active.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "EQU",
+            "source_a": "Recipe_No",
+            "source_b": "2"
+          },
+          {
+            "kind": "coil",
+            "var": "Recipe_B",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r8958e5c2",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Recipe_Valid",
+        "coil_negated": false,
+        "comment": "NEQ: a recipe is selected.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "NEQ",
+            "source_a": "Recipe_No",
+            "source_b": "0"
+          },
+          {
+            "kind": "coil",
+            "var": "Recipe_Valid",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "rd5b5b943",
+        "parallel": [
+          [
+            {
+              "tag": "Recipe_A",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Recipe A fill time 3000 ms.",
+        "contact_tag": "Recipe_A",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Recipe_A",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Fill_Time",
+            "source_a": "3000",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "r6a3620bd",
+        "parallel": [
+          [
+            {
+              "tag": "Recipe_B",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "Recipe B fill time 6000 ms.",
+        "contact_tag": "Recipe_B",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Recipe_B",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Fill_Time",
+            "source_a": "6000",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "r2940aa51",
+        "parallel": [
+          [
+            {
+              "tag": "Bottle_In_Place",
+              "normally_closed": false
+            },
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            },
+            {
+              "tag": "Recipe_Valid",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "FILL TIMER: TON T_Fill uses preset TAG Fill_Time (changes with the recipe).",
+        "contact_tag": "Bottle_In_Place",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_Fill",
+          "block": "TON",
+          "pt_ms": 0
+        },
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Bottle_In_Place",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Sys_Run",
+            "form": "NO"
+          },
+          {
+            "kind": "contact",
+            "var": "Recipe_Valid",
+            "form": "NO"
+          },
+          {
+            "kind": "timer",
+            "var": "T_Fill",
+            "block": "TON",
+            "pt_ms": 0,
+            "pt_tag": "Fill_Time"
+          }
+        ]
+      },
+      {
+        "id": "rf465f04d",
+        "parallel": [
+          [
+            {
+              "tag": "T_Fill.TT",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Filler_Valve",
+        "coil_negated": false,
+        "comment": "Filler valve open while T_Fill times.",
+        "contact_tag": "T_Fill.TT",
+        "normally_closed": false
+      },
+      {
+        "id": "r544c7787",
+        "parallel": [
+          [
+            {
+              "tag": "T_Fill.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Fill_Complete_Lamp",
+        "coil_negated": false,
+        "comment": "Fill complete lamp.",
+        "contact_tag": "T_Fill.DN",
+        "normally_closed": false
+      },
+      {
+        "id": "rc3145707",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "MUL: litres x10 (0.5 L per bottle -> 5).",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "MUL",
+            "dest": "Litres_x10",
+            "source_a": "Bottle_Count",
+            "source_b": "5"
+          }
+        ]
+      },
+      {
+        "id": "r5b2959bf",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "DIV: cases calculated from bottles.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "DIV",
+            "dest": "Cases_Calc",
+            "source_a": "Bottle_Count",
+            "source_b": "6"
+          }
+        ]
+      },
+      {
+        "id": "r851de5f0",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "STATUS: clear the word each pass.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "MOV",
+            "dest": "Status_Word",
+            "source_a": "0",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rde8beea0",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "bit0 = running (OR 1).",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Sys_Run",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "OR",
+            "dest": "Status_Word",
+            "source_a": "Status_Word",
+            "source_b": "1"
+          }
+        ]
+      },
+      {
+        "id": "rb3a0a878",
+        "parallel": [
+          [
+            {
+              "tag": "Jam_Alarm",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "bit1 = jam (OR 2).",
+        "contact_tag": "Jam_Alarm",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Jam_Alarm",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "OR",
+            "dest": "Status_Word",
+            "source_a": "Status_Word",
+            "source_b": "2"
+          }
+        ]
+      },
+      {
+        "id": "rb7f3098b",
+        "parallel": [
+          [
+            {
+              "tag": "Level_High",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "bit2 = level high (OR 4).",
+        "contact_tag": "Level_High",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Level_High",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "OR",
+            "dest": "Status_Word",
+            "source_a": "Status_Word",
+            "source_b": "4"
+          }
+        ]
+      },
+      {
+        "id": "r3baad715",
+        "parallel": [
+          [
+            {
+              "tag": "Man_Mode",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "bit3 = manual (OR 8).",
+        "contact_tag": "Man_Mode",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Man_Mode",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "OR",
+            "dest": "Status_Word",
+            "source_a": "Status_Word",
+            "source_b": "8"
+          }
+        ]
+      },
+      {
+        "id": "rdefde6cc",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "AND: low two bits.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "AND",
+            "dest": "Status_Low",
+            "source_a": "Status_Word",
+            "source_b": "3"
+          }
+        ]
+      },
+      {
+        "id": "r9a71a2c7",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "XOR: flip the low nibble.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "XOR",
+            "dest": "Status_Flip",
+            "source_a": "Status_Word",
+            "source_b": "15"
+          }
+        ]
+      },
+      {
+        "id": "r38e0b32d",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "NOT: bitwise inverse.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "math",
+            "op": "NOT",
+            "dest": "Status_Inv",
+            "source_a": "Status_Word",
+            "source_b": ""
+          }
+        ]
+      },
+      {
+        "id": "rf04e6e80",
+        "parallel": [],
+        "series": [],
+        "coil_tag": "Running_No_Jam",
+        "coil_negated": false,
+        "comment": "MEQ: (Status_Word AND 3) = 1 -> running with no jam.",
+        "contact_tag": "",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "compare",
+            "op": "MEQ",
+            "source_a": "Status_Word",
+            "source_b": "3",
+            "source_c": "1"
+          },
+          {
+            "kind": "coil",
+            "var": "Running_No_Jam",
+            "form": "normal"
+          }
+        ]
+      },
+      {
+        "id": "r35c3c046",
+        "parallel": [
+          [
+            {
+              "tag": "T_FlashOff.DN",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "FLASHER 1/2: T_FlashOn 0.5 s (reset by T_FlashOff).",
+        "contact_tag": "T_FlashOff.DN",
+        "normally_closed": true,
+        "timer": {
+          "tag": "T_FlashOn",
+          "block": "TON",
+          "pt_ms": 500
+        }
+      },
+      {
+        "id": "r03e4845f",
+        "parallel": [
+          [
+            {
+              "tag": "T_FlashOn.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "FLASHER 2/2: T_FlashOff 0.5 s - T_FlashOn.DN is a 1 Hz flash bit.",
+        "contact_tag": "T_FlashOn.DN",
+        "normally_closed": false,
+        "timer": {
+          "tag": "T_FlashOff",
+          "block": "TON",
+          "pt_ms": 500
+        }
+      },
+      {
+        "id": "r5f911f03",
+        "parallel": [
+          [
+            {
+              "tag": "Jam_Alarm",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Level_HiHi",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Level_LoLo",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Safety_OK",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Any_Alarm",
+        "coil_negated": false,
+        "comment": "ANY ALARM: jam, high-high, low-low or safety lost.",
+        "contact_tag": "Jam_Alarm",
+        "normally_closed": false
+      },
+      {
+        "id": "r5b72cec5",
+        "parallel": [
+          [
+            {
+              "tag": "Silence_PB",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Horn_Silenced",
+        "coil_negated": false,
+        "comment": "Horn silence latch.",
+        "contact_tag": "Silence_PB",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Silence_PB",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Horn_Silenced",
+            "form": "set"
+          }
+        ]
+      },
+      {
+        "id": "rafabd454",
+        "parallel": [
+          [
+            {
+              "tag": "Reset_Pulse",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Horn_Silenced",
+        "coil_negated": false,
+        "comment": "Reset clears horn silence.",
+        "contact_tag": "Reset_Pulse",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Reset_Pulse",
+            "form": "NO"
+          },
+          {
+            "kind": "coil",
+            "var": "Horn_Silenced",
+            "form": "reset"
+          }
+        ]
+      },
+      {
+        "id": "r5bd5bdb7",
+        "parallel": [
+          [
+            {
+              "tag": "Any_Alarm",
+              "normally_closed": false
+            },
+            {
+              "tag": "Horn_Silenced",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Alarm_Horn",
+        "coil_negated": false,
+        "comment": "Alarm horn until silenced.",
+        "contact_tag": "Any_Alarm",
+        "normally_closed": false
+      },
+      {
+        "id": "re30ac68e",
+        "parallel": [
+          [
+            {
+              "tag": "Any_Alarm",
+              "normally_closed": false
+            },
+            {
+              "tag": "T_FlashOn.DN",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Lamp_Red",
+        "coil_negated": false,
+        "comment": "RED lamp flashes on alarm.",
+        "contact_tag": "Any_Alarm",
+        "normally_closed": false
+      },
+      {
+        "id": "r2276d05a",
+        "parallel": [
+          [
+            {
+              "tag": "Man_Mode",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Case_Full",
+              "normally_closed": false
+            }
+          ],
+          [
+            {
+              "tag": "Start_Warn_Horn",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Lamp_Amber",
+        "coil_negated": false,
+        "comment": "AMBER lamp: manual, case indexing or start warning.",
+        "contact_tag": "Man_Mode",
+        "normally_closed": false
+      },
+      {
+        "id": "r57a40bb5",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            },
+            {
+              "tag": "Any_Alarm",
+              "normally_closed": true
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "Lamp_Green",
+        "coil_negated": false,
+        "comment": "GREEN lamp: running with no alarm.",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false
+      },
+      {
+        "id": "r7c83ed3e",
+        "parallel": [
+          [
+            {
+              "tag": "Init_Done",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "JSR Diagnostics every pass after init.",
+        "contact_tag": "Init_Done",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Init_Done",
+            "form": "NO"
+          },
+          {
+            "kind": "jsr",
+            "target": "Diagnostics"
+          }
+        ]
+      },
+      {
+        "id": "re28eef76",
+        "parallel": [
+          [
+            {
+              "tag": "Sys_Run",
+              "normally_closed": false
+            }
+          ]
+        ],
+        "series": [],
+        "coil_tag": "",
+        "coil_negated": false,
+        "comment": "JSR Lube_Cycle only while the line runs (timers in it freeze when not called).",
+        "contact_tag": "Sys_Run",
+        "normally_closed": false,
+        "elements": [
+          {
+            "kind": "contact",
+            "var": "Sys_Run",
+            "form": "NO"
+          },
+          {
+            "kind": "jsr",
+            "target": "Lube_Cycle"
+          }
+        ]
+      }
+    ],
+    "hmi_items": [
+      {
+        "id": "cfdd2a3760",
+        "kind": "screen",
+        "label": "OVERVIEW screen"
+      },
+      {
+        "id": "68b3d60bff",
+        "kind": "indicator",
+        "label": "Lamp_Green - Running (green)"
+      },
+      {
+        "id": "9b87ab699d",
+        "kind": "indicator",
+        "label": "Lamp_Amber - Manual / indexing / warning (amber)"
+      },
+      {
+        "id": "7c16010bb6",
+        "kind": "indicator",
+        "label": "Lamp_Red - Alarm (red, flashing)"
+      },
+      {
+        "id": "90d69fb691",
+        "kind": "indicator",
+        "label": "Line_Idle - Line idle"
+      },
+      {
+        "id": "6b699e0d47",
+        "kind": "button",
+        "label": "Start_PB - START"
+      },
+      {
+        "id": "c29af95535",
+        "kind": "button",
+        "label": "Stop_PB - STOP"
+      },
+      {
+        "id": "156ede8ae9",
+        "kind": "button",
+        "label": "Reset_PB - RESET"
+      },
+      {
+        "id": "e545ddd609",
+        "kind": "button",
+        "label": "Silence_PB - SILENCE HORN"
+      },
+      {
+        "id": "61914f8bec",
+        "kind": "selector",
+        "label": "Auto_Sel / Man_Sel - MODE"
+      },
+      {
+        "id": "79ebd2261b",
+        "kind": "screen",
+        "label": "PRODUCTION screen"
+      },
+      {
+        "id": "5dd475372b",
+        "kind": "numeric",
+        "label": "C_Case.ACC - Bottles in case (of 6)"
+      },
+      {
+        "id": "32d34a7c0a",
+        "kind": "numeric",
+        "label": "C_Total.ACC - Bottles this shift"
+      },
+      {
+        "id": "e2ca60150b",
+        "kind": "numeric",
+        "label": "C_Cases.ACC - Cases packed"
+      },
+      {
+        "id": "81c21a7533",
+        "kind": "numeric",
+        "label": "C_Batch.ACC - Cases left in batch"
+      },
+      {
+        "id": "b1547da77f",
+        "kind": "numeric",
+        "label": "Litres_x10 / Cases_Calc - Production math"
+      },
+      {
+        "id": "65f547a662",
+        "kind": "button",
+        "label": "Load_Batch_PB - LOAD BATCH"
+      },
+      {
+        "id": "2396ee21e7",
+        "kind": "indicator",
+        "label": "Batch_Done_Lamp - Batch complete"
+      },
+      {
+        "id": "c23199af5c",
+        "kind": "screen",
+        "label": "TANK & RECIPE screen"
+      },
+      {
+        "id": "5e5628e938",
+        "kind": "bargraph",
+        "label": "Tank_Level / Level_Pct - Tank level"
+      },
+      {
+        "id": "badddaec72",
+        "kind": "indicator",
+        "label": "Fill_Valve - Filling"
+      },
+      {
+        "id": "c5a8717b93",
+        "kind": "indicator",
+        "label": "Level_Low / Level_High / Level_In_Band"
+      },
+      {
+        "id": "d0430627e9",
+        "kind": "button",
+        "label": "Recipe_A_PB - RECIPE A (3 s)"
+      },
+      {
+        "id": "5a8e77dc34",
+        "kind": "button",
+        "label": "Recipe_B_PB - RECIPE B (6 s)"
+      },
+      {
+        "id": "6503787824",
+        "kind": "numeric",
+        "label": "Recipe_No / Fill_Time - Active recipe"
+      },
+      {
+        "id": "dd87af98ec",
+        "kind": "numeric",
+        "label": "T_Fill.ACC - Fill progress"
+      },
+      {
+        "id": "20fe8d35ba",
+        "kind": "screen",
+        "label": "MAINTENANCE screen"
+      },
+      {
+        "id": "accbbb4123",
+        "kind": "numeric",
+        "label": "T_RunHours.ACC - Run hours (RTO)"
+      },
+      {
+        "id": "d4c900e6e6",
+        "kind": "indicator",
+        "label": "Service_Due_Lamp - Service due"
+      },
+      {
+        "id": "8f5fa011a8",
+        "kind": "numeric",
+        "label": "C_LubeShots.ACC - Lube shots"
+      },
+      {
+        "id": "cf992511db",
+        "kind": "indicator",
+        "label": "Grease_Low_Lamp - Grease low"
+      },
+      {
+        "id": "98b3f01792",
+        "kind": "numeric",
+        "label": "Status_Word / Status_Low / Status_Flip / Status_Inv - Status bits"
+      },
+      {
+        "id": "7a389cc93a",
+        "kind": "indicator",
+        "label": "Heartbeat - PLC heartbeat"
+      },
+      {
+        "id": "c39a6bc043",
+        "kind": "screen",
+        "label": "ALARMS screen"
+      },
+      {
+        "id": "275ef61159",
+        "kind": "alarm",
+        "label": "Jam_Alarm - Infeed jam"
+      },
+      {
+        "id": "a3183c1ced",
+        "kind": "alarm",
+        "label": "Level_HiHi - Tank high-high"
+      },
+      {
+        "id": "b3243cf0f4",
+        "kind": "alarm",
+        "label": "Level_LoLo - Tank low-low"
+      },
+      {
+        "id": "fdb4f382ac",
+        "kind": "alarm",
+        "label": "Safety_OK off - Safety circuit open"
+      },
+      {
+        "id": "8812f44e0c",
+        "kind": "indicator",
+        "label": "Guard_Open_Lamp - Guard open"
+      }
+    ],
+    "plc_text": "Learning program for this cabinet. Not a download to a live PLC.\nNOT A CERTIFIED UL 508A DRAWING. Design aid only.\nEducational design aid only \u2014 real E-stop/safety functions must be hardwired or use rated safety relays per NFPA 79 / ISO 13849\n\nPLC ladder (plain text you can copy into your real PLC programmer)\nSymbols: [TAG]=NO contact  [/TAG]=NC contact  (TAG)=coil  (/TAG)=negated coil  TON/TOF/RTO=timer  CTU/CTD=counter  (RES C1)=reset  ONS/OSR/OSF=one-shot  nested OR / mid-rung coils supported\nReal ladder order: Start NO seals with contactor NO, Stop NC and E-Stop NC in series, coil = contactor.\n\nRung 1 - INIT 1/4: first scan only (Init_Done not yet set) - preload the tank level to 40.\n  |----[/Init_Done]----MOV[40\u2192Tank_Level]----|\n  Note:    INIT 1/4: first scan only (Init_Done not yet set) - preload the tank level to 40.\n\nRung 2 - INIT 2/4: default recipe = 1 (Recipe A, 3 s fill).\n  |----[/Init_Done]----MOV[1\u2192Recipe_No]----|\n  Note:    INIT 2/4: default recipe = 1 (Recipe A, 3 s fill).\n\nRung 3 - INIT 3/4: default fill time preset 3000 ms (used by T_Fill via preset tag).\n  |----[/Init_Done]----MOV[3000\u2192Fill_Time]----|\n  Note:    INIT 3/4: default fill time preset 3000 ms (used by T_Fill via preset tag).\n\nRung 4 - INIT 4/4: latch Init_Done so the init rungs never run again (until Reset sim).\n  |----[/Init_Done]----(S)Init_Done----|\n  Coil:    (Init_Done)\n  Note:    INIT 4/4: latch Init_Done so the init rungs never run again (until Reset sim).\n\nRung 5 - SAFETY OK seal-in: Reset_PB arms, ES1_Healthy and Guard_Closed must stay made. SAFETY: E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function.\n  |----([Reset_PB] OR [Safety_OK])----[ES1_Healthy]----[Guard_Closed]----(Safety_OK)----|\n  Coil:    (Safety_OK)\n  Note:    SAFETY OK seal-in: Reset_PB arms, ES1_Healthy and Guard_Closed must stay made. SAFETY: E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function.\n\nRung 6 - Reset one-shot: Reset_PB gives a ONE-scan Reset_Pulse (ONS), no matter how long it is held.\n  |----[Reset_PB]----ONS[Reset_ONS]----(Reset_Pulse)----|\n  Coil:    (Reset_Pulse)\n  Note:    Reset one-shot: Reset_PB gives a ONE-scan Reset_Pulse (ONS), no matter how long it is held.\n\nRung 7 - Guard door lamp - uses ALIAS Guard_Door -> Guard_Closed (NC contact).\n  |----[/Guard_Door]----(Guard_Open_Lamp)----|\n  Contact: [/Guard_Door]  (NC)  Guard_Door (Device)\n  Coil:    (Guard_Open_Lamp)  Guard_Open_Lamp (Device)\n  Note:    Guard door lamp - uses ALIAS Guard_Door -> Guard_Closed (NC contact).\n\nRung 8 - MODE: Auto when Auto_Sel on and Man_Sel off.\n  |----[Auto_Sel]----[/Man_Sel]----(Auto_Mode)----|\n  Contact: [Auto_Sel]  (NO)  Auto_Sel (Device)\n  Contact: [/Man_Sel]  (NC)  Man_Sel (Device)\n  Coil:    (Auto_Mode)  Auto_Mode (Device)\n  Note:    MODE: Auto when Auto_Sel on and Man_Sel off.\n\nRung 9 - MODE: Manual when Man_Sel on and Auto_Sel off (both on = no mode).\n  |----[Man_Sel]----[/Auto_Sel]----(Man_Mode)----|\n  Contact: [Man_Sel]  (NO)  Man_Sel (Device)\n  Contact: [/Auto_Sel]  (NC)  Auto_Sel (Device)\n  Coil:    (Man_Mode)  Man_Mode (Device)\n  Note:    MODE: Manual when Man_Sel on and Auto_Sel off (both on = no mode).\n\nRung 10 - LINE RUN seal-in: Start_PB starts, Stop_PB (NC logic) / safety / jam / leaving Auto drops it.\n  |----([Start_PB] OR [Sys_Run])----[/Stop_PB]----[Safety_OK]----[Auto_Mode]----[/Jam_Alarm]----(Sys_Run)----|\n  Coil:    (Sys_Run)\n  Note:    LINE RUN seal-in: Start_PB starts, Stop_PB (NC logic) / safety / jam / leaving Auto drops it.\n\nRung 11 - NEGATED COIL: Line_Idle is the inverse of the rung (on while Sys_Run is off).\n  |----[Sys_Run]----(/Line_Idle)----|\n  Contact: [Sys_Run]  (NO)  Sys_Run (Device)\n  Coil:    (/Line_Idle)  Line_Idle (Device)\n  Note:    NEGATED COIL: Line_Idle is the inverse of the rung (on while Sys_Run is off).\n\nRung 12 - MID-RUNG COIL: Run_Echo follows Sys_Run; Auto_Running needs Auto_Mode as well.\n  |----[Sys_Run]----(Run_Echo)----[Auto_Mode]----(Auto_Running)----|\n  Mid-coils: Run_Echo\n  Coil:    (Auto_Running)\n  Note:    MID-RUNG COIL: Run_Echo follows Sys_Run; Auto_Running needs Auto_Mode as well.\n\nRung 13 - START WARNING: TON T_StartDelay 2 s after Sys_Run before conveyors move.\n  |----[Sys_Run]----TON[T_StartDelay/2000ms]----|\n  Contact: [Sys_Run]  (NO)  Sys_Run (Device)\n  Timer:   TON(T_StartDelay) PT=2000ms\n  Note:    START WARNING: TON T_StartDelay 2 s after Sys_Run before conveyors move.\n\nRung 14 - Start warning horn sounds while T_StartDelay is timing (.TT).\n  |----[T_StartDelay.TT]----(Start_Warn_Horn)----|\n  Contact: [T_StartDelay.TT]  (NO)  T_StartDelay.TT (Device)\n  Coil:    (Start_Warn_Horn)  Start_Warn_Horn (Device)\n  Note:    Start warning horn sounds while T_StartDelay is timing (.TT).\n\nRung 15 - INFEED CONVEYOR (nested OR): auto after delay unless jammed (or bypassed) and case not full, OR manual jog.\n  |----([T_StartDelay.DN]+([/Jam_Alarm] OR [Jam_Bypass_SW])+[/Case_Full] OR [Man_Mode]+[Jog_PB])----(Conv1_Run)----|\n  Coil:    (Conv1_Run)\n  Note:    INFEED CONVEYOR (nested OR): auto after delay unless jammed (or bypassed) and case not full, OR manual jog.\n\nRung 16 - OFF-DELAY: TOF T_RunOn keeps the outfeed running 3 s after the infeed stops.\n  |----[Conv1_Run]----TOF[T_RunOn/3000ms]----|\n  Contact: [Conv1_Run]  (NO)  Conv1_Run (Device)\n  Timer:   TOF(T_RunOn) PT=3000ms\n  Note:    OFF-DELAY: TOF T_RunOn keeps the outfeed running 3 s after the infeed stops.\n\nRung 17 - Outfeed conveyor follows T_RunOn.DN (TOF done bit = on during run + 3 s after).\n  |----[T_RunOn.DN]----(Conv2_Run)----|\n  Contact: [T_RunOn.DN]  (NO)  T_RunOn.DN (Device)\n  Coil:    (Conv2_Run)  Conv2_Run (Device)\n  Note:    Outfeed conveyor follows T_RunOn.DN (TOF done bit = on during run + 3 s after).\n\nRung 18 - RETENTIVE: RTO T_RunHours accumulates infeed run time (1 h preset). Click it to reset.\n  |----[Conv1_Run]----RTO[T_RunHours/3600000ms]----|\n  Contact: [Conv1_Run]  (NO)  Conv1_Run (Device)\n  Timer:   RTO(T_RunHours) PT=3600000ms\n  Note:    RETENTIVE: RTO T_RunHours accumulates infeed run time (1 h preset). Click it to reset.\n\nRung 19 - Service lamp after 1 h of accumulated run time.\n  |----[T_RunHours.DN]----(Service_Due_Lamp)----|\n  Contact: [T_RunHours.DN]  (NO)  T_RunHours.DN (Device)\n  Coil:    (Service_Due_Lamp)  Service_Due_Lamp (Device)\n  Note:    Service lamp after 1 h of accumulated run time.\n\nRung 20 - PART GENERATOR (test aid): with Sim_Parts_SW on, a pulse every 1.5 s while the infeed runs.\n  |----[Sim_Parts_SW]----[Conv1_Run]----[/T_PartGen.DN]----TON[T_PartGen/1500ms]----|\n  Contact: [Sim_Parts_SW]  (NO)  Sim_Parts_SW (Device)\n  Contact: [Conv1_Run]  (NO)  Conv1_Run (Device)\n  Contact: [/T_PartGen.DN]  (NC)  T_PartGen.DN (Device)\n  Timer:   TON(T_PartGen) PT=1500ms\n  Note:    PART GENERATOR (test aid): with Sim_Parts_SW on, a pulse every 1.5 s while the infeed runs.\n\nRung 21 - RISING EDGE: OSR gives Part_Pulse for one scan per bottle (photo-eye OR generator).\n  |----([Part_Eye] OR [T_PartGen.DN])----OSR[Eye_OSR\u2192Part_Pulse]----|\n  Note:    RISING EDGE: OSR gives Part_Pulse for one scan per bottle (photo-eye OR generator).\n\nRung 22 - FALLING EDGE: OSF gives Eye_Clear_Pulse when the photo-eye clears.\n  |----[Part_Eye]----OSF[Eye_OSF\u2192Eye_Clear_Pulse]----|\n  Note:    FALLING EDGE: OSF gives Eye_Clear_Pulse when the photo-eye clears.\n\nRung 23 - Count photo-eye clears (proves the falling edge).\n  |----[Eye_Clear_Pulse]----CTU[C_EyeClears/PRE=9999]----|\n  Contact: [Eye_Clear_Pulse]  (NO)  Eye_Clear_Pulse (Device)\n  Counter: CTU(C_EyeClears) PRE=9999  DN when ACC>=PRE\n  Note:    Count photo-eye clears (proves the falling edge).\n\nRung 24 - CTU C_Case: 6 bottles per case.\n  |----[Part_Pulse]----CTU[C_Case/PRE=6]----|\n  Contact: [Part_Pulse]  (NO)  Part_Pulse (Device)\n  Counter: CTU(C_Case) PRE=6  DN when ACC>=PRE\n  Note:    CTU C_Case: 6 bottles per case.\n\nRung 25 - CTU C_Total: total bottles this shift.\n  |----[Part_Pulse]----CTU[C_Total/PRE=9999]----|\n  Contact: [Part_Pulse]  (NO)  Part_Pulse (Device)\n  Counter: CTU(C_Total) PRE=9999  DN when ACC>=PRE\n  Note:    CTU C_Total: total bottles this shift.\n\nRung 26 - Bottle_Count numeric mirror (ADD) for the math rungs.\n  |----[Part_Pulse]----ADD[Bottle_Count=Bottle_Count,1]----|\n  Note:    Bottle_Count numeric mirror (ADD) for the math rungs.\n\nRung 27 - LATCH: case full when C_Case done (OTL).\n  |----[C_Case.DN]----(S)Case_Full----|\n  Coil:    (Case_Full)\n  Note:    LATCH: case full when C_Case done (OTL).\n\nRung 28 - CASE INDEX: TON T_CaseIndex 2.5 s while the case is full.\n  |----[Case_Full]----TON[T_CaseIndex/2500ms]----|\n  Contact: [Case_Full]  (NO)  Case_Full (Device)\n  Timer:   TON(T_CaseIndex) PT=2500ms\n  Note:    CASE INDEX: TON T_CaseIndex 2.5 s while the case is full.\n\nRung 29 - Case pusher solenoid while indexing.\n  |----[Case_Full]----[/T_CaseIndex.DN]----(Case_Pusher)----|\n  Contact: [Case_Full]  (NO)  Case_Full (Device)\n  Contact: [/T_CaseIndex.DN]  (NC)  T_CaseIndex.DN (Device)\n  Coil:    (Case_Pusher)  Case_Pusher (Device)\n  Note:    Case pusher solenoid while indexing.\n\nRung 30 - RES: index done resets C_Case.\n  |----[T_CaseIndex.DN]----(RES C_Case)----|\n  Contact: [T_CaseIndex.DN]  (NO)  T_CaseIndex.DN (Device)\n  Counter: RES(C_Case)  ACC:=0\n  Note:    RES: index done resets C_Case.\n\nRung 31 - UNLATCH: index done clears Case_Full (OTU).\n  |----[T_CaseIndex.DN]----(R)Case_Full----|\n  Coil:    (Case_Full)\n  Note:    UNLATCH: index done clears Case_Full (OTU).\n\nRung 32 - Cases packed: ONS on Case_Full feeding CTU C_Cases.\n  |----[Case_Full]----ONS[Case_ONS]----CTU[C_Cases/PRE=9999]----|\n  Note:    Cases packed: ONS on Case_Full feeding CTU C_Cases.\n\nRung 33 - Case done pulse (ONS) for the batch countdown.\n  |----[T_CaseIndex.DN]----ONS[CaseDone_ONS]----(Case_Done_Pulse)----|\n  Coil:    (Case_Done_Pulse)\n  Note:    Case done pulse (ONS) for the batch countdown.\n\nRung 34 - LOAD: Load_Batch_PB (or Reset) loads C_Batch with 4 cases.\n  |----[Load_Batch_PB]----+----(LOAD C_Batch)----|\n  |----[Reset_Pulse]  ----+                     |\n  Contact: [Load_Batch_PB]  (NO)  Load_Batch_PB (Device)\n  Contact: [Reset_Pulse]  (NO)  Reset_Pulse (Device)\n  Counter: LOAD(C_Batch)  ACC:=PRE\n  Note:    LOAD: Load_Batch_PB (or Reset) loads C_Batch with 4 cases.\n\nRung 35 - CTD: each finished case counts C_Batch down.\n  |----[Case_Done_Pulse]----CTD[C_Batch/PRE=4]----|\n  Contact: [Case_Done_Pulse]  (NO)  Case_Done_Pulse (Device)\n  Counter: CTD(C_Batch) PRE=4  DN when ACC<=0\n  Note:    CTD: each finished case counts C_Batch down.\n\nRung 36 - Batch complete lamp when C_Batch reaches 0 (CTD done = ACC <= 0).\n  |----[C_Batch.DN]----[Init_Done]----(Batch_Done_Lamp)----|\n  Contact: [C_Batch.DN]  (NO)  C_Batch.DN (Device)\n  Contact: [Init_Done]  (NO)  Init_Done (Device)\n  Coil:    (Batch_Done_Lamp)  Batch_Done_Lamp (Device)\n  Note:    Batch complete lamp when C_Batch reaches 0 (CTD done = ACC <= 0).\n\nRung 37 - Reset clears the shift counters.\n  |----[Reset_Pulse]----(RES C_Total)----|\n  Contact: [Reset_Pulse]  (NO)  Reset_Pulse (Device)\n  Counter: RES(C_Total)  ACC:=0\n  Note:    Reset clears the shift counters.\n\nRung 38 - JAM: photo-eye blocked 4 s while the infeed runs.\n  |----[Part_Eye]----[Conv1_Run]----TON[T_Jam/4000ms]----|\n  Contact: [Part_Eye]  (NO)  Part_Eye (Device)\n  Contact: [Conv1_Run]  (NO)  Conv1_Run (Device)\n  Timer:   TON(T_Jam) PT=4000ms\n  Note:    JAM: photo-eye blocked 4 s while the infeed runs.\n\nRung 39 - Jam alarm latch.\n  |----[T_Jam.DN]----(S)Jam_Alarm----|\n  Coil:    (Jam_Alarm)\n  Note:    Jam alarm latch.\n\nRung 40 - Jam alarm reset once the eye is clear.\n  |----[Reset_Pulse]----[/Part_Eye]----(R)Jam_Alarm----|\n  Coil:    (Jam_Alarm)\n  Note:    Jam alarm reset once the eye is clear.\n\nRung 41 - TANK: fill valve open adds 4 % per pass (ADD).\n  |----[Fill_Valve]----ADD[Tank_Level=Tank_Level,4]----|\n  Note:    TANK: fill valve open adds 4 % per pass (ADD).\n\nRung 42 - TANK: each filled bottle / Drain_SW draws 3 % per pass (SUB).\n  |----([Filler_Valve] OR [Drain_SW])----SUB[Tank_Level=Tank_Level,3]----|\n  Note:    TANK: each filled bottle / Drain_SW draws 3 % per pass (SUB).\n\nRung 43 - Clamp: never below 0 (LES then MOV).\n  |----LES[Tank_Level,0]----MOV[0\u2192Tank_Level]----|\n  Note:    Clamp: never below 0 (LES then MOV).\n\nRung 44 - Clamp: never above 120 (GRT then MOV).\n  |----GRT[Tank_Level,120]----MOV[120\u2192Tank_Level]----|\n  Note:    Clamp: never above 120 (GRT then MOV).\n\nRung 45 - LES: low level below 20.\n  |----LES[Tank_Level,20]----(Level_Low)----|\n  Coil:    (Level_Low)\n  Note:    LES: low level below 20.\n\nRung 46 - GEQ: high level at or above 90.\n  |----GEQ[Tank_Level,90]----(Level_High)----|\n  Coil:    (Level_High)\n  Note:    GEQ: high level at or above 90.\n\nRung 47 - FILL CONTROL with hysteresis: start below 20, stop at 90, only while running.\n  |----([Level_Low] OR [Fill_Valve])----[/Level_High]----[Sys_Run]----(Fill_Valve)----|\n  Coil:    (Fill_Valve)\n  Note:    FILL CONTROL with hysteresis: start below 20, stop at 90, only while running.\n\nRung 48 - LIM: level in the 20..80 band (Test, Low, High).\n  |----LIM[Tank_Level,20,80]----(Level_In_Band)----|\n  Coil:    (Level_In_Band)\n  Note:    LIM: level in the 20..80 band (Test, Low, High).\n\nRung 49 - GRT: high-high above 110.\n  |----GRT[Tank_Level,110]----(Level_HiHi)----|\n  Coil:    (Level_HiHi)\n  Note:    GRT: high-high above 110.\n\nRung 50 - LEQ: low-low at or below 5 (only after init).\n  |----[Init_Done]----LEQ[Tank_Level,5]----(Level_LoLo)----|\n  Coil:    (Level_LoLo)\n  Note:    LEQ: low-low at or below 5 (only after init).\n\nRung 51 - CPT: level in percent of the 120 % scale.\n  |----[Init_Done]----CPT[Level_Pct=(Tank_Level * 100) / 120]----|\n  Note:    CPT: level in percent of the 120 % scale.\n\nRung 52 - Recipe A select (ONS + MOV 1).\n  |----[Recipe_A_PB]----ONS[RecA_ONS]----MOV[1\u2192Recipe_No]----|\n  Note:    Recipe A select (ONS + MOV 1).\n\nRung 53 - Recipe B select (ONS + MOV 2).\n  |----[Recipe_B_PB]----ONS[RecB_ONS]----MOV[2\u2192Recipe_No]----|\n  Note:    Recipe B select (ONS + MOV 2).\n\nRung 54 - EQU: Recipe A active.\n  |----EQU[Recipe_No,1]----(Recipe_A)----|\n  Coil:    (Recipe_A)\n  Note:    EQU: Recipe A active.\n\nRung 55 - EQU: Recipe B active.\n  |----EQU[Recipe_No,2]----(Recipe_B)----|\n  Coil:    (Recipe_B)\n  Note:    EQU: Recipe B active.\n\nRung 56 - NEQ: a recipe is selected.\n  |----NEQ[Recipe_No,0]----(Recipe_Valid)----|\n  Coil:    (Recipe_Valid)\n  Note:    NEQ: a recipe is selected.\n\nRung 57 - Recipe A fill time 3000 ms.\n  |----[Recipe_A]----MOV[3000\u2192Fill_Time]----|\n  Note:    Recipe A fill time 3000 ms.\n\nRung 58 - Recipe B fill time 6000 ms.\n  |----[Recipe_B]----MOV[6000\u2192Fill_Time]----|\n  Note:    Recipe B fill time 6000 ms.\n\nRung 59 - FILL TIMER: TON T_Fill uses preset TAG Fill_Time (changes with the recipe).\n  |----[Bottle_In_Place]----[Sys_Run]----[Recipe_Valid]----TON[T_Fill/PT=Fill_Time]----|\n  Note:    FILL TIMER: TON T_Fill uses preset TAG Fill_Time (changes with the recipe).\n\nRung 60 - Filler valve open while T_Fill times.\n  |----[T_Fill.TT]----(Filler_Valve)----|\n  Contact: [T_Fill.TT]  (NO)  T_Fill.TT (Device)\n  Coil:    (Filler_Valve)  Filler_Valve (Device)\n  Note:    Filler valve open while T_Fill times.\n\nRung 61 - Fill complete lamp.\n  |----[T_Fill.DN]----(Fill_Complete_Lamp)----|\n  Contact: [T_Fill.DN]  (NO)  T_Fill.DN (Device)\n  Coil:    (Fill_Complete_Lamp)  Fill_Complete_Lamp (Device)\n  Note:    Fill complete lamp.\n\nRung 62 - MUL: litres x10 (0.5 L per bottle -> 5).\n  |----[Init_Done]----MUL[Litres_x10=Bottle_Count,5]----|\n  Note:    MUL: litres x10 (0.5 L per bottle -> 5).\n\nRung 63 - DIV: cases calculated from bottles.\n  |----[Init_Done]----DIV[Cases_Calc=Bottle_Count,6]----|\n  Note:    DIV: cases calculated from bottles.\n\nRung 64 - STATUS: clear the word each pass.\n  |----[Init_Done]----MOV[0\u2192Status_Word]----|\n  Note:    STATUS: clear the word each pass.\n\nRung 65 - bit0 = running (OR 1).\n  |----[Sys_Run]----OR[Status_Word=Status_Word,1]----|\n  Note:    bit0 = running (OR 1).\n\nRung 66 - bit1 = jam (OR 2).\n  |----[Jam_Alarm]----OR[Status_Word=Status_Word,2]----|\n  Note:    bit1 = jam (OR 2).\n\nRung 67 - bit2 = level high (OR 4).\n  |----[Level_High]----OR[Status_Word=Status_Word,4]----|\n  Note:    bit2 = level high (OR 4).\n\nRung 68 - bit3 = manual (OR 8).\n  |----[Man_Mode]----OR[Status_Word=Status_Word,8]----|\n  Note:    bit3 = manual (OR 8).\n\nRung 69 - AND: low two bits.\n  |----[Init_Done]----AND[Status_Low=Status_Word,3]----|\n  Note:    AND: low two bits.\n\nRung 70 - XOR: flip the low nibble.\n  |----[Init_Done]----XOR[Status_Flip=Status_Word,15]----|\n  Note:    XOR: flip the low nibble.\n\nRung 71 - NOT: bitwise inverse.\n  |----[Init_Done]----NOT[Status_Inv=~Status_Word]----|\n  Note:    NOT: bitwise inverse.\n\nRung 72 - MEQ: (Status_Word AND 3) = 1 -> running with no jam.\n  |----MEQ[Status_Word,3,1]----(Running_No_Jam)----|\n  Coil:    (Running_No_Jam)\n  Note:    MEQ: (Status_Word AND 3) = 1 -> running with no jam.\n\nRung 73 - FLASHER 1/2: T_FlashOn 0.5 s (reset by T_FlashOff).\n  |----[/T_FlashOff.DN]----TON[T_FlashOn/500ms]----|\n  Contact: [/T_FlashOff.DN]  (NC)  T_FlashOff.DN (Device)\n  Timer:   TON(T_FlashOn) PT=500ms\n  Note:    FLASHER 1/2: T_FlashOn 0.5 s (reset by T_FlashOff).\n\nRung 74 - FLASHER 2/2: T_FlashOff 0.5 s - T_FlashOn.DN is a 1 Hz flash bit.\n  |----[T_FlashOn.DN]----TON[T_FlashOff/500ms]----|\n  Contact: [T_FlashOn.DN]  (NO)  T_FlashOn.DN (Device)\n  Timer:   TON(T_FlashOff) PT=500ms\n  Note:    FLASHER 2/2: T_FlashOff 0.5 s - T_FlashOn.DN is a 1 Hz flash bit.\n\nRung 75 - ANY ALARM: jam, high-high, low-low or safety lost.\n  |----[Jam_Alarm] ----+----(Any_Alarm)----|\n  |----[Level_HiHi]----+                  |\n  |----[Level_LoLo]----+                  |\n  |----[/Safety_OK]----+                  |\n  Contact: [Jam_Alarm]  (NO)  Jam_Alarm (Device)\n  Contact: [Level_HiHi]  (NO)  Level_HiHi (Device)\n  Contact: [Level_LoLo]  (NO)  Level_LoLo (Device)\n  Contact: [/Safety_OK]  (NC)  Safety_OK (Device)\n  Coil:    (Any_Alarm)  Any_Alarm (Device)\n  Note:    ANY ALARM: jam, high-high, low-low or safety lost.\n\nRung 76 - Horn silence latch.\n  |----[Silence_PB]----(S)Horn_Silenced----|\n  Coil:    (Horn_Silenced)\n  Note:    Horn silence latch.\n\nRung 77 - Reset clears horn silence.\n  |----[Reset_Pulse]----(R)Horn_Silenced----|\n  Coil:    (Horn_Silenced)\n  Note:    Reset clears horn silence.\n\nRung 78 - Alarm horn until silenced.\n  |----[Any_Alarm]----[/Horn_Silenced]----(Alarm_Horn)----|\n  Contact: [Any_Alarm]  (NO)  Any_Alarm (Device)\n  Contact: [/Horn_Silenced]  (NC)  Horn_Silenced (Device)\n  Coil:    (Alarm_Horn)  Alarm_Horn (Device)\n  Note:    Alarm horn until silenced.\n\nRung 79 - RED lamp flashes on alarm.\n  |----[Any_Alarm]----[T_FlashOn.DN]----(Lamp_Red)----|\n  Contact: [Any_Alarm]  (NO)  Any_Alarm (Device)\n  Contact: [T_FlashOn.DN]  (NO)  T_FlashOn.DN (Device)\n  Coil:    (Lamp_Red)  Lamp_Red (Device)\n  Note:    RED lamp flashes on alarm.\n\nRung 80 - AMBER lamp: manual, case indexing or start warning.\n  |----[Man_Mode]       ----+----(Lamp_Amber)----|\n  |----[Case_Full]      ----+                   |\n  |----[Start_Warn_Horn]----+                   |\n  Contact: [Man_Mode]  (NO)  Man_Mode (Device)\n  Contact: [Case_Full]  (NO)  Case_Full (Device)\n  Contact: [Start_Warn_Horn]  (NO)  Start_Warn_Horn (Device)\n  Coil:    (Lamp_Amber)  Lamp_Amber (Device)\n  Note:    AMBER lamp: manual, case indexing or start warning.\n\nRung 81 - GREEN lamp: running with no alarm.\n  |----[Sys_Run]----[/Any_Alarm]----(Lamp_Green)----|\n  Contact: [Sys_Run]  (NO)  Sys_Run (Device)\n  Contact: [/Any_Alarm]  (NC)  Any_Alarm (Device)\n  Coil:    (Lamp_Green)  Lamp_Green (Device)\n  Note:    GREEN lamp: running with no alarm.\n\nRung 82 - JSR Diagnostics every pass after init.\n  |----[Init_Done]----jsr----|\n  Note:    JSR Diagnostics every pass after init.\n\nRung 83 - JSR Lube_Cycle only while the line runs (timers in it freeze when not called).\n  |----[Sys_Run]----jsr----|\n  Note:    JSR Lube_Cycle only while the line runs (timers in it freeze when not called).\n",
+    "hmi_text": "Learning program for this cabinet. Not a download to a live PLC.\n\nHMI screens and indicators (edit the names, then copy into your HMI software)\n\nScreen: Main\n  - [screen] OVERVIEW screen\n  - [indicator] Lamp_Green - Running (green)\n  - [indicator] Lamp_Amber - Manual / indexing / warning (amber)\n  - [indicator] Lamp_Red - Alarm (red, flashing)\n  - [indicator] Line_Idle - Line idle\n  - [button] Start_PB - START\n  - [button] Stop_PB - STOP\n  - [button] Reset_PB - RESET\n  - [button] Silence_PB - SILENCE HORN\n  - [selector] Auto_Sel / Man_Sel - MODE\n  - [screen] PRODUCTION screen\n  - [numeric] C_Case.ACC - Bottles in case (of 6)\n  - [numeric] C_Total.ACC - Bottles this shift\n  - [numeric] C_Cases.ACC - Cases packed\n  - [numeric] C_Batch.ACC - Cases left in batch\n  - [numeric] Litres_x10 / Cases_Calc - Production math\n  - [button] Load_Batch_PB - LOAD BATCH\n  - [indicator] Batch_Done_Lamp - Batch complete\n  - [screen] TANK & RECIPE screen\n  - [bargraph] Tank_Level / Level_Pct - Tank level\n  - [indicator] Fill_Valve - Filling\n  - [indicator] Level_Low / Level_High / Level_In_Band\n  - [button] Recipe_A_PB - RECIPE A (3 s)\n  - [button] Recipe_B_PB - RECIPE B (6 s)\n  - [numeric] Recipe_No / Fill_Time - Active recipe\n  - [numeric] T_Fill.ACC - Fill progress\n  - [screen] MAINTENANCE screen\n  - [numeric] T_RunHours.ACC - Run hours (RTO)\n  - [indicator] Service_Due_Lamp - Service due\n  - [numeric] C_LubeShots.ACC - Lube shots\n  - [indicator] Grease_Low_Lamp - Grease low\n  - [numeric] Status_Word / Status_Low / Status_Flip / Status_Inv - Status bits\n  - [indicator] Heartbeat - PLC heartbeat\n  - [screen] ALARMS screen\n  - [alarm] Jam_Alarm - Infeed jam\n  - [alarm] Level_HiHi - Tank high-high\n  - [alarm] Level_LoLo - Tank low-low\n  - [alarm] Safety_OK off - Safety circuit open\n  - [indicator] Guard_Open_Lamp - Guard open\n",
+    "text_edited": true,
+    "tag_descriptions": {
+      "ES1_Healthy": "E-stop circuit healthy (safety relay feedback) - FORCE ON to run",
+      "Guard_Closed": "Guard door closed switch - FORCE ON to run",
+      "Reset_PB": "Reset / arm pushbutton",
+      "Start_PB": "Line start pushbutton",
+      "Stop_PB": "Line stop pushbutton",
+      "Silence_PB": "Horn silence",
+      "Jog_PB": "Manual jog infeed",
+      "Auto_Sel": "Mode selector - AUTO",
+      "Man_Sel": "Mode selector - MANUAL",
+      "Jam_Bypass_SW": "Jam bypass key switch",
+      "Sim_Parts_SW": "TEST AID: auto part generator",
+      "Drain_SW": "Manual tank drain",
+      "Diag_Enable": "Diagnostics enable",
+      "Part_Eye": "Infeed bottle photo-eye",
+      "Bottle_In_Place": "Bottle at filler prox",
+      "Recipe_A_PB": "Select recipe A (3 s fill)",
+      "Recipe_B_PB": "Select recipe B (6 s fill)",
+      "Load_Batch_PB": "Load batch (4 cases)",
+      "Safety_OK": "Safety circuit OK (seal-in)",
+      "Sys_Run": "Line running",
+      "Conv1_Run": "Infeed conveyor M1",
+      "Conv2_Run": "Outfeed conveyor M2",
+      "Case_Pusher": "Case pusher solenoid",
+      "Fill_Valve": "Tank fill valve",
+      "Filler_Valve": "Bottle filler valve",
+      "Lube_Pump": "Chain lube pump",
+      "Lamp_Green": "Stack light green",
+      "Lamp_Amber": "Stack light amber",
+      "Lamp_Red": "Stack light red",
+      "Alarm_Horn": "Alarm horn",
+      "Start_Warn_Horn": "Start-up warning horn",
+      "Tank_Level": "Tank level % (simulated analog)",
+      "Recipe_No": "Active recipe number",
+      "Fill_Time": "Fill time preset ms (T_Fill preset tag)",
+      "Status_Word": "Packed status bits",
+      "T_RunHours": "Infeed run-hour meter (RTO)",
+      "C_Case": "Bottles in current case",
+      "C_Batch": "Cases left in batch (CTD)"
+    },
+    "tag_aliases": {
+      "Guard_Door": "Guard_Closed"
+    },
+    "routines": {
+      "Diagnostics": [
+        {
+          "id": "c90456d36b",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "SBR Diagnostics",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "sbr",
+              "name": "Diagnostics"
+            }
+          ]
+        },
+        {
+          "id": "000ead8051",
+          "parallel": [
+            [
+              {
+                "tag": "T_HB2.DN",
+                "normally_closed": true
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Heartbeat 1/2: T_HB1 1 s.",
+          "contact_tag": "T_HB2.DN",
+          "normally_closed": true,
+          "timer": {
+            "tag": "T_HB1",
+            "block": "TON",
+            "pt_ms": 1000
+          }
+        },
+        {
+          "id": "39dbec09bf",
+          "parallel": [
+            [
+              {
+                "tag": "T_HB1.DN",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Heartbeat 2/2: T_HB2 1 s.",
+          "contact_tag": "T_HB1.DN",
+          "normally_closed": false,
+          "timer": {
+            "tag": "T_HB2",
+            "block": "TON",
+            "pt_ms": 1000
+          }
+        },
+        {
+          "id": "4d803b116c",
+          "parallel": [
+            [
+              {
+                "tag": "T_HB1.DN",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "Heartbeat",
+          "coil_negated": false,
+          "comment": "Heartbeat bit (0.5 Hz).",
+          "contact_tag": "T_HB1.DN",
+          "normally_closed": false
+        },
+        {
+          "id": "01a48da766",
+          "parallel": [
+            [
+              {
+                "tag": "Diag_Enable",
+                "normally_closed": true
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "EARLY RET when Diag_Enable is off (rungs below are skipped).",
+          "contact_tag": "Diag_Enable",
+          "normally_closed": true,
+          "elements": [
+            {
+              "kind": "contact",
+              "var": "Diag_Enable",
+              "form": "NC"
+            },
+            {
+              "kind": "ret"
+            }
+          ]
+        },
+        {
+          "id": "7a183d9215",
+          "parallel": [
+            [
+              {
+                "tag": "Heartbeat",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Count heartbeats (ONS + ADD).",
+          "contact_tag": "Heartbeat",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "contact",
+              "var": "Heartbeat",
+              "form": "NO"
+            },
+            {
+              "kind": "oneshot",
+              "block": "ONS",
+              "var": "HB_ONS"
+            },
+            {
+              "kind": "math",
+              "op": "ADD",
+              "dest": "Diag_Ticks",
+              "source_a": "Diag_Ticks",
+              "source_b": "1"
+            }
+          ]
+        },
+        {
+          "id": "daae9f0e10",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Roll over at 9999.",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "compare",
+              "op": "GRT",
+              "source_a": "Diag_Ticks",
+              "source_b": "9999"
+            },
+            {
+              "kind": "math",
+              "op": "MOV",
+              "dest": "Diag_Ticks",
+              "source_a": "0",
+              "source_b": ""
+            }
+          ]
+        },
+        {
+          "id": "9592b24a0a",
+          "parallel": [
+            [
+              {
+                "tag": "Diag_Enable",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "Diag_Active_Lamp",
+          "coil_negated": false,
+          "comment": "Diagnostics active lamp.",
+          "contact_tag": "Diag_Enable",
+          "normally_closed": false
+        },
+        {
+          "id": "9f39458f7e",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "RET",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "ret"
+            }
+          ]
+        }
+      ],
+      "Lube_Cycle": [
+        {
+          "id": "92b134085e",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "SBR Lube_Cycle",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "sbr",
+              "name": "Lube_Cycle"
+            }
+          ]
+        },
+        {
+          "id": "60e09ae040",
+          "parallel": [
+            [
+              {
+                "tag": "Conv1_Run",
+                "normally_closed": false
+              },
+              {
+                "tag": "T_LubePulse.DN",
+                "normally_closed": true
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Lube interval 10 s of running.",
+          "contact_tag": "Conv1_Run",
+          "normally_closed": false,
+          "timer": {
+            "tag": "T_LubeInterval",
+            "block": "TON",
+            "pt_ms": 10000
+          }
+        },
+        {
+          "id": "5ae4bfb300",
+          "parallel": [
+            [
+              {
+                "tag": "T_LubeInterval.DN",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "Lube pulse 2 s.",
+          "contact_tag": "T_LubeInterval.DN",
+          "normally_closed": false,
+          "timer": {
+            "tag": "T_LubePulse",
+            "block": "TON",
+            "pt_ms": 2000
+          }
+        },
+        {
+          "id": "8c6661067f",
+          "parallel": [
+            [
+              {
+                "tag": "T_LubeInterval.DN",
+                "normally_closed": false
+              },
+              {
+                "tag": "T_LubePulse.DN",
+                "normally_closed": true
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "Lube_Pump",
+          "coil_negated": false,
+          "comment": "Lube pump on during the pulse.",
+          "contact_tag": "T_LubeInterval.DN",
+          "normally_closed": false
+        },
+        {
+          "id": "d80ae47f87",
+          "parallel": [
+            [
+              {
+                "tag": "Lube_Pump",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "NESTED JSR: count lube shots.",
+          "contact_tag": "Lube_Pump",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "contact",
+              "var": "Lube_Pump",
+              "form": "NO"
+            },
+            {
+              "kind": "jsr",
+              "target": "Lube_Count"
+            }
+          ]
+        },
+        {
+          "id": "687c6d981b",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "RET",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "ret"
+            }
+          ]
+        }
+      ],
+      "Lube_Count": [
+        {
+          "id": "b075840a3d",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "SBR Lube_Count",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "sbr",
+              "name": "Lube_Count"
+            }
+          ]
+        },
+        {
+          "id": "bf68d11d75",
+          "parallel": [
+            [
+              {
+                "tag": "Lube_Pump",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "CTU C_LubeShots (ONS so one count per pulse).",
+          "contact_tag": "Lube_Pump",
+          "normally_closed": false,
+          "counter": {
+            "tag": "C_LubeShots",
+            "block": "CTU",
+            "pv": 100
+          },
+          "elements": [
+            {
+              "kind": "contact",
+              "var": "Lube_Pump",
+              "form": "NO"
+            },
+            {
+              "kind": "oneshot",
+              "block": "ONS",
+              "var": "Lube_ONS"
+            },
+            {
+              "kind": "counter",
+              "var": "C_LubeShots",
+              "block": "CTU",
+              "pv": 100
+            }
+          ]
+        },
+        {
+          "id": "1155c989ff",
+          "parallel": [
+            [
+              {
+                "tag": "C_LubeShots.DN",
+                "normally_closed": false
+              }
+            ]
+          ],
+          "series": [],
+          "coil_tag": "Grease_Low_Lamp",
+          "coil_negated": false,
+          "comment": "Grease low lamp after 100 shots.",
+          "contact_tag": "C_LubeShots.DN",
+          "normally_closed": false
+        },
+        {
+          "id": "b003e18b3d",
+          "parallel": [],
+          "series": [],
+          "coil_tag": "",
+          "coil_negated": false,
+          "comment": "RET",
+          "contact_tag": "",
+          "normally_closed": false,
+          "elements": [
+            {
+              "kind": "ret"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "wiring_context": {
+    "wire_colors": {},
+    "wire_gauges": {},
+    "numbering_prefix": "W",
+    "numbering_next": 101,
+    "numbering_width": 3,
+    "parent_plc_tag": "",
+    "next_input_slot": 1,
+    "next_input_bit": 0,
+    "next_output_slot": 2,
+    "next_output_bit": 0,
+    "ip_base": "192.168.1",
+    "next_ip_host": 10,
+    "shared_buses": {},
+    "interlock_color": ""
+  },
+  "cabinet": {
+    "label": "TB1",
+    "width": 780.0,
+    "height": 860.0,
+    "enclosure_width_in": 36.0,
+    "enclosure_height_in": 30.0,
+    "backplate_width_in": 33.0,
+    "backplate_height_in": 27.0,
+    "enclosure_maker": "Hoffman",
+    "enclosure_catalog": "A363012LP+A36P30"
+  },
+  "items": [
+    {
+      "id": "772c94c761ef",
+      "library_id": "ab-1606-xls",
+      "type_id": "power_supply",
+      "x": 24.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "PSU1",
+        "description": "24 VDC control power",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "27b50c43e1c8",
+      "library_id": "ab-compactlogix-5380",
+      "type_id": "plc",
+      "x": 144.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "PLC1",
+        "description": "Fill & pack line controller",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "0fb7ad2177bd",
+      "library_id": "ab-5069-ib16",
+      "type_id": "io_module",
+      "x": 264.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "DI1",
+        "description": "16-pt 24 VDC input card",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "1ec1c18bd276",
+      "library_id": "ab-5069-ib16",
+      "type_id": "io_module",
+      "x": 384.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "DI2",
+        "description": "16-pt 24 VDC input card",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "48e2576dee26",
+      "library_id": "ab-5069-ob16",
+      "type_id": "io_module",
+      "x": 504.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "DO1",
+        "description": "16-pt 24 VDC output card",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "0eac89ac8f3d",
+      "library_id": "ab-panelview-5310",
+      "type_id": "hmi",
+      "x": 624.0,
+      "y": 48.0,
+      "fields": {
+        "tag": "HMI1",
+        "description": "Operator HMI (screens per HMI list)",
+        "io_direction": "n/a",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "5f000f69d961",
+      "library_id": "ab-estop-800t",
+      "type_id": "estop",
+      "x": 24.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "ES1_Healthy",
+        "description": "E-stop healthy feedback",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "82107a99e197",
+      "library_id": "ab-prox-871c",
+      "type_id": "sensor",
+      "x": 144.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "Guard_Closed",
+        "description": "Guard door switch",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "f688b3736c10",
+      "library_id": "ab-pb-green-start",
+      "type_id": "pushbutton",
+      "x": 264.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "Start_PB",
+        "description": "Line start",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "4969ae99ce31",
+      "library_id": "ab-pb-red-stop",
+      "type_id": "pushbutton",
+      "x": 384.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "Stop_PB",
+        "description": "Line stop",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "d0664c6096a4",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 504.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "Reset_PB",
+        "description": "Reset / arm",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "d96a079e59eb",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 624.0,
+      "y": 158.0,
+      "fields": {
+        "tag": "Silence_PB",
+        "description": "Horn silence",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "e5e2af83b2aa",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 24.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Jog_PB",
+        "description": "Manual jog",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "f847afd7318b",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 144.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Auto_Sel",
+        "description": "Mode selector AUTO",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "694ec37178f2",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 264.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Man_Sel",
+        "description": "Mode selector MANUAL",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "e9f3eee4f314",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 384.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Jam_Bypass_SW",
+        "description": "Jam bypass key",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "dee2e97970be",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 504.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Sim_Parts_SW",
+        "description": "Test aid: auto parts",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "4223833fccb6",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 624.0,
+      "y": 268.0,
+      "fields": {
+        "tag": "Drain_SW",
+        "description": "Tank drain",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "996f48a09806",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 24.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Diag_Enable",
+        "description": "Diagnostics enable",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "1be86069c2dd",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 144.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Recipe_A_PB",
+        "description": "Recipe A",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "fc0ed0d7b281",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 264.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Recipe_B_PB",
+        "description": "Recipe B",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "da97419b682f",
+      "library_id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "x": 384.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Load_Batch_PB",
+        "description": "Load batch",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "e7c3f6081174",
+      "library_id": "generic-photoeye",
+      "type_id": "sensor",
+      "x": 504.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Part_Eye",
+        "description": "Infeed photo-eye",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "b8c768a3b67e",
+      "library_id": "ab-prox-871c",
+      "type_id": "sensor",
+      "x": 624.0,
+      "y": 378.0,
+      "fields": {
+        "tag": "Bottle_In_Place",
+        "description": "Bottle at filler",
+        "io_direction": "Input",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "a7098e7c5a0f",
+      "library_id": "ab-contactor-100c",
+      "type_id": "contactor",
+      "x": 24.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Conv1_Run",
+        "description": "Infeed conveyor M1 contactor",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "34ebc338b5d1",
+      "library_id": "ab-contactor-100c",
+      "type_id": "contactor",
+      "x": 144.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Conv2_Run",
+        "description": "Outfeed conveyor M2 contactor",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "6cb044ae2279",
+      "library_id": "solenoid-24vdc",
+      "type_id": "solenoid",
+      "x": 264.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Case_Pusher",
+        "description": "Case pusher",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "d8948ce113a7",
+      "library_id": "valve-2way-24v",
+      "type_id": "valve",
+      "x": 384.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Fill_Valve",
+        "description": "Tank fill valve",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "b2a9f62ec765",
+      "library_id": "valve-2way-24v",
+      "type_id": "valve",
+      "x": 504.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Filler_Valve",
+        "description": "Bottle filler valve",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "6f38e04b3777",
+      "library_id": "relay-control-24v",
+      "type_id": "relay",
+      "x": 624.0,
+      "y": 488.0,
+      "fields": {
+        "tag": "Lube_Pump",
+        "description": "Lube pump relay",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "a92b7eb5f34c",
+      "library_id": "relay-control-24v",
+      "type_id": "relay",
+      "x": 24.0,
+      "y": 598.0,
+      "fields": {
+        "tag": "Alarm_Horn",
+        "description": "Alarm horn relay",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "d13344ba2284",
+      "library_id": "relay-control-24v",
+      "type_id": "relay",
+      "x": 144.0,
+      "y": 598.0,
+      "fields": {
+        "tag": "Start_Warn_Horn",
+        "description": "Start warning horn relay",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "f92ee30f0c0b",
+      "library_id": "ab-stack-855e",
+      "type_id": "light",
+      "x": 264.0,
+      "y": 598.0,
+      "fields": {
+        "tag": "Lamp_Green",
+        "description": "Stack light green",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "a93dca36bda1",
+      "library_id": "ab-stack-855e",
+      "type_id": "light",
+      "x": 384.0,
+      "y": 598.0,
+      "fields": {
+        "tag": "Lamp_Amber",
+        "description": "Stack light amber",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "04607160d7db",
+      "library_id": "ab-stack-855e",
+      "type_id": "light",
+      "x": 504.0,
+      "y": 598.0,
+      "fields": {
+        "tag": "Lamp_Red",
+        "description": "Stack light red",
+        "io_direction": "Output",
+        "mounting": "In cabinet"
+      }
+    }
+  ],
+  "saved_at": "2026-10-06T15:31:34+00:00"
+}

@@ -1,0 +1,18 @@
+﻿Cabinet Studio — local development
+
+Source (editable): Desktop\CabinetStudio\mvp
+Venv Python: mvp\.venv\Scripts\python.exe
+
+Run from source (needs the venv):
+  cd Desktop\CabinetStudio\mvp
+  .venv\Scripts\python.exe app.py
+  (same as: .venv\Scripts\python.exe -m cabinet_studio)
+
+Rebuild the Windows exe (onedir, no console window):
+  cd Desktop\CabinetStudio\mvp
+  .venv\Scripts\python.exe -m PyInstaller --noconfirm --windowed --name CabinetStudio --collect-all customtkinter --add-data "C:\Users\spart\OneDrive\Desktop\CabinetStudio\mvp\cabinet_studio\library;cabinet_studio\library" --add-data "C:\Users\spart\OneDrive\Desktop\CabinetStudio\mvp\cabinet_studio\programs;cabinet_studio\programs" --distpath "C:\Users\spart\OneDrive\Desktop\CabinetStudio\builds" --workpath "C:\Users\spart\OneDrive\Desktop\CabinetStudio\builds\pyinstaller-work" --specpath "C:\Users\spart\OneDrive\Desktop\CabinetStudio\builds" "C:\Users\spart\OneDrive\Desktop\CabinetStudio\mvp\app.py"
+
+Output lands at builds\CabinetStudio\CabinetStudio.exe. Zip of that folder: builds\CabinetStudio-windows.zip
+
+Deploy to another Windows PC: copy the builds\CabinetStudio folder (or unzip CabinetStudio-windows.zip) and double-click CabinetStudio.exe. No Python install is required on the target PC. Keep editing and running from mvp; the exe is only the packaged deploy copy.
+Generate drawings from the open cabinet: left rail, Project, Drawings. SVG files go in a drawings folder next to the save (or in saves\drawings\<cabinet-name>\ when the cabinet has not been saved yet).

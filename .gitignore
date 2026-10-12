@@ -1,0 +1,40 @@
+# Allow-list: ignore everything at the root, then re-include what belongs in the repo.
+/*
+!/.gitignore
+!/README.md
+!/AGENTS.md
+!/DEV.txt
+!/START-HERE.md
+!/mvp/
+!/docs/
+!/installer/
+!/assets/
+!/.cursor/
+/.cursor/*
+!/.cursor/rules/
+!/builds/
+/builds/*
+!/builds/*.spec
+
+# Junk anywhere
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.bak
+*.exe
+*.zip
+*.tgz
+*.log
+*.lnk
+.env
+ai_settings.json
+standards_profile.json
+build/
+dist/
+
+# Inside mvp
+/mvp/saves/
+/mvp/builds/
+/mvp/_launch_*.txt

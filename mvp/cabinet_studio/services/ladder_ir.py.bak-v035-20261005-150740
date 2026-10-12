@@ -1,0 +1,802 @@
+"""Cabinet Studio Educational Ladder IR (v3 / v0.3.4).
+
+First-party intermediate representation for NO/NC contacts, coils,
+TON/TOF/RTO timers, CTU/CTD counters (+ RES / LOAD), series/parallel,
+**nested OR branches**, and **mid-rung coils**. Converts to/from the
+project.program rung dicts used by the Programming viewer so existing
+cabinets keep working.
+
+Nested OR (v0.3.4): an ``or`` element's branches may contain contacts and
+further ``or`` groups (educational CCW-style parallel nesting).
+
+Mid-rung coils (v0.3.4): coil elements may appear before the end of a rung;
+scan power continues past a coil (OTE-style / CCW educational passthrough)
+so later contacts and coils still evaluate.
+
+Not a vendor PLC format. Not MicroLogix / .RSS / Do-more / CODESYS native.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+from uuid import uuid4
+
+
+IR_FORMAT = "cabinet-studio-ladder"
+IR_VERSION = 1
+IR_DIALECT = "educational-iec"
+
+
+TIMER_BLOCKS = ("TON", "TOF", "RTO")
+# Counter instructions (v0.3.3). CTU/CTD own the counter instance; RES/LOAD act on it.
+COUNTER_BLOCKS = ("CTU", "CTD", "RES", "LOAD")
+COUNTER_OWNER_BLOCKS = ("CTU", "CTD")
+COUNTER_MIN = -32768
+COUNTER_MAX = 32767
+# Member suffixes readable as contacts, e.g. C1.DN / T1.TT (Rockwell-style names).
+MEMBER_SUFFIXES = ("DN", "TT", "EN", "CU", "CD", "OV", "UN", "Q")
+
+
+def clamp_counter(value: object) -> int:
+    try:
+        num = int(float(value or 0))
+    except (TypeError, ValueError):
+        num = 0
+    return max(COUNTER_MIN, min(COUNTER_MAX, num))
+
+
+def normalize_counter_block(block: object) -> str:
+    blk = str(block or "CTU").upper().strip()
+    if blk == "CTUD":
+        blk = "CTU"
+    if blk in {"RST", "RESET"}:
+        blk = "RES"
+    if blk in {"LD", "LOAD"}:
+        blk = "LOAD"
+    return blk if blk in COUNTER_BLOCKS else "CTU"
+
+
+def split_member(tag: str) -> tuple[str, str]:
+    """'C1.DN' -> ('C1', 'DN'); 'PB_Start' -> ('PB_Start', '')."""
+    name = (tag or "").strip()
+    if "." in name:
+        base, _, member = name.rpartition(".")
+        if base and member.upper() in MEMBER_SUFFIXES:
+            return base, member.upper()
+    return name, ""
+
+
+def new_id(prefix: str = "r") -> str:
+    return f"{prefix}{uuid4().hex[:8]}"
+
+
+def empty_ladder(
+    *,
+    project_name: str = "",
+    variables: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    return {
+        "format": IR_FORMAT,
+        "version": IR_VERSION,
+        "dialect": IR_DIALECT,
+        "meta": {
+            "project": project_name or "",
+            "not_a_vendor_format": True,
+            "label": "Cabinet Studio Educational Ladder",
+        },
+        "variables": list(variables or []),
+        "rungs": [],
+    }
+
+
+def _contact_el(tag: str, normally_closed: bool = False) -> dict[str, Any]:
+    return {
+        "kind": "contact",
+        "var": (tag or "").strip(),
+        "form": "NC" if normally_closed else "NO",
+    }
+
+
+def _coil_el(tag: str, negated: bool = False, form: str | None = None) -> dict[str, Any]:
+    coil_form = form or ("negated" if negated else "normal")
+    return {
+        "kind": "coil",
+        "var": (tag or "").strip(),
+        "form": coil_form,
+    }
+
+
+def _timer_el(tag: str, block: str = "TON", pt_ms: int = 0) -> dict[str, Any]:
+    blk = str(block or "TON").upper()
+    if blk not in {"TON", "TOF", "RTO"}:
+        blk = "TON"
+    return {
+        "kind": "timer",
+        "var": (tag or "").strip(),
+        "block": blk,
+        "pt_ms": max(0, int(pt_ms or 0)),
+    }
+
+
+def _counter_el(tag: str, block: str = "CTU", pv: int = 0) -> dict[str, Any]:
+    blk = normalize_counter_block(block)
+    return {
+        "kind": "counter",
+        "var": (tag or "").strip(),
+        "block": blk,
+        "pv": clamp_counter(pv) if blk in COUNTER_OWNER_BLOCKS or blk == "LOAD" else 0,
+    }
+
+
+
+def _clean_logic_item(item: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Normalize one logic element; OR branches may nest further OR groups."""
+    if not isinstance(item, dict):
+        return None
+    kind = str(item.get("kind") or "").lower()
+    if kind == "contact":
+        var = str(item.get("var") or item.get("tag") or "").strip()
+        if not var:
+            return None
+        return {
+            "kind": "contact",
+            "var": var,
+            "form": "NC" if str(item.get("form", "NO")).upper() == "NC" or bool(item.get("normally_closed")) else "NO",
+        }
+    if kind == "or":
+        branches: list[list[dict[str, Any]]] = []
+        for branch in item.get("branches") or []:
+            if not isinstance(branch, list):
+                continue
+            cleaned: list[dict[str, Any]] = []
+            for sub in branch:
+                c = _clean_logic_item(sub if isinstance(sub, dict) else None)
+                if c:
+                    cleaned.append(c)
+            if cleaned:
+                branches.append(cleaned)
+        if not branches:
+            return None
+        return {"kind": "or", "branches": branches}
+    if kind == "coil":
+        var = str(item.get("var") or item.get("tag") or "").strip()
+        if not var:
+            return None
+        form = str(item.get("form") or ("negated" if item.get("negated") or item.get("coil_negated") else "normal")).lower()
+        if form not in {"normal", "negated", "set", "reset", "s", "r"}:
+            form = "normal"
+        return {"kind": "coil", "var": var, "form": form}
+    if kind == "timer":
+        var = str(item.get("var") or item.get("tag") or "").strip()
+        if not var:
+            return None
+        blk = str(item.get("block") or "TON").upper()
+        if blk not in TIMER_BLOCKS:
+            blk = "TON"
+        return {"kind": "timer", "var": var, "block": blk, "pt_ms": max(0, int(item.get("pt_ms") or 0))}
+    if kind == "counter":
+        var = str(item.get("var") or item.get("tag") or "").strip()
+        if not var:
+            return None
+        return _counter_el(var, str(item.get("block") or "CTU"), item.get("pv", item.get("pre", 0)))
+    return None
+
+
+def clean_elements(elements: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    """Normalize a full rung element list (allows nested OR + mid-rung coils)."""
+    out: list[dict[str, Any]] = []
+    for el in elements or []:
+        cleaned = _clean_logic_item(el if isinstance(el, dict) else None)
+        if cleaned:
+            out.append(cleaned)
+    return out
+
+
+def elements_have_nested_or(elements: list[dict[str, Any]] | None) -> bool:
+    def walk(els: list) -> bool:
+        for el in els or []:
+            if not isinstance(el, dict):
+                continue
+            if str(el.get("kind") or "").lower() != "or":
+                continue
+            for branch in el.get("branches") or []:
+                for item in branch or []:
+                    if isinstance(item, dict) and str(item.get("kind") or "").lower() == "or":
+                        return True
+                    if isinstance(item, dict) and str(item.get("kind") or "").lower() == "or":
+                        return True
+                if walk(list(branch or [])):
+                    return True
+        return False
+    return walk(list(elements or []))
+
+
+def elements_have_mid_rung_coil(elements: list[dict[str, Any]] | None) -> bool:
+    """True when a coil appears before the final element (or before later logic)."""
+    els = list(elements or [])
+    coil_indexes = [i for i, e in enumerate(els) if str(e.get("kind") or "").lower() == "coil"]
+    if not coil_indexes:
+        return False
+    last = len(els) - 1
+    for i in coil_indexes:
+        if i < last:
+            # Anything after a coil (contact/or/coil/timer/counter) => mid-rung
+            return True
+    return False
+
+
+def elements_need_storage(elements: list[dict[str, Any]] | None) -> bool:
+    """Program dict should keep full elements when nested OR or mid-rung coils exist."""
+    els = clean_elements(elements)
+    if elements_have_nested_or(els) or elements_have_mid_rung_coil(els):
+        return True
+    coils = [e for e in els if str(e.get("kind") or "").lower() == "coil"]
+    return len(coils) > 1
+
+
+def program_rung_to_elements(rung: dict[str, Any]) -> list[dict[str, Any]]:
+    """Map one project.program rung into IR element list (series of contact/or/coil).
+
+    Prefer an explicit ``elements`` list when present (nested OR / mid-rung coils).
+    Otherwise rebuild from parallel / series / timer / counter / coil_tag.
+    """
+    if isinstance(rung.get("elements"), list) and rung.get("elements"):
+        return clean_elements(rung.get("elements"))
+
+    elements: list[dict[str, Any]] = []
+    parallel = list(rung.get("parallel") or [])
+    series = list(rung.get("series") or [])
+    coil = (rung.get("coil_tag") or "").strip()
+    coil_neg = bool(rung.get("coil_negated"))
+    mid_coils = list(rung.get("mid_coils") or [])
+
+    if parallel:
+        if len(parallel) == 1 and len(parallel[0]) == 1:
+            c = parallel[0][0]
+            # Branch item may be a nested OR dict (rare in program dict) or contact
+            if isinstance(c, dict) and str(c.get("kind") or "").lower() == "or":
+                cleaned = _clean_logic_item(c)
+                if cleaned:
+                    elements.append(cleaned)
+            else:
+                elements.append(_contact_el(c.get("tag", ""), bool(c.get("normally_closed"))))
+        elif len(parallel) == 1:
+            for c in parallel[0]:
+                if isinstance(c, dict) and str(c.get("kind") or "").lower() == "or":
+                    cleaned = _clean_logic_item(c)
+                    if cleaned:
+                        elements.append(cleaned)
+                else:
+                    elements.append(_contact_el(c.get("tag", ""), bool(c.get("normally_closed"))))
+        else:
+            branches: list[list[dict[str, Any]]] = []
+            for branch in parallel:
+                branch_els: list[dict[str, Any]] = []
+                for c in branch:
+                    if isinstance(c, dict) and str(c.get("kind") or "").lower() == "or":
+                        cleaned = _clean_logic_item(c)
+                        if cleaned:
+                            branch_els.append(cleaned)
+                    elif (c.get("tag") or "").strip():
+                        branch_els.append(_contact_el(c.get("tag", ""), bool(c.get("normally_closed"))))
+                if branch_els:
+                    branches.append(branch_els)
+            if len(branches) == 1:
+                elements.extend(branches[0])
+            elif branches:
+                elements.append({"kind": "or", "branches": branches})
+
+    # Mid-rung coils inserted after parallel group, before series (program-dict shorthand)
+    for mc in mid_coils:
+        if not isinstance(mc, dict):
+            continue
+        tag = (mc.get("tag") or mc.get("var") or "").strip()
+        if not tag:
+            continue
+        form = str(mc.get("form") or ("negated" if mc.get("negated") else "normal"))
+        elements.append(_coil_el(tag, form=form if form in {"normal", "negated", "set", "reset"} else "normal"))
+
+    for c in series:
+        tag = (c.get("tag") or "").strip()
+        if tag:
+            elements.append(_contact_el(tag, bool(c.get("normally_closed"))))
+
+    timer = rung.get("timer") if isinstance(rung.get("timer"), dict) else None
+    if timer:
+        t_tag = (timer.get("tag") or timer.get("var") or "").strip()
+        if t_tag:
+            elements.append(
+                _timer_el(
+                    t_tag,
+                    str(timer.get("block") or "TON"),
+                    int(timer.get("pt_ms") or 0),
+                )
+            )
+
+    counter = rung.get("counter") if isinstance(rung.get("counter"), dict) else None
+    if counter:
+        c_tag = (counter.get("tag") or counter.get("var") or "").strip()
+        if c_tag:
+            elements.append(
+                _counter_el(
+                    c_tag,
+                    str(counter.get("block") or "CTU"),
+                    counter.get("pv", counter.get("pre", 0)),
+                )
+            )
+
+    if coil:
+        elements.append(_coil_el(coil, coil_neg))
+    return elements
+
+
+def elements_to_program_rung(
+    elements: list[dict[str, Any]],
+    *,
+    rung_id: str | None = None,
+    comment: str = "",
+) -> dict[str, Any]:
+    """Map IR elements back into the Programming viewer rung shape.
+
+    Simple series/parallel/single-coil rungs keep the classic fields only.
+    Nested OR or mid-rung / multi-coil rungs also store ``elements`` (and
+    ``mid_coils`` when applicable) so round-trips stay lossless.
+    """
+    elements = clean_elements(elements)
+    parallel: list[list[dict[str, Any]]] = []
+    series: list[dict[str, Any]] = []
+    coil_tag = ""
+    coil_negated = False
+    timer: dict[str, Any] | None = None
+    counter: dict[str, Any] | None = None
+    mid_coils: list[dict[str, Any]] = []
+    seen_or = False
+    trailing_coil_indexes: list[int] = []
+
+    def contact_from(item: dict[str, Any]) -> dict[str, Any] | None:
+        tag = (item.get("var") or "").strip()
+        if not tag:
+            return None
+        return {
+            "tag": tag,
+            "normally_closed": str(item.get("form", "NO")).upper() == "NC",
+        }
+
+    def branch_to_program(branch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Flatten one OR branch for the classic parallel field (contacts only;
+        nested OR groups are kept as kind=or dicts inside the branch list)."""
+        out: list[dict[str, Any]] = []
+        for item in branch:
+            kind = str(item.get("kind") or "").lower()
+            if kind == "contact":
+                c = contact_from(item)
+                if c:
+                    out.append(c)
+            elif kind == "or":
+                out.append({"kind": "or", "branches": item.get("branches") or []})
+        return out
+
+    for idx, el in enumerate(elements):
+        kind = (el.get("kind") or "").strip().lower()
+        if kind == "or":
+            seen_or = True
+            for branch in el.get("branches") or []:
+                contacts = branch_to_program(list(branch))
+                if contacts:
+                    parallel.append(contacts)
+        elif kind == "contact":
+            contact = contact_from(el)
+            if not contact:
+                continue
+            if not seen_or and not parallel and not series and not mid_coils:
+                parallel.append([contact])
+            elif not seen_or and len(parallel) == 1 and not series and not mid_coils:
+                parallel[0].append(contact)
+            else:
+                series.append(contact)
+        elif kind == "coil":
+            trailing_coil_indexes.append(idx)
+            form = str(el.get("form", "normal")).lower()
+            tag = (el.get("var") or "").strip()
+            # Defer assigning coil_tag: last coil wins for classic field
+            coil_tag = tag
+            coil_negated = form in {"negated", "not", "nc"}
+        elif kind == "timer":
+            t_tag = (el.get("var") or "").strip()
+            if t_tag:
+                blk = str(el.get("block") or "TON").upper()
+                if blk not in {"TON", "TOF", "RTO"}:
+                    blk = "TON"
+                timer = {
+                    "tag": t_tag,
+                    "block": blk,
+                    "pt_ms": max(0, int(el.get("pt_ms") or 0)),
+                }
+        elif kind == "counter":
+            c_tag = (el.get("var") or "").strip()
+            if c_tag:
+                c_el = _counter_el(c_tag, str(el.get("block") or "CTU"), el.get("pv", el.get("pre", 0)))
+                counter = {"tag": c_tag, "block": c_el["block"], "pv": c_el["pv"]}
+
+    # Mid-rung coils: every coil except the final trailing one (and any after last logic)
+    if elements_have_mid_rung_coil(elements) and trailing_coil_indexes:
+        last_coil_i = trailing_coil_indexes[-1]
+        for i in trailing_coil_indexes:
+            if i >= last_coil_i:
+                continue
+            el = elements[i]
+            mid_coils.append(
+                {
+                    "tag": (el.get("var") or "").strip(),
+                    "form": str(el.get("form") or "normal").lower(),
+                    "negated": str(el.get("form") or "").lower() in {"negated", "not", "nc"},
+                }
+            )
+        # Last coil is coil_tag
+        last = elements[last_coil_i]
+        coil_tag = (last.get("var") or "").strip()
+        coil_negated = str(last.get("form", "normal")).lower() in {"negated", "not", "nc"}
+
+    contact_tag = ""
+    normally_closed = False
+    flat = []
+    for branch in parallel:
+        for item in branch:
+            if isinstance(item, dict) and item.get("tag"):
+                flat.append(item)
+    flat.extend(series)
+    if flat:
+        contact_tag = flat[0].get("tag", "")
+        normally_closed = bool(flat[0].get("normally_closed"))
+
+    out = {
+        "id": (rung_id or new_id("r")).strip() or new_id("r"),
+        "parallel": parallel,
+        "series": series,
+        "coil_tag": coil_tag,
+        "coil_negated": bool(coil_negated),
+        "comment": (comment or "").strip(),
+        "contact_tag": contact_tag,
+        "normally_closed": normally_closed,
+    }
+    if timer:
+        out["timer"] = timer
+    if counter:
+        out["counter"] = counter
+    if mid_coils:
+        out["mid_coils"] = mid_coils
+    if elements_need_storage(elements):
+        out["elements"] = elements
+    return out
+
+
+def variables_from_program(
+    program: dict[str, Any] | None,
+    *,
+    devices: list[dict[str, str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Build IR variable table from rungs + optional cabinet device tags."""
+    seen: dict[str, dict[str, Any]] = {}
+    for device in devices or []:
+        tag = (device.get("tag") or "").strip()
+        if not tag or tag in seen:
+            continue
+        type_id = (device.get("type_id") or "").lower()
+        cls = "internal"
+        if type_id in {
+            "pushbutton",
+            "estop",
+            "selector",
+            "limit_switch",
+            "proximity",
+            "photoeye",
+            "sensor",
+            "light_curtain",
+        } or "sensor" in type_id or "button" in type_id:
+            cls = "input"
+        elif type_id in {
+            "contactor",
+            "relay",
+            "solenoid",
+            "motor",
+            "lamp",
+            "pilot_light",
+            "valve",
+            "horn",
+        } or "relay" in type_id or "coil" in type_id:
+            cls = "output"
+        addr = (device.get("io_address") or "").strip()
+        seen[tag] = {
+            "name": tag,
+            "class": cls,
+            "type": "BOOL",
+            "address": addr if addr and addr.lower() != "n/a" else "",
+        }
+
+    # Timer / counter instance names: their members (C1.DN, T1.TT) are not inputs.
+    fb_names: set[str] = set()
+    for rung in (program or {}).get("rungs") or []:
+        for key in ("timer", "counter"):
+            blk = rung.get(key) if isinstance(rung.get(key), dict) else None
+            if blk and (blk.get("tag") or blk.get("var") or "").strip():
+                fb_names.add((blk.get("tag") or blk.get("var") or "").strip())
+        for el in rung.get("elements") or []:
+            if isinstance(el, dict) and str(el.get("kind") or "").lower() in {"timer", "counter"}:
+                name = (el.get("var") or el.get("tag") or "").strip()
+                if name:
+                    fb_names.add(name)
+
+    def _is_member_ref(tag: str) -> bool:
+        base, member = split_member(tag)
+        return bool(member) and base in fb_names
+
+    def _note_contact_tag(tag: str) -> None:
+        tag = (tag or "").strip()
+        if tag and tag not in seen and not _is_member_ref(tag) and tag not in fb_names:
+            seen[tag] = {"name": tag, "class": "input", "type": "BOOL", "address": ""}
+
+    def _walk_logic_for_vars(els: list) -> None:
+        for el in els or []:
+            if not isinstance(el, dict):
+                continue
+            kind = str(el.get("kind") or "").lower()
+            if kind == "contact":
+                _note_contact_tag(str(el.get("var") or el.get("tag") or ""))
+            elif kind == "or":
+                for branch in el.get("branches") or []:
+                    _walk_logic_for_vars(list(branch))
+            elif kind == "coil":
+                tag = str(el.get("var") or el.get("tag") or "").strip()
+                if tag:
+                    if tag not in seen:
+                        seen[tag] = {"name": tag, "class": "output", "type": "BOOL", "address": ""}
+                    elif seen[tag].get("class") == "input":
+                        seen[tag]["class"] = "output"
+
+    for rung in (program or {}).get("rungs") or []:
+        if isinstance(rung.get("elements"), list) and rung.get("elements"):
+            _walk_logic_for_vars(rung.get("elements"))
+        for contact in list(rung.get("series") or []):
+            _note_contact_tag(contact.get("tag", ""))
+        for branch in rung.get("parallel") or []:
+            for contact in branch:
+                if isinstance(contact, dict) and str(contact.get("kind") or "").lower() == "or":
+                    _walk_logic_for_vars([contact])
+                else:
+                    _note_contact_tag((contact.get("tag") if isinstance(contact, dict) else "") or "")
+        for mc in rung.get("mid_coils") or []:
+            if isinstance(mc, dict):
+                tag = (mc.get("tag") or mc.get("var") or "").strip()
+                if tag:
+                    if tag not in seen:
+                        seen[tag] = {"name": tag, "class": "output", "type": "BOOL", "address": ""}
+                    elif seen[tag].get("class") == "input":
+                        seen[tag]["class"] = "output"
+        coil = (rung.get("coil_tag") or "").strip()
+        if coil:
+            if coil not in seen:
+                seen[coil] = {"name": coil, "class": "output", "type": "BOOL", "address": ""}
+            elif seen[coil].get("class") == "input":
+                # Coil use upgrades class to output for sim feedback.
+                seen[coil]["class"] = "output"
+        tmr = rung.get("timer") if isinstance(rung.get("timer"), dict) else None
+        if tmr:
+            t_tag = (tmr.get("tag") or tmr.get("var") or "").strip()
+            if t_tag:
+                blk = str(tmr.get("block") or "TON").upper()
+                if blk not in {"TON", "TOF", "RTO"}:
+                    blk = "TON"
+                seen[t_tag] = {
+                    "name": t_tag,
+                    "class": "timer",
+                    "type": blk,
+                    "address": "",
+                    "pt_ms": max(0, int(tmr.get("pt_ms") or 0)),
+                }
+        ctr = rung.get("counter") if isinstance(rung.get("counter"), dict) else None
+        if ctr:
+            c_tag = (ctr.get("tag") or ctr.get("var") or "").strip()
+            if c_tag:
+                blk = normalize_counter_block(ctr.get("block"))
+                existing = seen.get(c_tag)
+                if blk in COUNTER_OWNER_BLOCKS:
+                    seen[c_tag] = {
+                        "name": c_tag,
+                        "class": "counter",
+                        "type": blk,
+                        "address": "",
+                        "pv": clamp_counter(ctr.get("pv", ctr.get("pre", 0))),
+                    }
+                elif not existing or existing.get("class") != "counter":
+                    # RES / LOAD before (or without) the owning CTU/CTD rung.
+                    seen[c_tag] = {
+                        "name": c_tag,
+                        "class": "counter",
+                        "type": "CTU",
+                        "address": "",
+                        "pv": clamp_counter(ctr.get("pv", 0)) if blk == "LOAD" else 0,
+                    }
+    return list(seen.values())
+
+
+def program_to_ladder_ir(
+    program: dict[str, Any] | None,
+    *,
+    project_name: str = "",
+    devices: list[dict[str, str]] | None = None,
+) -> dict[str, Any]:
+    """Convert project.program into cabinet-studio-ladder IR."""
+    data = program or {}
+    ladder = empty_ladder(project_name=project_name, variables=variables_from_program(data, devices=devices))
+    rungs_out: list[dict[str, Any]] = []
+    for index, rung in enumerate(data.get("rungs") or [], start=1):
+        rid = str(rung.get("id") or index)
+        rungs_out.append(
+            {
+                "id": rid,
+                "comment": (rung.get("comment") or "").strip(),
+                "elements": program_rung_to_elements(rung),
+            }
+        )
+    ladder["rungs"] = rungs_out
+    # Preserve answers/hmi as opaque meta for round-trip convenience (not IEC).
+    if data.get("answers"):
+        ladder["meta"]["answers"] = dict(data["answers"])
+    if data.get("hmi_items"):
+        ladder["meta"]["hmi_items"] = list(data["hmi_items"])
+    return ladder
+
+
+def ladder_ir_to_program(ladder: dict[str, Any] | None) -> dict[str, Any]:
+    """Convert IR back into project.program shape (answers/hmi from meta when present)."""
+    ladder = ladder or {}
+    rungs = []
+    for index, rung in enumerate(ladder.get("rungs") or [], start=1):
+        elements = list(rung.get("elements") or [])
+        # Support brief sketch that nests under rails.elements
+        if not elements and isinstance(rung.get("rails"), dict):
+            elements = list((rung.get("rails") or {}).get("elements") or [])
+        rungs.append(
+            elements_to_program_rung(
+                elements,
+                rung_id=str(rung.get("id") or index),
+                comment=str(rung.get("comment") or ""),
+            )
+        )
+    meta = ladder.get("meta") if isinstance(ladder.get("meta"), dict) else {}
+    answers = dict(meta.get("answers") or {})
+    hmi_items = list(meta.get("hmi_items") or [])
+    return {
+        "answers": answers,
+        "rungs": rungs,
+        "hmi_items": hmi_items,
+        "plc_text": "",
+        "hmi_text": "",
+        "text_edited": False,
+        "ladder_ir": {
+            "format": ladder.get("format", IR_FORMAT),
+            "version": ladder.get("version", IR_VERSION),
+            "dialect": ladder.get("dialect", IR_DIALECT),
+        },
+    }
+
+
+def normalize_ladder_ir(raw: object) -> dict[str, Any]:
+    """Validate/normalize an IR dict; raise ValueError on hard errors."""
+    if raw is None:
+        return empty_ladder()
+    if not isinstance(raw, dict):
+        raise ValueError("Ladder IR must be an object.")
+    fmt = raw.get("format", IR_FORMAT)
+    if fmt not in {IR_FORMAT, "cabinet-studio-ladder", "plcopen-import"}:
+        # Still accept if rungs present (imported sibling shapes).
+        if "rungs" not in raw:
+            raise ValueError(f"Unknown ladder format: {fmt!r}")
+    ladder = empty_ladder(project_name=str((raw.get("meta") or {}).get("project") or ""))
+    if isinstance(raw.get("meta"), dict):
+        ladder["meta"].update({k: v for k, v in raw["meta"].items() if k != "project" or v})
+        if raw["meta"].get("project"):
+            ladder["meta"]["project"] = str(raw["meta"]["project"])
+    ladder["version"] = int(raw.get("version") or IR_VERSION)
+    ladder["dialect"] = str(raw.get("dialect") or IR_DIALECT)
+    ladder["format"] = IR_FORMAT
+
+    variables = []
+    for item in raw.get("variables") or []:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name") or "").strip()
+        if not name:
+            continue
+        variables.append(
+            {
+                "name": name,
+                "class": str(item.get("class") or "internal"),
+                "type": str(item.get("type") or "BOOL"),
+                "address": str(item.get("address") or ""),
+                **(
+                    {"pt_ms": int(item["pt_ms"])}
+                    if item.get("pt_ms") is not None and str(item.get("type", "")).upper() in {"TON", "TOF", "RTO"}
+                    else {}
+                ),
+                **(
+                    {"pv": clamp_counter(item.get("pv", item.get("pre", 0)))}
+                    if str(item.get("type", "")).upper() in COUNTER_OWNER_BLOCKS
+                    or str(item.get("class") or "").lower() == "counter"
+                    else {}
+                ),
+            }
+        )
+    ladder["variables"] = variables
+
+    rungs = []
+    for index, rung in enumerate(raw.get("rungs") or [], start=1):
+        if not isinstance(rung, dict):
+            raise ValueError(f"Rung {index} must be an object.")
+        elements = list(rung.get("elements") or [])
+        if not elements and isinstance(rung.get("rails"), dict):
+            elements = list((rung.get("rails") or {}).get("elements") or [])
+        clean_els = clean_elements(elements)
+        rungs.append(
+            {
+                "id": str(rung.get("id") or index),
+                "comment": str(rung.get("comment") or "").strip(),
+                "elements": clean_els,
+            }
+        )
+    ladder["rungs"] = rungs
+    return ladder
+
+
+def collect_tags(ladder: dict[str, Any]) -> tuple[set[str], set[str], set[str]]:
+    """Return (inputs_guess, outputs/coils, all_tags) from IR."""
+    coils: set[str] = set()
+    contacts: set[str] = set()
+
+    def walk(els: list[dict[str, Any]]) -> None:
+        for el in els:
+            kind = (el.get("kind") or "").lower()
+            if kind == "contact":
+                tag = (el.get("var") or "").strip()
+                if tag:
+                    contacts.add(tag)
+            elif kind == "coil":
+                tag = (el.get("var") or "").strip()
+                if tag:
+                    coils.add(tag)
+            elif kind == "or":
+                for branch in el.get("branches") or []:
+                    walk(branch)
+            elif kind in {"timer", "counter"}:
+                tag = (el.get("var") or "").strip()
+                if tag:
+                    coils.add(tag)
+                    fb_names.add(tag)
+
+    fb_names: set[str] = set()
+    for rung in ladder.get("rungs") or []:
+        walk(list(rung.get("elements") or []))
+    for v in ladder.get("variables") or []:
+        if str(v.get("class") or "").lower() in {"timer", "counter"} and v.get("name"):
+            fb_names.add(str(v.get("name")))
+    # Member reads (C1.DN, T1.TT) are driven by the FB instance, never forceable inputs.
+    contacts = {
+        tag
+        for tag in contacts
+        if not (split_member(tag)[1] and split_member(tag)[0] in fb_names)
+    }
+
+    declared_in = {
+        str(v.get("name"))
+        for v in ladder.get("variables") or []
+        if str(v.get("class") or "").lower() == "input" and v.get("name")
+    }
+    declared_out = {
+        str(v.get("name"))
+        for v in ladder.get("variables") or []
+        if str(v.get("class") or "").lower() in {"output", "timer", "counter"} and v.get("name")
+    }
+    inputs = (contacts - coils) | declared_in
+    outputs = coils | declared_out
+    all_tags = contacts | coils | declared_in | declared_out
+    return inputs, outputs, all_tags

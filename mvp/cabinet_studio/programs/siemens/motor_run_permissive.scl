@@ -1,0 +1,37 @@
+(* ============================================================
+   Cabinet Studio — cut/paste stub
+   Platform: Siemens TIA Portal SCL
+   Not downloaded to a controller.
+
+   Map the formals to PLC tags. Copy the address from each
+   device's PLC I/O field in Cabinet Studio.
+
+   StartPB     %I0.0
+   StopPB      %I0.1
+   EStopOK     %I0.2
+   RunCmd      %Q0.0
+   FaultLamp   %Q0.1
+   ============================================================ *)
+
+FUNCTION_BLOCK "FB_MotorRun"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+  VAR_INPUT
+    StartPB : Bool;
+    StopPB : Bool;
+    EStopOK : Bool;
+    Fault : Bool;
+  END_VAR
+  VAR_OUTPUT
+    RunCmd : Bool;
+    FaultLamp : Bool;
+  END_VAR
+  VAR
+    RunSeal : Bool;
+  END_VAR
+
+BEGIN
+  #RunSeal := (#StartPB OR #RunSeal) AND NOT #StopPB AND #EStopOK AND NOT #Fault;
+  #RunCmd := #RunSeal;
+  #FaultLamp := #Fault;
+END_FUNCTION_BLOCK

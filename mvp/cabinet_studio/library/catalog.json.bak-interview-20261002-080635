@@ -1,0 +1,1057 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "ab-compactlogix-5380",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "CompactLogix 5380",
+      "catalog": "5069-L306ER",
+      "summary": "CompactLogix CPU, EtherNet/IP, local 5069 I/O.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-L306ER",
+        "protocol": "EtherNet/IP",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5069-L306ER.html"
+    },
+    {
+      "id": "ab-micro850",
+      "type_id": "plc",
+      "vendor": "Allen-Bradley",
+      "name": "Micro850",
+      "catalog": "2080-LC50-24QWB",
+      "summary": "Micro850 with embedded I/O and EtherNet/IP.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2080-LC50-24QWB",
+        "protocol": "EtherNet/IP",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "siemens-s7-1200-1214c",
+      "type_id": "plc",
+      "vendor": "Siemens",
+      "name": "S7-1200 CPU 1214C",
+      "catalog": "6ES7214-1AG40-0XB0",
+      "summary": "S7-1200 CPU, PROFINET, embedded I/O plus signal modules.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7214-1AG40-0XB0",
+        "protocol": "PROFINET",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "siemens-s7-1500-1511",
+      "type_id": "plc",
+      "vendor": "Siemens",
+      "name": "S7-1500 CPU 1511-1 PN",
+      "catalog": "6ES7511-1AK02-0AB0",
+      "summary": "S7-1500 CPU, PROFINET.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7511-1AK02-0AB0",
+        "protocol": "PROFINET",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-modbus-plc",
+      "type_id": "plc",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP controller",
+      "catalog": "MB-PLC",
+      "summary": "Generic controller that is supervised or polled over Modbus TCP.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PLC",
+        "protocol": "Modbus TCP",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "ab-panelview-5310",
+      "type_id": "hmi",
+      "vendor": "Allen-Bradley",
+      "name": "PanelView 5310 7 in",
+      "catalog": "2713P-T7CD1",
+      "summary": "7 inch PanelView 5310, EtherNet/IP.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "2713P-T7CD1",
+        "screen_size": "7 in",
+        "protocol": "EtherNet/IP",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "siemens-ktp700",
+      "type_id": "hmi",
+      "vendor": "Siemens",
+      "name": "KTP700 Basic",
+      "catalog": "6AV2123-2GB03-0AX0",
+      "summary": "7 inch Basic panel, PROFINET.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6AV2123-2GB03-0AX0",
+        "screen_size": "7 in",
+        "protocol": "PROFINET",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "generic-modbus-hmi",
+      "type_id": "hmi",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP HMI 7 in",
+      "catalog": "MB-HMI-7",
+      "summary": "Generic 7 inch panel that polls a Modbus TCP map.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-HMI-7",
+        "screen_size": "7 in",
+        "protocol": "Modbus TCP",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "ab-powerflex-525",
+      "type_id": "vfd",
+      "vendor": "Allen-Bradley",
+      "name": "PowerFlex 525",
+      "catalog": "25B-D6P0N104",
+      "summary": "480 VAC PowerFlex 525 with EtherNet/IP.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "25B-D6P0N104",
+        "voltage": "480 VAC",
+        "comms": "EtherNet/IP",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.25B-D6P0N104.html"
+    },
+    {
+      "id": "siemens-g120c",
+      "type_id": "vfd",
+      "vendor": "Siemens",
+      "name": "SINAMICS G120C",
+      "catalog": "6SL3210-1KE15-8UF1",
+      "summary": "480 VAC SINAMICS G120C with PROFINET.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6SL3210-1KE15-8UF1",
+        "voltage": "480 VAC",
+        "comms": "PROFINET",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-modbus-vfd",
+      "type_id": "vfd",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP VFD",
+      "catalog": "MB-VFD",
+      "summary": "Generic drive commanded over Modbus TCP.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-VFD",
+        "voltage": "480 VAC",
+        "comms": "Modbus TCP",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "motor-nema-5hp",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "NEMA 5 HP motor",
+      "catalog": "NEMA-5HP-1750",
+      "summary": "Generic NEMA motor, 5 HP, 1750 RPM, 460 VAC.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "NEMA-5HP-1750",
+        "horsepower": "5 HP",
+        "rpm": "1750",
+        "voltage": "460 VAC",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "motor-iec-4kw",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "IEC 4 kW motor",
+      "catalog": "IEC-4KW-1450",
+      "summary": "Generic IEC motor, 4 kW, 1450 RPM, 400 VAC.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "IEC-4KW-1450",
+        "horsepower": "4 kW",
+        "rpm": "1450",
+        "voltage": "400 VAC",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "motor-nema-1hp",
+      "type_id": "motor",
+      "vendor": "Generic / Modbus",
+      "name": "NEMA 1 HP motor",
+      "catalog": "NEMA-1HP-1750",
+      "summary": "Generic NEMA motor, 1 HP, 1750 RPM, 230 VAC.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "NEMA-1HP-1750",
+        "horsepower": "1 HP",
+        "rpm": "1750",
+        "voltage": "230 VAC",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "ab-contactor-100c",
+      "type_id": "contactor",
+      "vendor": "Allen-Bradley",
+      "name": "100-C contactor",
+      "catalog": "100-C09D10",
+      "summary": "9 A contactor, 24 VDC coil, 3-pole.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "100-C09D10",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "9 A",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C09D10.html"
+    },
+    {
+      "id": "siemens-contactor-3rt",
+      "type_id": "contactor",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3RT contactor",
+      "catalog": "3RT2015-1BB41",
+      "summary": "7 A SIRIUS contactor, 24 VDC coil, 3-pole.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RT2015-1BB41",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "7 A",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-contactor",
+      "type_id": "contactor",
+      "vendor": "Generic / Modbus",
+      "name": "3-pole contactor",
+      "catalog": "MB-C12",
+      "summary": "Generic 12 A contactor, 24 VDC coil.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-C12",
+        "coil_voltage": "24 VDC",
+        "poles": "3",
+        "amp_rating": "12 A",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "ab-estop-800t",
+      "type_id": "estop",
+      "vendor": "Allen-Bradley",
+      "name": "800T e-stop",
+      "catalog": "800T-FXJT6A",
+      "summary": "30 mm twist-to-release e-stop, 2NC.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800T-FXJT6A",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800T-FXJT6A.html"
+    },
+    {
+      "id": "siemens-estop-3su1",
+      "type_id": "estop",
+      "vendor": "Siemens",
+      "name": "3SU1 e-stop",
+      "catalog": "3SU1000-1HB20-0AA0",
+      "summary": "22 mm twist-to-release e-stop, 2NC.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1000-1HB20-0AA0",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "generic-estop",
+      "type_id": "estop",
+      "vendor": "Generic / Modbus",
+      "name": "Dual-channel e-stop",
+      "catalog": "MB-ES-2NC",
+      "summary": "Generic dual-channel e-stop, twist release.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-ES-2NC",
+        "contact_config": "2NC",
+        "voltage": "24 VDC",
+        "reset_style": "Twist",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "ab-stratix-2000",
+      "type_id": "ethernet_switch",
+      "vendor": "Allen-Bradley",
+      "name": "Stratix 2000",
+      "catalog": "1783-US8T",
+      "summary": "8-port unmanaged Stratix switch.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1783-US8T",
+        "port_count": "8",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "siemens-xb005",
+      "type_id": "ethernet_switch",
+      "vendor": "Siemens",
+      "name": "SCALANCE XB005",
+      "catalog": "6GK5005-0BA00-1AB2",
+      "summary": "5-port unmanaged SCALANCE switch.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6GK5005-0BA00-1AB2",
+        "port_count": "5",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-switch-8",
+      "type_id": "ethernet_switch",
+      "vendor": "Generic / Modbus",
+      "name": "8-port unmanaged switch",
+      "catalog": "MB-SW-8",
+      "summary": "Generic unmanaged industrial switch.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-SW-8",
+        "port_count": "8",
+        "managed": "Unmanaged",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "ab-1606-xls",
+      "type_id": "power_supply",
+      "vendor": "Allen-Bradley",
+      "name": "1606-XLE power supply",
+      "catalog": "1606-XLE240EN",
+      "summary": "24 VDC, 10 A, single-phase input.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "1606-XLE240EN",
+        "input_voltage": "120/240 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1606-XLE240EN.html"
+    },
+    {
+      "id": "siemens-sitop",
+      "type_id": "power_supply",
+      "vendor": "Siemens",
+      "name": "SITOP 24 V / 10 A",
+      "catalog": "6EP1334-2BA20",
+      "summary": "24 VDC, 10 A SITOP, single-phase input.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6EP1334-2BA20",
+        "input_voltage": "120/230 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-psu-24-10",
+      "type_id": "power_supply",
+      "vendor": "Generic / Modbus",
+      "name": "24 VDC 10 A supply",
+      "catalog": "MB-PSU-2410",
+      "summary": "Generic 24 VDC, 10 A, single-phase supply.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PSU-2410",
+        "input_voltage": "100-240 VAC",
+        "output_voltage": "24 VDC",
+        "output_current": "10 A",
+        "phases": "1",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "ab-prox-871c",
+      "type_id": "sensor",
+      "vendor": "Allen-Bradley",
+      "name": "872C proximity",
+      "catalog": "872C-D5NP18-D4",
+      "summary": "18 mm inductive proximity, PNP, shielded, 5 mm, Micro QD.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "872C-D5NP18-D4",
+        "sensor_kind": "Proximity",
+        "signal": "PNP",
+        "mounting": "Field device"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.872C-D5NP18-D4.html"
+    },
+    {
+      "id": "siemens-prox-3rg",
+      "type_id": "sensor",
+      "vendor": "Siemens",
+      "name": "3RG40 proximity",
+      "catalog": "3RG4014-0AG33",
+      "summary": "Inductive proximity, PNP.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3RG4014-0AG33",
+        "sensor_kind": "Proximity",
+        "signal": "PNP",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "generic-photoeye",
+      "type_id": "sensor",
+      "vendor": "Generic / Modbus",
+      "name": "Photoeye",
+      "catalog": "MB-PE-PNP",
+      "summary": "Generic retroreflective photoeye, PNP.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PE-PNP",
+        "sensor_kind": "Photoeye",
+        "signal": "PNP",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "valve-2way-24v",
+      "type_id": "valve",
+      "vendor": "Generic / Modbus",
+      "name": "2-way solenoid valve",
+      "catalog": "MB-XV-2W",
+      "summary": "1/2 in 2-way valve, 24 VDC coil, fails closed.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-XV-2W",
+        "size": "1/2 in NPT",
+        "solenoid_voltage": "24 VDC",
+        "ports": "2-way",
+        "fail_position": "Closed",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "valve-3way-24v",
+      "type_id": "valve",
+      "vendor": "Generic / Modbus",
+      "name": "3-way solenoid valve",
+      "catalog": "MB-XV-3W",
+      "summary": "1/4 in 3-way valve, 24 VDC coil, fails closed.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-XV-3W",
+        "size": "1/4 in NPT",
+        "solenoid_voltage": "24 VDC",
+        "ports": "3-way",
+        "fail_position": "Closed",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "solenoid-24vdc",
+      "type_id": "solenoid",
+      "vendor": "Generic / Modbus",
+      "name": "24 VDC solenoid",
+      "catalog": "MB-SOL-24",
+      "summary": "Generic continuous-duty 24 VDC coil.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-SOL-24",
+        "voltage": "24 VDC",
+        "duty": "Continuous",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "ab-stack-855e",
+      "type_id": "light",
+      "vendor": "Allen-Bradley",
+      "name": "855E stack light",
+      "catalog": "855E-BVM10",
+      "summary": "24 VDC multi-color stack.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "855E-BVM10",
+        "color": "Multi-color stack",
+        "voltage": "24 VDC",
+        "function": "Stack",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "generic-indicator-green",
+      "type_id": "light",
+      "vendor": "Generic / Modbus",
+      "name": "Green indicator",
+      "catalog": "MB-LT-GN",
+      "summary": "24 VDC green pilot light.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-LT-GN",
+        "color": "Green",
+        "voltage": "24 VDC",
+        "function": "Run",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "ab-guardmaster-msr127",
+      "type_id": "safety_relay",
+      "vendor": "Allen-Bradley",
+      "name": "Guardmaster MSR127",
+      "catalog": "440R-N23132",
+      "summary": "Dual-channel e-stop relay, monitored manual reset.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "440R-N23132",
+        "safety_function": "E-stop monitoring",
+        "channels": "Dual",
+        "reset_type": "Monitored manual",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.440R-N23132.html"
+    },
+    {
+      "id": "siemens-3sk1111",
+      "type_id": "safety_relay",
+      "vendor": "Siemens",
+      "name": "SIRIUS 3SK1",
+      "catalog": "3SK1111-1AB30",
+      "summary": "Dual-channel safety relay, monitored manual reset.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SK1111-1AB30",
+        "safety_function": "E-stop monitoring",
+        "channels": "Dual",
+        "reset_type": "Monitored manual",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "tx-pressure-4-20",
+      "type_id": "transmitter",
+      "vendor": "Generic / Modbus",
+      "name": "Pressure transmitter",
+      "catalog": "MB-PT-420",
+      "summary": "Loop-powered pressure transmitter, 4-20 mA.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PT-420",
+        "measured_variable": "Pressure",
+        "signal": "4-20 mA",
+        "loop_power": "Loop-powered",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "tx-temperature-4-20",
+      "type_id": "transmitter",
+      "vendor": "Generic / Modbus",
+      "name": "Temperature transmitter",
+      "catalog": "MB-TT-420",
+      "summary": "Loop-powered temperature transmitter, 4-20 mA.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-TT-420",
+        "measured_variable": "Temperature",
+        "signal": "4-20 mA",
+        "loop_power": "Loop-powered",
+        "mounting": "Field device"
+      }
+    },
+    {
+      "id": "ab-5069-ib16",
+      "type_id": "io_module",
+      "vendor": "Allen-Bradley",
+      "name": "5069-IB16",
+      "catalog": "5069-IB16",
+      "summary": "16-point 24 VDC sinking input module.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-IB16",
+        "io_kind": "DI",
+        "point_count": "16",
+        "mounting": "In cabinet"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5069-IB16.html"
+    },
+    {
+      "id": "ab-5069-ob16",
+      "type_id": "io_module",
+      "vendor": "Allen-Bradley",
+      "name": "5069-OB16",
+      "catalog": "5069-OB16",
+      "summary": "16-point 24 VDC sourcing output module.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "5069-OB16",
+        "io_kind": "DO",
+        "point_count": "16",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "siemens-sm1223",
+      "type_id": "io_module",
+      "vendor": "Siemens",
+      "name": "SM 1223 DI/DO",
+      "catalog": "6ES7223-1BL32-0XB0",
+      "summary": "16 DI / 16 DO signal module for S7-1200.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "6ES7223-1BL32-0XB0",
+        "io_kind": "Mixed",
+        "point_count": "16 DI / 16 DO",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "generic-modbus-io",
+      "type_id": "io_module",
+      "vendor": "Generic / Modbus",
+      "name": "Modbus TCP I/O",
+      "catalog": "MB-IO-16",
+      "summary": "Generic 16-point Modbus TCP I/O block.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-IO-16",
+        "io_kind": "Mixed",
+        "point_count": "16",
+        "mounting": "In cabinet"
+      }
+    },
+    {
+      "id": "ab-pb-green-start",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F start",
+      "catalog": "800FP-F3",
+      "summary": "Green momentary start, normally open.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-F3",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800FP-F3.html"
+    },
+    {
+      "id": "ab-pb-red-stop",
+      "type_id": "pushbutton",
+      "vendor": "Allen-Bradley",
+      "name": "800F stop",
+      "catalog": "800FP-F4",
+      "summary": "Red momentary stop, normally closed.",
+      "defaults": {
+        "vendor": "Allen-Bradley",
+        "catalog": "800FP-F4",
+        "color": "Red",
+        "function": "Stop",
+        "contact": "NC momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door"
+      },
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.800FP-F4.html"
+    },
+    {
+      "id": "siemens-pb-green-start",
+      "type_id": "pushbutton",
+      "vendor": "Siemens",
+      "name": "3SU1 start",
+      "catalog": "3SU1000-0AB20-0AA0",
+      "summary": "Green momentary start, normally open.",
+      "defaults": {
+        "vendor": "Siemens",
+        "catalog": "3SU1000-0AB20-0AA0",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "generic-pb-start",
+      "type_id": "pushbutton",
+      "vendor": "Generic / Modbus",
+      "name": "Start pushbutton",
+      "catalog": "MB-PB-START",
+      "summary": "Generic green start, normally open, 24 VDC.",
+      "defaults": {
+        "vendor": "Generic / Modbus",
+        "catalog": "MB-PB-START",
+        "color": "Green",
+        "function": "Start",
+        "contact": "NO momentary",
+        "voltage": "24 VDC",
+        "mounting": "On door"
+      }
+    },
+    {
+      "id": "hoffman-a363012lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A363012LP",
+      "catalog": "A363012LP",
+      "summary": "36\u00d730\u00d712 wall-mount enclosure \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A363012LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "36\u00d730\u00d712 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a302412lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A302412LP",
+      "catalog": "A302412LP",
+      "summary": "30\u00d724\u00d712 wall-mount enclosure \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A302412LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "30\u00d724\u00d712 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a242408lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A242408LP",
+      "catalog": "A242408LP",
+      "summary": "24\u00d724\u00d78 wall-mount enclosure \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A242408LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "24\u00d724\u00d78 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a202008lp",
+      "type_id": "enclosure",
+      "vendor": "Hoffman",
+      "name": "Hoffman A202008LP",
+      "catalog": "A202008LP",
+      "summary": "20\u00d720\u00d78 wall-mount enclosure \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A202008LP",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "20",
+        "enclosure_height_in": "20",
+        "enclosure_depth_in": "8",
+        "description": "20\u00d720\u00d78 wall-mount enclosure"
+      }
+    },
+    {
+      "id": "hoffman-a16p16",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A16P16",
+      "catalog": "A16P16",
+      "summary": "16\u00d716 subpanel \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A16P16",
+        "mounting": "In cabinet",
+        "backplate_width_in": "16",
+        "backplate_height_in": "16",
+        "description": "16\u00d716 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a20p20",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A20P20",
+      "catalog": "A20P20",
+      "summary": "20\u00d720 subpanel \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A20P20",
+        "mounting": "In cabinet",
+        "backplate_width_in": "20",
+        "backplate_height_in": "20",
+        "description": "20\u00d720 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a24p24",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A24P24",
+      "catalog": "A24P24",
+      "summary": "24\u00d724 subpanel \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A24P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "24",
+        "backplate_height_in": "24",
+        "description": "24\u00d724 subpanel"
+      }
+    },
+    {
+      "id": "hoffman-a30p24",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A30P24",
+      "catalog": "A30P24",
+      "summary": "30\u00d724 subpanel (\u224827\u00d721 usable) \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A30P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "30\u00d724 subpanel (\u224827\u00d721 usable)"
+      }
+    },
+    {
+      "id": "hoffman-a36p30",
+      "type_id": "backplate",
+      "vendor": "Hoffman",
+      "name": "Hoffman A36P30",
+      "catalog": "A36P30",
+      "summary": "36\u00d730 subpanel (\u224833\u00d727 usable) \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Hoffman",
+        "catalog": "A36P30",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "36\u00d730 subpanel (\u224833\u00d727 usable)"
+      }
+    },
+    {
+      "id": "saginaw-sce-36x30x12",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-36X30X12",
+      "catalog": "SCE-36X30X12",
+      "summary": "36\u00d730\u00d712 wall-mount \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-36X30X12",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "36\u00d730\u00d712 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-30x24x12",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-30X24X12",
+      "catalog": "SCE-30X24X12",
+      "summary": "30\u00d724\u00d712 wall-mount \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-30X24X12",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "30\u00d724\u00d712 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-24x24x8",
+      "type_id": "enclosure",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-24X24X8",
+      "catalog": "SCE-24X24X8",
+      "summary": "24\u00d724\u00d78 wall-mount \u00b7 NEMA 12 indoor unless washdown noted.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-24X24X8",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "24\u00d724\u00d78 wall-mount"
+      }
+    },
+    {
+      "id": "saginaw-sce-36p30",
+      "type_id": "backplate",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-36P30",
+      "catalog": "SCE-36P30",
+      "summary": "Subpanel for 36\u00d730 class \u00b7 mates to matching enclosure.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-36P30",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "Subpanel for 36\u00d730 class"
+      }
+    },
+    {
+      "id": "saginaw-sce-30p24",
+      "type_id": "backplate",
+      "vendor": "Saginaw",
+      "name": "Saginaw SCE-30P24",
+      "catalog": "SCE-30P24",
+      "summary": "Subpanel for 30\u00d724 class \u00b7 mates to matching enclosure.",
+      "defaults": {
+        "vendor": "Saginaw",
+        "catalog": "SCE-30P24",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "Subpanel for 30\u00d724 class"
+      }
+    },
+    {
+      "id": "hammond-en4sd363012",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD363012",
+      "catalog": "EN4SD363012",
+      "summary": "Eclipse 36\u00d730\u00d712 \u00b7 NEMA 12/4 family \u2014 confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD363012",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "36",
+        "enclosure_height_in": "30",
+        "enclosure_depth_in": "12",
+        "description": "Eclipse 36\u00d730\u00d712"
+      }
+    },
+    {
+      "id": "hammond-en4sd302412",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD302412",
+      "catalog": "EN4SD302412",
+      "summary": "Eclipse 30\u00d724\u00d712 \u00b7 NEMA 12/4 family \u2014 confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD302412",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "30",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "12",
+        "description": "Eclipse 30\u00d724\u00d712"
+      }
+    },
+    {
+      "id": "hammond-en4sd242408",
+      "type_id": "enclosure",
+      "vendor": "Hammond",
+      "name": "Hammond EN4SD242408",
+      "catalog": "EN4SD242408",
+      "summary": "Eclipse 24\u00d724\u00d78 \u00b7 NEMA 12/4 family \u2014 confirm rating for the job.",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EN4SD242408",
+        "mounting": "Wall",
+        "nema_rating": "NEMA 12",
+        "enclosure_width_in": "24",
+        "enclosure_height_in": "24",
+        "enclosure_depth_in": "8",
+        "description": "Eclipse 24\u00d724\u00d78"
+      }
+    },
+    {
+      "id": "hammond-ep3630",
+      "type_id": "backplate",
+      "vendor": "Hammond",
+      "name": "Hammond EP3630",
+      "catalog": "EP3630",
+      "summary": "Eclipse panel 36\u00d730 class",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EP3630",
+        "mounting": "In cabinet",
+        "backplate_width_in": "33",
+        "backplate_height_in": "27",
+        "description": "Eclipse panel 36\u00d730 class"
+      }
+    },
+    {
+      "id": "hammond-ep3024",
+      "type_id": "backplate",
+      "vendor": "Hammond",
+      "name": "Hammond EP3024",
+      "catalog": "EP3024",
+      "summary": "Eclipse panel 30\u00d724 class",
+      "defaults": {
+        "vendor": "Hammond",
+        "catalog": "EP3024",
+        "mounting": "In cabinet",
+        "backplate_width_in": "27",
+        "backplate_height_in": "21",
+        "description": "Eclipse panel 30\u00d724 class"
+      }
+    }
+  ]
+}

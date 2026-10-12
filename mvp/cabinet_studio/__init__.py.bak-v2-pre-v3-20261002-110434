@@ -1,0 +1,3 @@
+"""Cabinet Studio — cabinet, PLC, HMI, and network design for ERMCO."""
+
+__version__ = "0.3.0"

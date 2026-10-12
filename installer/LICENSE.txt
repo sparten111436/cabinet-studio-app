@@ -1,0 +1,14 @@
+Cabinet Studio - Copyright (c) Warren Williams. All rights reserved.
+
+This pre-release build is provided for testing only, as-is, without warranty
+of any kind.
+
+IMPORTANT
+Design aid only - not a certified UL 508A drawing tool; E-stop and safety
+functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849).
+
+Every printed sheet carries: NOT A CERTIFIED UL 508A DRAWING. Design aid only.
+A qualified person must review all drawings, wiring and PLC logic before use.
+The live PLC link is beta and must be bench-tested before any real use.
+
+By installing you accept these terms.
