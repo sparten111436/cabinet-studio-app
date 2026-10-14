@@ -1,59 +1,896 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<title>Cabinet Studio how-to — Warren Williams</title>
-<style>
-body{font-family:Segoe UI,Arial,sans-serif;max-width:960px;margin:24px auto;padding:0 16px;background:#111820;color:#e8eef7;line-height:1.45}
-h1,h2,h3{color:#fff} h2{border-bottom:1px solid #2a3648;padding-bottom:6px;margin-top:2em}
-a{color:#6aa8ff} code,pre{background:#1a2330;padding:2px 6px;border-radius:4px}
-img{max-width:100%;height:auto;border:1px solid #2a3648;border-radius:6px;margin:10px 0 18px;background:#0b1018}
-.note{background:#243044;border-left:4px solid #f0a020;padding:10px 14px;margin:16px 0}
-table{border-collapse:collapse;width:100%} td,th{border:1px solid #2a3648;padding:8px;text-align:left}
-th{background:#1a2330}
-</style>
-</head>
-<body>
-<h1>Cabinet Studio how-to</h1>
-<p>For <strong>Warren Williams</strong>. Guide folder: <code>C:\Users\spart\OneDrive\Desktop\CabinetStudio\docs\how-to\</code></p>
-<div class="note"><strong>Design aid:</strong> drawings are not certified UL 508A. Programming is not a live PLC download. Edit devices/wires in the cabinet UI, then re-run <strong>Drawings</strong> — do not hand-edit the SVG.</div>
-
-<h2>A. Start</h2>
-<ol><li>Double-click Desktop shortcut <strong>Cabinet Studio</strong>.</li></ol>
-<p><img src="images/01-desktop-icon.png" alt="Desktop shortcut"/><img src="images/02-main-open.png" alt="Main window"/></p>
-
-<h2>B. Open sample</h2>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cabinet Studio User Manual</title><style>
+:root { --ink:#1b1b1f; --muted:#555; --accent:#e8711a; --line:#d9d9de; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 19px; line-height: 1.6; color: var(--ink);
+       background: #fff; margin: 0; }
+main { max-width: 920px; margin: 0 auto; padding: 24px 28px 60px; }
+h1 { font-size: 2.2em; margin: .4em 0 .2em; border-bottom: 5px solid var(--accent); padding-bottom: .2em; }
+h2 { font-size: 1.6em; margin-top: 2em; padding-top: .3em; border-top: 2px solid var(--line); }
+h3 { font-size: 1.25em; margin-top: 1.4em; }
+code { font-family: Consolas, monospace; background: #f1f1f4; padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+a { color: #1a56c9; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .92em; }
+th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: #f4f4f7; }
+li { margin: .25em 0; }
+.callout { border-left: 7px solid; border-radius: 6px; padding: 10px 16px; margin: 1em 0; }
+.callout.see { border-color: #2f6bff; background: #eef3ff; }
+.callout.tip { border-color: #1e9e57; background: #ebf8f0; }
+.callout.warn { border-color: #e0a100; background: #fff7e0; }
+.callout.safety { border-color: #c62828; background: #fdecec; }
+nav.toc { background: #f7f7fa; border: 1px solid var(--line); border-radius: 8px; padding: 12px 22px; }
+nav.toc ol { padding-left: 1.4em; } nav.toc ol ol { font-size: .9em; }
+.footer { margin-top: 3em; padding-top: 1em; border-top: 2px solid var(--line); color: var(--muted); font-size: .85em; }
+.top { font-size: .8em; }
+@media print {
+  body { font-size: 12pt; } main { max-width: none; padding: 0; }
+  h2 { page-break-before: always; border-top: none; } h2.first { page-break-before: avoid; }
+  .callout, table, tr { page-break-inside: avoid; } .top { display: none; } a { color: inherit; text-decoration: none; }
+}
+</style></head><body><main>
+<h1>Cabinet Studio User Manual</h1>
+<nav class="toc" id="contents"><h2 class="first" style="border:none;margin-top:0">Contents</h2><ol>
+<li><a href="#how-to-use-this-manual">How to use this manual</a></li>
+<li><a href="#what-is-cabinet-studio">What is Cabinet Studio?</a></li>
+<li><a href="#safety-read-this-first">Safety (read this first)</a></li>
+<li><a href="#installing-cabinet-studio">Installing Cabinet Studio</a>
 <ol>
-<li>Click <strong>Open</strong> (or Ctrl+O).</li>
-<li>Open <code>CabinetStudio\saves\sample-motor-cabinet.cabinet.json</code>.</li>
-</ol>
-<p><img src="images/04-sample-loaded.png" alt="Sample loaded"/><img src="images/02b-exe-sample-loaded.png" alt="Exe sample"/></p>
-
-<h2>C. Left rail (order of operations)</h2>
-<p>New build with AI → Open/Save → Save as → New → Guide build / AI suggest → Drawings / View drawings → Programming / Program stubs → Desktop shortcut → UL 508A review.</p>
-<p><img src="images/05-left-rail-top.png" alt="Left rail top"/><img src="images/05-rail-with-programming.png" alt="Left rail with programming"/></p>
-
-<h2>D. Drawings</h2>
-<ol><li>Click <strong>Drawings</strong>.</li><li>Click <strong>View drawings</strong> and flip with Previous/Next.</li></ol>
-<p><img src="images/09-cabinet-ready-for-drawings.png" alt="Ready"/><img src="images/10-view-drawings-sheet1.png" alt="Sheet 1"/><img src="images/11-view-drawings-sheet2.png" alt="Sheet 2"/></p>
-
-<h2>E. Edit schematics (via cabinet, not SVG)</h2>
+<li><a href="#way-1-the-installer-easiest">Way 1: The installer (easiest)</a></li>
+<li><a href="#way-2-the-portable-zip-no-install">Way 2: The portable ZIP (no install)</a></li>
+<li><a href="#uninstalling">Uninstalling</a></li>
+</ol></li>
+<li><a href="#opening-the-manual-from-inside-the-program">Opening the manual from inside the program</a></li>
+<li><a href="#first-launch">First launch</a></li>
+<li><a href="#the-main-window-piece-by-piece">The main window, piece by piece</a>
 <ol>
-<li>Select a tile → Inspector → <strong>Edit definition</strong>.</li>
-<li>On the Wiring step set terminal landings, wire numbers, wire color.</li>
-<li>Click <strong>Drawings</strong> again to regenerate.</li>
-</ol>
-<p><img src="images/07-inspector-selected.png" alt="Inspector"/><img src="images/08-device-properties-editor.png" alt="Properties"/><img src="images/08-wiring-landings.png" alt="Wiring"/></p>
-
-<h2>F. Programming</h2>
+<li><a href="#the-menu-bar">The menu bar</a></li>
+<li><a href="#the-toolbar">The toolbar</a></li>
+<li><a href="#the-project-name-box">The project name box</a></li>
+<li><a href="#the-left-rail-library-rail">The left rail (library rail)</a></li>
+<li><a href="#the-cabinet-area-middle">The cabinet area (middle)</a></li>
+<li><a href="#the-inspector-right-side">The INSPECTOR (right side)</a></li>
+<li><a href="#the-project-explorer">The Project explorer</a></li>
+</ol></li>
+<li><a href="#projects-new-open-save">Projects: new, open, save</a>
 <ol>
-<li>Click <strong>Programming</strong>.</li>
-<li>Use Ask questions / Ladder / Copy PLC / Print / Rung editor.</li>
-<li>Click <strong>Done - return to cabinet</strong>.</li>
+<li><a href="#start-a-new-project">Start a new project</a></li>
+</ol></li>
+<li><a href="#starting-from-a-template">Starting from a template</a>
+<ol>
+<li><a href="#open-the-template-gallery">Open the template gallery</a></li>
+<li><a href="#use-a-template-step-by-step">Use a template, step by step</a></li>
+<li><a href="#the-templates-and-when-to-use-each-one">The templates and when to use each one</a></li>
+<li><a href="#save-your-project">Save your project</a></li>
+<li><a href="#open-a-project">Open a project</a></li>
+<li><a href="#where-your-files-go">Where your files go</a></li>
+</ol></li>
+<li><a href="#new-build-with-ai-step-by-step">New build with AI, step by step</a>
+<ol>
+<li><a href="#the-questions-explained">The questions, explained</a></li>
+<li><a href="#checking-the-recommended-devices">Checking the recommended devices</a></li>
+</ol></li>
+<li><a href="#adding-and-editing-parts">Adding and editing parts</a>
+<ol>
+<li><a href="#add-a-part-from-the-library">Add a part from the library</a></li>
+<li><a href="#define-or-edit-a-part">Define or edit a part</a></li>
+<li><a href="#make-a-part-that-is-not-in-the-library">Make a part that is not in the library</a></li>
+<li><a href="#remove-a-part">Remove a part</a></li>
+<li><a href="#let-the-ai-help-with-parts">Let the AI help with parts</a></li>
+</ol></li>
+<li><a href="#choosing-the-enclosure">Choosing the enclosure</a></li>
+<li><a href="#drawings">Drawings</a>
+<ol>
+<li><a href="#make-and-view-the-drawings">Make and view the drawings</a></li>
+<li><a href="#the-sheets-in-order">The sheets, in order</a></li>
+<li><a href="#hover-for-wire-details">Hover for wire details</a></li>
+<li><a href="#move-parts-and-text-on-the-layout">Move parts and text on the layout</a></li>
+<li><a href="#pop-out-the-drawing">Pop out the drawing</a></li>
+<li><a href="#printing-drawings">Printing drawings</a></li>
+<li><a href="#the-footer-on-every-sheet">The footer on every sheet</a></li>
+</ol></li>
+<li><a href="#ul-508a-review">UL 508A review</a></li>
+<li><a href="#the-programming-page">The Programming page</a>
+<ol>
+<li><a href="#ladder-logic-in-one-minute">Ladder logic in one minute</a></li>
+<li><a href="#the-programming-toolbar">The Programming toolbar</a></li>
+<li><a href="#the-file-menu-programming-page">The File menu (Programming page)</a></li>
+<li><a href="#the-rung-editor-bottom-strip">The rung editor (bottom strip)</a></li>
+<li><a href="#your-first-rung-step-by-step">Your first rung, step by step</a></li>
+<li><a href="#editing-instructions-on-the-ladder">Editing instructions on the ladder</a></li>
+<li><a href="#the-instruction-palette">The instruction palette</a></li>
+<li><a href="#find-replace-and-undo">Find, replace and undo</a></li>
+<li><a href="#layout-and-windows">Layout and windows</a></li>
+<li><a href="#ask-ai">Ask AI</a></li>
+</ol></li>
+<li><a href="#the-simulator">The simulator</a>
+<ol>
+<li><a href="#the-simulate-row">The SIMULATE row</a></li>
+<li><a href="#switching-inputs-yourself">Switching inputs yourself</a></li>
+<li><a href="#normal-run-the-pretend-machine">Normal run: the pretend machine</a></li>
+<li><a href="#test-the-e-stop-and-light-curtain-yourself">Test the E-stop and light curtain yourself</a></li>
+<li><a href="#explain-run">Explain run</a></li>
+</ol></li>
+<li><a href="#the-hmi-editor">The HMI editor</a>
+<ol>
+<li><a href="#fastest-way-auto-build">Fastest way: Auto-build</a></li>
+<li><a href="#the-hmi-interview">The HMI interview</a></li>
+<li><a href="#screens">Screens</a></li>
+<li><a href="#adding-things-to-the-screen">Adding things to the screen</a></li>
+<li><a href="#faceplates-one-click">Faceplates (one click)</a></li>
+<li><a href="#machine-graphics-and-animation">Machine graphics and animation</a></li>
+<li><a href="#the-properties-panel-right-side">The PROPERTIES panel (right side)</a></li>
+<li><a href="#the-tag-wizard-bind-tags-for-me">The tag wizard: Bind tags for me</a></li>
+<li><a href="#nav-bar-alarms-and-themes">Nav bar, alarms and themes</a></li>
+<li><a href="#test-the-hmi-with-the-simulator">Test the HMI with the simulator</a></li>
+<li><a href="#save-and-export-the-hmi">Save and export the HMI</a></li>
+</ol></li>
+<li><a href="#the-plc-device-window">The PLC / Device window</a>
+<ol>
+<li><a href="#files-row">Files row</a></li>
+<li><a href="#live-link-beta">Live link (beta)</a></li>
+<li><a href="#watching-tags">Watching tags</a></li>
+<li><a href="#writing-a-tag-be-careful">Writing a tag (be careful)</a></li>
+</ol></li>
+<li><a href="#ai-settings">AI settings</a></li>
+<li><a href="#keyboard-shortcuts">Keyboard shortcuts</a></li>
+<li><a href="#troubleshooting-and-faq">Troubleshooting and FAQ</a></li>
+<li><a href="#glossary-words-you-will-see">Glossary: words you will see</a></li>
+<li><a href="#about-this-manual">About this manual</a>
+</li></ol></nav>
+<p>Version 0.3.35 · Written for beginners · October 2026</p>
+<div class="callout safety"><strong>Safety:</strong> Cabinet Studio is a design aid. Its drawings are NOT A CERTIFIED UL 508A DRAWING. E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function. Read the <a href="#safety-read-this-first">Safety page</a> before you build anything real.</div>
+<h2 id="how-to-use-this-manual" class="first">How to use this manual <a class="top" href="#contents">(back to contents)</a></h2>
+<p>This manual explains Cabinet Studio one small step at a time. You do not need to know anything about electrical cabinets or PLCs to start. Words that might be new are in the <a href="#glossary-words-you-will-see">Glossary</a> at the end.</p>
+<p>You will see four kinds of boxes:</p>
+<div class="callout see"><strong>What you'll see:</strong> This box tells you what should appear on the screen after a step.</div>
+<div class="callout tip"><strong>Tip:</strong> This box gives a shortcut or a helpful idea.</div>
+<div class="callout warn"><strong>Watch out:</strong> This box warns you about a common mistake.</div>
+<div class="callout safety"><strong>Safety:</strong> This box is about keeping people safe. Never skip these.</div>
+<p>Button names are written in <strong>bold</strong>, exactly as they appear in the program. Menus are written like <strong>File &gt; Save</strong>, which means "click the File menu, then click Save".</p>
+<p>Almost every button in Cabinet Studio has <strong>hover help</strong>. Rest your mouse pointer on a button for a second and a small yellow note explains what it does. If you are ever unsure, hover first.</p>
+<h2 id="what-is-cabinet-studio">What is Cabinet Studio? <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Factories use machines. Those machines are controlled by a metal box full of electrical parts, called a <strong>control cabinet</strong>. Inside the cabinet there is usually a small computer called a <strong>PLC</strong> that runs the machine, plus power supplies, breakers, motor starters, relays and rows of wire terminals. On the door there are buttons, lights, an emergency stop and sometimes a touch screen called an <strong>HMI</strong>.</p>
+<p>Cabinet Studio helps you design all of that on your computer:</p>
+<ol>
+<li><strong>Pick the parts</strong> that go in the cabinet (or let the AI pick them for you).</li>
+<li><strong>Make the drawings</strong>: where each part sits on the metal backplate, how the power is wired, how the control buttons are wired, and a list of every wire.</li>
+<li><strong>Write the PLC program</strong> in ladder logic (a picture language that looks like a ladder).</li>
+<li><strong>Test the program in a simulator</strong> with a pretend machine, before you ever touch real equipment.</li>
+<li><strong>Design the operator touch screen (HMI)</strong> and test it with the simulator too.</li>
+<li><strong>Export files</strong> for the real PLC and HMI software from Allen-Bradley, Siemens or Omron.</li>
 </ol>
-<p><img src="images/12-programming-open.png" alt="Programming"/><img src="images/13-programming-ladder.png" alt="Ladder"/><img src="images/14-back-to-cabinet.png" alt="Back"/></p>
-
-<h2>G. New build with AI</h2>
-<p>Top button walks interview → recommend → define → save → drawings → programming with confirms.</p>
-<p><img src="images/03-rail-new-build-ai.png" alt="New build with AI"/></p>
-</body></html>
+<p>Everything you make is saved in one project file that ends in <code>.cabinet.json</code>.</p>
+<h2 id="safety-read-this-first">Safety (read this first) <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Please read this whole page. It is short and it matters.</p>
+<ol>
+<li><strong>Design aid only.</strong> Every sheet Cabinet Studio prints has this footer: <code>NOT A CERTIFIED UL 508A DRAWING. Design aid only.</code> That means a qualified person (a licensed electrician, a controls engineer or a UL 508A panel shop) must check the design before anyone builds it. The drawings help you think. They do not prove the cabinet is safe or legal.</li>
+<li><strong>The software is never the safety function.</strong> E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). An E-stop button must cut power through real wires and a safety relay, not through the PLC program and not through the HMI screen. Cabinet Studio's ladder programs and HMI screens only *show* the E-stop and light curtain status. They never control safety.</li>
+<li><strong>The simulator is pretend.</strong> When you click Run, nothing real moves. A program that works in the simulator can still be wrong on a real machine.</li>
+<li><strong>Bench-test real PLC connections.</strong> The live PLC link is a test tool (beta). Only connect to a PLC on a test bench, or to a machine you can see, that is safe, and where nobody can be hurt. Never test on a running production machine.</li>
+<li><strong>Check part sizes with the maker.</strong> Part outlines in the drawings are typical sizes. Before you order parts, cut holes in a door, or drill a backplate, check the exact dimensions on the maker's data sheet.</li>
+<li><strong>Electricity can kill.</strong> Never open a live cabinet. Only qualified people should wire or test real cabinets, following lock-out / tag-out rules.</li>
+</ol>
+<div class="callout safety"><strong>Safety:</strong> If you are a student, always work on real equipment with a teacher or qualified adult beside you.</div>
+<h2 id="installing-cabinet-studio">Installing Cabinet Studio <a class="top" href="#contents">(back to contents)</a></h2>
+<p>You need a 64-bit Windows 10 or Windows 11 computer. There are two ways to install. Pick one.</p>
+<h3 id="way-1-the-installer-easiest">Way 1: The installer (easiest)</h3>
+<ol>
+<li>Find the file <code>CabinetStudio-Setup-0.3.35.exe</code> (someone sent it to you, or you downloaded it).</li>
+<li>Double-click it.</li>
+<li>Windows may show a blue box that says <strong>Windows protected your PC</strong>. This happens because the program is not "code-signed" yet. It does not mean there is a virus.
+<ol>
+<li>Click the small words <strong>More info</strong>.</li>
+<li>A new button appears: <strong>Run anyway</strong>. Click it.</li>
+</ol></li>
+<li>Read the license and click <strong>I accept the agreement</strong>, then <strong>Next</strong>.</li>
+<li>If you want an icon on your desktop, tick <strong>Create a desktop shortcut</strong>. Click <strong>Next</strong>, then <strong>Install</strong>.</li>
+<li>Read the short "read me" screen, then click <strong>Finish</strong>. Leave <strong>Launch Cabinet Studio</strong> ticked if you want to start it right away.</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> A new folder in your Start menu called <strong>Cabinet Studio</strong> with four entries: <strong>Cabinet Studio</strong>, <strong>Cabinet Studio User Manual</strong> (this manual), <strong>Read me first</strong>, and <strong>Uninstall Cabinet Studio</strong>.</div>
+<div class="callout tip"><strong>Tip:</strong> The installer does not need an administrator password. It installs only for you, in <code>%LOCALAPPDATA%\Programs\Cabinet Studio</code>.</div>
+<h3 id="way-2-the-portable-zip-no-install">Way 2: The portable ZIP (no install)</h3>
+<ol>
+<li>Find <code>CabinetStudio-0.3.35-portable.zip</code>.</li>
+<li>Right-click it and choose <strong>Extract All...</strong>. Pick a place you can find again, like your Documents folder.</li>
+<li>Open the new <code>CabinetStudio</code> folder and double-click <code>CabinetStudio.exe</code>.</li>
+<li>If you see <strong>Windows protected your PC</strong>, click <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
+</ol>
+<div class="callout warn"><strong>Watch out:</strong> Keep the <code>_internal</code> folder next to <code>CabinetStudio.exe</code>. The program will not start without it. Do not move the .exe out of its folder; make a shortcut instead.</div>
+<p>The ZIP also contains <code>README-FIRST.txt</code> and this manual (<code>Cabinet-Studio-User-Manual.html</code> and, when available, a PDF).</p>
+<h3 id="uninstalling">Uninstalling</h3>
+<p>Open Windows <strong>Settings &gt; Apps</strong>, find <strong>Cabinet Studio 0.3.35</strong> and click <strong>Uninstall</strong>. Your project files are <strong>not</strong> deleted (see <a href="#where-your-files-go">Where your files go</a>).</p>
+<h2 id="opening-the-manual-from-inside-the-program">Opening the manual from inside the program <a class="top" href="#contents">(back to contents)</a></h2>
+<p>You can open this manual at any time:</p>
+<ul>
+<li>Click the <strong>? Manual</strong> button at the right end of the main toolbar (top of the main window), or</li>
+<li>Use the menu <strong>Help &gt; User manual</strong> in the main window, or</li>
+<li>In the Programming page, use <strong>Help &gt; User manual</strong>, or</li>
+<li>From the Windows Start menu, click <strong>Cabinet Studio User Manual</strong>.</li>
+</ul>
+<p>The manual opens in your web browser. To print it, press <strong>Ctrl+P</strong> in the browser.</p>
+<h2 id="first-launch">First launch <a class="top" href="#contents">(back to contents)</a></h2>
+<ol>
+<li>Start Cabinet Studio from the Start menu, the desktop icon, or <code>CabinetStudio.exe</code>.</li>
+<li>A dark welcome card (the "splash") appears with the words <strong>CABINET STUDIO</strong> and <strong>click to continue</strong>. Click it, or just wait.</li>
+<li>The main window opens.</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> A dark window. Across the top is a menu bar (<strong>File, Edit, View, Tools, Help</strong>) and a toolbar. On the left is a tall column of buttons (the library rail). In the middle is the cabinet area. On the right is the <strong>INSPECTOR</strong>. At the bottom is a status bar with hints like <code>Ctrl+S save  Ctrl+Z undo  double-click defines  Delete removes</code>.</div>
+<div class="callout tip"><strong>Tip:</strong> Want a light screen instead of dark? Click <strong>☀ Light</strong> at the right end of the toolbar. Click <strong>☾ Dark</strong> to go back. You can also use <strong>View &gt; Theme &gt; Light / Dark / System</strong>.</div>
+<h2 id="the-main-window-piece-by-piece">The main window, piece by piece <a class="top" href="#contents">(back to contents)</a></h2>
+<h3 id="the-menu-bar">The menu bar</h3>
+<table><thead><tr><th>Menu</th><th>What is inside</th></tr></thead><tbody>
+<tr><td><strong>File</strong></td><td>New project…, New from template…, New build with AI…, Open…, Save, Save As…, Program library…, Install desktop shortcut, Exit</td></tr>
+<tr><td><strong>Edit</strong></td><td>Undo, Delete selected device, Add device…</td></tr>
+<tr><td><strong>View</strong></td><td>Theme (Light / Dark / System), Project explorer, Compact library rail, View drawings</td></tr>
+<tr><td><strong>Tools</strong></td><td>Generate drawings, Programming, Guide build, AI suggest devices, Apply all suggestions, UL 508A review</td></tr>
+<tr><td><strong>Help</strong></td><td>User manual, Keyboard shortcuts, About Cabinet Studio</td></tr></tbody></table>
+<h3 id="the-toolbar">The toolbar</h3>
+<p>The row of buttons under the menu bar, from left to right:</p>
+<ul>
+<li><strong>New</strong>, <strong>Open</strong>, <strong>Save</strong>: start, open or save a project.</li>
+<li><strong>Templates</strong>: start a new cabinet from a ready-made template (see <a href="#starting-from-a-template">Starting from a template</a>).</li>
+<li><strong>Undo</strong>: take back your last change.</li>
+<li><strong>Drawings</strong>: make (generate) the drawing sheets.</li>
+<li><strong>View drawings</strong>: look at the sheets.</li>
+<li><strong>Programming</strong>: open the ladder program page.</li>
+<li><strong>UL 508A review</strong>: a checklist that helps you spot design problems (advice only).</li>
+<li><strong>Explorer</strong>: show or hide the Project explorer tree.</li>
+<li><strong>Compact rail</strong>: make the left rail narrower.</li>
+<li><strong>? Manual</strong>: open this manual.</li>
+<li><strong>☀ Light / ☾ Dark</strong>: switch the color theme.</li>
+</ul>
+<h3 id="the-project-name-box">The project name box</h3>
+<p>At the top of the window is a long text box with your project's name. Click it, type a new name, and press <strong>Enter</strong>. The window title shows the name too. A star (<code>*</code>) in front of the title means you have changes that are not saved yet.</p>
+<h3 id="the-left-rail-library-rail">The left rail (library rail)</h3>
+<p>The left rail is your main control panel. From top to bottom:</p>
+<p><strong>OUTPUT</strong> (always visible, it never scrolls away):</p>
+<ul>
+<li><strong>Drawings</strong>: generates all the drawing sheets for this cabinet.</li>
+<li><strong>View drawings</strong>: opens the drawing viewer so you can flip through the sheets.</li>
+<li><strong>Programming</strong>: opens the full-screen ladder program page.</li>
+<li><strong>HMI editor</strong>: opens the touch screen designer.</li>
+</ul>
+<p><strong>PROJECT</strong>:</p>
+<ul>
+<li><strong>New build with AI</strong>: the guided way to build a whole cabinet by answering questions. See <a href="#new-build-with-ai-step-by-step">New build with AI</a>.</li>
+<li><strong>Open</strong> / <strong>Save</strong>: open a saved project, or save this one.</li>
+<li><strong>Save as</strong>: save a copy with a new name.</li>
+<li><strong>New</strong>: start a new, empty (or template) cabinet.</li>
+</ul>
+<p><strong>DEVICES</strong>:</p>
+<ul>
+<li><strong>Guide build</strong>: an interview about your cabinet (voltages, enclosure and more), followed by suggested parts.</li>
+<li><strong>AI suggest</strong>: asks the AI to suggest details for the selected part.</li>
+<li><strong>Apply all AI suggestions</strong>: accepts every suggestion at once.</li>
+<li><strong>Program stubs</strong>: an older browser of starter PLC text (Logix, SCL, Modbus).</li>
+<li><strong>Desktop shortcut</strong>: puts a Cabinet Studio icon on your desktop.</li>
+</ul>
+<p><strong>REVIEW</strong>:</p>
+<ul>
+<li><strong>UL 508A review</strong>: an advisory checklist (it gives advice, it does not certify).</li>
+</ul>
+<p><strong>LAYOUT TEMPLATES</strong>: cards with ready-made starting layouts. Click one to use it.</p>
+<p><strong>EQUIPMENT LIBRARY</strong> (at the bottom, always visible):</p>
+<ul>
+<li>A search box: <strong>Search name, vendor, catalog</strong>. Type words like <code>contactor</code>, <code>Siemens</code> or a part number.</li>
+<li>A type filter: <strong>All types</strong>, or one kind of part (PLC, contactor, e-stop and so on).</li>
+<li>A maker filter: <strong>All makers</strong>, <strong>Allen-Bradley</strong>, <strong>Siemens</strong>, <strong>Omron</strong> and others. Pick one to see only that maker's parts.</li>
+<li><strong>Add selected</strong>: adds the part you clicked in the list.</li>
+<li><strong>Define a device not listed</strong>: make your own part when the library does not have it.</li>
+</ul>
+<p><strong>STARTER DEVICES</strong>: the list of library parts that match your search and filters. Each card shows the name, type, maker and catalog number.</p>
+<p>At the very bottom the rail shows the version, <code>v0.3.35</code>.</p>
+<div class="callout tip"><strong>Tip:</strong> Is the rail too long for your screen? Scroll it with the mouse wheel. The OUTPUT buttons at the top and the EQUIPMENT LIBRARY at the bottom always stay in view.</div>
+<h3 id="the-cabinet-area-middle">The cabinet area (middle)</h3>
+<p>This is where the parts of your cabinet appear as tiles. Click a tile to select it. Double-click a tile to define or edit it. Press the <strong>Delete</strong> key to remove the selected tile.</p>
+<h3 id="the-inspector-right-side">The INSPECTOR (right side)</h3>
+<p>When you click a part, the Inspector shows its tag (its short name, like <code>PSU1</code>), description, maker and catalog number.</p>
+<ul>
+<li><strong>Continue definition</strong> (or <strong>Edit definition</strong> when the part is complete): opens the <strong>Define device</strong> wizard to fill in details.</li>
+<li><strong>Remove from layout</strong>: removes the part from this cabinet.</li>
+</ul>
+<h3 id="the-project-explorer">The Project explorer</h3>
+<p>Click <strong>Explorer</strong> on the toolbar (or <strong>View &gt; Project explorer</strong>) to show a tree of everything in the project. Click an item to jump to it.</p>
+<h2 id="projects-new-open-save">Projects: new, open, save <a class="top" href="#contents">(back to contents)</a></h2>
+<h3 id="start-a-new-project">Start a new project</h3>
+<ol>
+<li>Click <strong>New</strong> (toolbar or left rail), or press <strong>Ctrl+N</strong>.</li>
+<li>The <strong>New cabinet</strong> box opens.</li>
+<li>Type a <strong>Project name</strong>, for example <code>Conveyor 1</code>.</li>
+<li>Choose a <strong>Starting layout</strong>.</li>
+<li>Click <strong>Create</strong>.</li>
+</ol>
+<div class="callout tip"><strong>Tip:</strong> If you want the program to do most of the work for you, use <a href="#new-build-with-ai-step-by-step">New build with AI</a> or <a href="#starting-from-a-template">start from a template</a> instead.</div>
+<h2 id="starting-from-a-template">Starting from a template <a class="top" href="#contents">(back to contents)</a></h2>
+<p>A template is a finished starter cabinet. It already has the parts (real catalog numbers), wire numbers, PLC I/O addresses, a working ladder program, and for most templates an HMI screen. You pick the one closest to your machine, then change what is different. It is the fastest way to begin.</p>
+<h3 id="open-the-template-gallery">Open the template gallery</h3>
+<p>There are three ways:</p>
+<ul>
+<li>Click <strong>Templates</strong> on the toolbar (next to <strong>New</strong>).</li>
+<li>Use <strong>File &gt; New from template…</strong>.</li>
+<li>Click <strong>New</strong> (or press <strong>Ctrl+N</strong>), then click <strong>Start from a template…</strong> at the bottom left of the <strong>New cabinet</strong> box.</li>
+</ul>
+<p>If your open cabinet has unsaved changes, the program first asks <strong>Save cabinet?</strong> — the same question you get with <strong>New</strong>. Your open cabinet is never replaced without that question.</p>
+<div class="callout see"><strong>What you'll see:</strong> The <strong>Start from a template</strong> window with a card for each template. Each card has a small drawing, the name, one or two lines about it, and <strong>Use it for:</strong> (when to pick it).</div>
+<h3 id="use-a-template-step-by-step">Use a template, step by step</h3>
+<ol>
+<li>(Optional) Type a <strong>Project name</strong> at the top. If you leave it empty, the template name is used.</li>
+<li>On the card you want, pick the <strong>maker</strong> (Allen-Bradley, Siemens or Omron) from the first drop-down.</li>
+<li>Pick the <strong>supply voltage</strong> (the power that feeds the cabinet) from the second drop-down.</li>
+<li>Click <strong>Use this template</strong>.</li>
+</ol>
+<p>The new cabinet opens right away. It is <strong>not saved yet</strong> (you will see the star <code>*</code> in the title), so click <strong>Save</strong> when you are happy with it. Everything is editable: add or remove parts, change the ladder, or run <strong>Guide build</strong> or <strong>New build with AI</strong> to answer the questions again.</p>
+<div class="callout tip"><strong>Tip:</strong> Open the <strong>Notes</strong> of the new project. They list <strong>What to change first</strong> for that template — usually the motor size, a timer setting and the sensor type.</div>
+<div class="callout tip"><strong>Tip:</strong> The maker drop-down swaps in that maker's part when the library has one (PLC, I/O cards, power supply, E-stop, safety relay, drive, contactor, buttons and more). Parts the library only has from one maker stay as they are — check them on the drawings.</div>
+<div class="callout safety"><strong>Safety:</strong> Every template keeps the safety note on its first rung. E-stop, light curtain and two-hand functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function. The simulator's <strong>Normal run</strong> never presses the E-stop or breaks the light curtain for you.</div>
+<h3 id="the-templates-and-when-to-use-each-one">The templates and when to use each one</h3>
+<table><thead><tr><th>Template</th><th>When to use it</th></tr></thead><tbody>
+<tr><td><strong>Simple motor starter</strong></td><td>One fixed-speed motor (fan, pump, blower, saw). A contactor and overload start it across the line. Start, Stop, E-stop, Reset, a run light and a fault light.</td></tr>
+<tr><td><strong>Conveyor with VFD</strong></td><td>A belt or roller conveyor with a variable-speed drive. A photo-eye counts parts (batch of 100), a jam timer stops the belt, and a 3-color stack light and HMI show status.</td></tr>
+<tr><td><strong>Pump and tank level</strong></td><td>Filling (or emptying) a tank. Low and high level switches start and stop the pump. High-high (overfill) and no-flow alarms.</td></tr>
+<tr><td><strong>Pneumatic press station</strong></td><td>A press, crimper or staker loaded by hand. Two-hand start, light curtain with its own safety relay, cylinder extend / retract sensors, a dwell timer, a stroke counter and a watchdog.</td></tr>
+<tr><td><strong>Mixer / batch tank</strong></td><td>Mixing or heating a batch. Agitator motor and heater, lid switch, temperature permissive and a timed mix.</td></tr>
+<tr><td><strong>Pick-and-place indexer</strong></td><td>Packaging or transfer stations that move parts in steps. Three solenoids run a 6-step sequence using step bits, with a part-present eye and a motion watchdog.</td></tr>
+<tr><td><strong>HVAC / exhaust fan</strong></td><td>A fan run by a building system. Hand-Off-Auto selector, fan drive, airflow proving pressure switch, 120 V control.</td></tr>
+<tr><td><strong>Lighting control panel</strong></td><td>A small 120 V panel for parking-lot, building or sign lights. Photocell, Auto/Off selector, override buttons, timers and three lighting relays.</td></tr>
+<tr><td><strong>PLC trainer bench</strong></td><td>Learning and practice. A PLC with buttons, a selector, a photo-eye, a prox, a relay, lights and a stack light on 24 VDC, with example rungs (seal-in, flasher, counter).</td></tr></tbody></table>
+<div class="callout tip"><strong>Tip:</strong> Want the same template with Siemens or Omron parts? Pick the maker on the card before you click <strong>Use this template</strong>. You can make all three and compare them.</div>
+<h3 id="save-your-project">Save your project</h3>
+<ol>
+<li>Click <strong>Save</strong> or press <strong>Ctrl+S</strong>.</li>
+<li>The first time, Windows asks where to save. The program suggests its <code>saves</code> folder. Keep that, type a name and click <strong>Save</strong>.</li>
+</ol>
+<p>Use <strong>Save as</strong> (<strong>Ctrl+Shift+S</strong>) to save a copy under a new name.</p>
+<div class="callout warn"><strong>Watch out:</strong> Save often! The star (<code>*</code>) in the window title means there are unsaved changes. When you close the program with unsaved changes, it asks you first.</div>
+<h3 id="open-a-project">Open a project</h3>
+<ol>
+<li>Click <strong>Open</strong> or press <strong>Ctrl+O</strong>.</li>
+<li>Go to the saves folder and pick a file that ends in <code>.cabinet.json</code>.</li>
+<li>Click <strong>Open</strong>.</li>
+</ol>
+<h3 id="where-your-files-go">Where your files go</h3>
+<table><thead><tr><th>What</th><th>Where</th></tr></thead><tbody>
+<tr><td>Projects (<code>.cabinet.json</code>)</td><td><code>Documents\Cabinet Studio\saves</code></td></tr>
+<tr><td>Drawings for a project</td><td><code>Documents\Cabinet Studio\saves\drawings\&lt;project name&gt;</code></td></tr>
+<tr><td>PLC export files</td><td>a <code>plc</code> folder with the drawings (use <strong>Open folder</strong> in the PLC / Device window)</td></tr>
+<tr><td>HMI export files</td><td>an <code>hmi</code> folder with the drawings</td></tr>
+<tr><td>AI settings and your API key</td><td><code>%APPDATA%\CabinetStudio\ai_settings.json</code></td></tr></tbody></table>
+<div class="callout tip"><strong>Tip:</strong> Uninstalling the program does not delete any of these files. Back up your <code>saves</code> folder to a USB stick or cloud drive now and then.</div>
+<h2 id="new-build-with-ai-step-by-step">New build with AI, step by step <a class="top" href="#contents">(back to contents)</a></h2>
+<p>This is the easiest way to make a complete cabinet. The program asks you simple questions, one at a time, then picks parts, makes the drawings and starts the program.</p>
+<ol>
+<li>Click <strong>New build with AI</strong> at the top of the left rail (or <strong>File &gt; New build with AI…</strong>).</li>
+<li>A window called <strong>New build with AI</strong> opens. It says: *Answer one question at a time. You can change your mind with Back.*</li>
+<li>Answer each question (explained below), then click <strong>Next</strong>.</li>
+<li>Click <strong>Back</strong> to change an earlier answer. Click <strong>Cancel</strong> to stop without changing anything.</li>
+</ol>
+<p>Under each question there is an <strong>AI tip</strong> with a suggested answer. Two helpful buttons:</p>
+<ul>
+<li><strong>Use AI answer</strong>: fills in the suggested answer for this one question.</li>
+<li><strong>Accept all AI answers</strong>: fills in the suggested answer for every question that is left. Use this when you are not sure and just want a good starting point.</li>
+</ul>
+<div class="callout tip"><strong>Tip:</strong> There is no wrong answer. You can change everything later.</div>
+<h3 id="the-questions-explained">The questions, explained</h3>
+<ol>
+<li><strong>What does this machine do?</strong> Type a few plain words, like <code>conveyor that moves boxes</code> or <code>small press with a guard</code>. The AI uses these words to guess the rest. Words like *press, weld, robot, saw, cut* make it suggest safety guarding.</li>
+<li><strong>Which manufacturer do you prefer for the parts?</strong> Pick <strong>Allen-Bradley</strong>, <strong>Siemens</strong>, <strong>Omron</strong>, or <strong>Best fit (AI picks)</strong>. Every part the AI picks comes from this maker when the library has one.</li>
+<li><strong>What voltage feeds the cabinet?</strong> The main power coming in, for example <strong>480 VAC</strong> (common in US factories) or <strong>120 VAC</strong> (like a wall outlet). Pick <strong>Other / not sure</strong> if you do not know.</li>
+<li><strong>What voltage do the pushbuttons and sensors use?</strong> The "control voltage". <strong>24 VDC</strong> is the most common and the safest choice for buttons and sensors.</li>
+<li><strong>Does this machine run a motor?</strong> <strong>Yes</strong>, <strong>No</strong> or <strong>Not sure</strong>.</li>
+<li><strong>How should the motor be controlled? (skip if no motor)</strong>
+<ul>
+<li><strong>VFD (variable speed)</strong>: a drive that can change the motor's speed.</li>
+<li><strong>Contactor (across-the-line)</strong>: a big switch that turns the motor fully on or off.</li>
+<li><strong>Both / not sure</strong> or <strong>No motor</strong>.</li>
+</ul></li>
+<li><strong>How do people start and stop it?</strong> <strong>Pushbuttons</strong>, <strong>Touchscreen (HMI)</strong>, <strong>Both</strong> or <strong>Not sure</strong>.</li>
+<li><strong>Which operator devices should go on the door / panel? (pick all that apply)</strong> Tick the boxes you want: Start pushbutton, Stop pushbutton, Selector switch (HOA = Hand / Off / Auto), Reset pushbutton, Run indicator light, Fault indicator light.</li>
+<li><strong>Do you want interposing / control relays in the cabinet?</strong> Relays are small switches that let the PLC control bigger things. Pick <strong>Not sure (AI will suggest)</strong> if unsure.</li>
+<li><strong>Is there an emergency stop (e-stop) button?</strong> For almost every real machine the answer is <strong>Yes</strong>.</li>
+<li><strong>Should we include a safety relay to monitor the e-stop?</strong> A safety relay is a special rated part that makes the E-stop truly safe. The answer should almost always be <strong>Yes</strong>.</li>
+<li><strong>Does a light curtain guard the operator opening? (beam broken = machine stops)</strong> A light curtain is a row of invisible light beams across an opening. If a hand breaks a beam, the machine stops. Pick <strong>Yes — add a light curtain + safety relay</strong> or <strong>No</strong>.</li>
+<li><strong>Add a 3-color stack light?</strong> A tower of lights on top of the machine. Pick <strong>Yes — green / amber / red stack light</strong> or <strong>No</strong>. Green = ready / running, amber = light curtain broken, red = E-stop.</li>
+<li><strong>Is there a touchscreen or HMI for the operator?</strong> <strong>Yes</strong>, <strong>No</strong> or <strong>Not sure</strong>.</li>
+<li><strong>Do you need a cabinet door drawing?</strong> Pick <strong>Yes — draw the door</strong> to get a drawing of the buttons, lights, E-stop and HMI on the door.</li>
+<li><strong>What should we call this cabinet project?</strong> Type a name, like <code>Box Conveyor</code>. Please type this one yourself.</li>
+</ol>
+<h3 id="checking-the-recommended-devices">Checking the recommended devices</h3>
+<p>After the last question the window changes to <strong>Recommended devices</strong>.</p>
+<div class="callout see"><strong>What you'll see:</strong> A list of parts with tick boxes. They come from your library, from the maker you picked when it has one.</div>
+<ol>
+<li>Look down the list. Untick any part you do not want.</li>
+<li>Click <strong>Accept all AI picks</strong> to take every part, or click <strong>Confirm devices</strong> to take just the ticked ones.</li>
+<li>Confirming creates a <strong>new</strong> cabinet. The program also picks an enclosure (box) that fits the parts.</li>
+<li>The program then walks you through saving, making drawings and starting the program. Each step asks you first. You can skip any step.</li>
+</ol>
+<div class="callout warn"><strong>Watch out:</strong> Confirming makes a NEW cabinet. Save your old project first if you want to keep it.</div>
+<h2 id="adding-and-editing-parts">Adding and editing parts <a class="top" href="#contents">(back to contents)</a></h2>
+<h3 id="add-a-part-from-the-library">Add a part from the library</h3>
+<ol>
+<li>In the <strong>EQUIPMENT LIBRARY</strong> at the bottom of the left rail, type in the search box, for example <code>e-stop</code>.</li>
+<li>Optional: pick a type in the type filter, and a maker in the maker filter.</li>
+<li>Click a card in the <strong>STARTER DEVICES</strong> list to select it (it gets a blue outline).</li>
+<li>Click <strong>Add selected</strong>.</li>
+</ol>
+<div class="callout tip"><strong>Tip:</strong> Double-click a card to add it in one step.</div>
+<h3 id="define-or-edit-a-part">Define or edit a part</h3>
+<ol>
+<li>Click the part's tile in the middle of the window.</li>
+<li>In the <strong>INSPECTOR</strong>, click <strong>Continue definition</strong> (or <strong>Edit definition</strong>). You can also double-click the tile.</li>
+<li>The <strong>Define device</strong> wizard opens. Walk through the steps with <strong>Next</strong>. On the wiring step you set terminal landings, wire numbers and wire colors.</li>
+<li>Finish the wizard to save the part.</li>
+<li>Click <strong>Drawings</strong> again so the drawings update.</li>
+</ol>
+<div class="callout warn"><strong>Watch out:</strong> You never draw wires by hand. You describe the parts and their wiring, and Cabinet Studio draws the sheets for you. Change the part, then make the drawings again.</div>
+<h3 id="make-a-part-that-is-not-in-the-library">Make a part that is not in the library</h3>
+<ol>
+<li>Click <strong>Define a device not listed</strong> (left rail) or <strong>Edit &gt; Add device…</strong>.</li>
+<li>Pick the <strong>Device class</strong> (what kind of part it is).</li>
+<li>Fill in the wizard. Anything the PLC supervises gets a definition.</li>
+</ol>
+<h3 id="remove-a-part">Remove a part</h3>
+<p>Select it, then press <strong>Delete</strong> or click <strong>Remove from layout</strong> in the Inspector. Made a mistake? Press <strong>Ctrl+Z</strong> (Undo).</p>
+<h3 id="let-the-ai-help-with-parts">Let the AI help with parts</h3>
+<ul>
+<li><strong>Guide build</strong>: answers questions about your cabinet, then suggests parts.</li>
+<li><strong>AI suggest</strong>: suggests details for the selected part.</li>
+<li><strong>Apply all AI suggestions</strong>: accepts all the suggestions at once.</li>
+</ul>
+<h2 id="choosing-the-enclosure">Choosing the enclosure <a class="top" href="#contents">(back to contents)</a></h2>
+<p>The <strong>enclosure</strong> is the metal box. Inside it is a flat metal sheet called the <strong>backplate</strong> where parts are mounted.</p>
+<ul>
+<li><strong>Hoffman</strong> is the default maker. <strong>Saginaw</strong> and <strong>Hammond</strong> are also available.</li>
+<li>Sizes include 36×30×12, 30×24×12 and 24×24×8 inches (height × width × depth), each with its matching backplate part number.</li>
+<li>When you use <strong>New build with AI</strong>, the program picks an enclosure automatically to fit your parts.</li>
+<li>To choose yourself, use <strong>Guide build</strong> and answer the <strong>Enclosure brand and size</strong> question (for example <code>Hoffman 30×24×12 (A302412LP + A30P24)</code>). Pick <strong>Other / not decided</strong> if you are not sure yet.</li>
+</ul>
+<div class="callout tip"><strong>Tip:</strong> Bigger is easier to wire and leaves room for future parts. UL 508A shops like some empty space.</div>
+<h2 id="drawings">Drawings <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Drawings are the sheets an electrician uses to build and wire the cabinet. Cabinet Studio makes them from your parts list. Sheets are 11×17 inches (tabloid).</p>
+<h3 id="make-and-view-the-drawings">Make and view the drawings</h3>
+<ol>
+<li>Make sure your cabinet has parts.</li>
+<li>Click <strong>Drawings</strong> (left rail OUTPUT, or the toolbar, or <strong>Tools &gt; Generate drawings</strong>).</li>
+<li>When it is done, click <strong>View drawings</strong>.</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> The <strong>DRAWINGS</strong> viewer. On the left, a <strong>SHEETS</strong> list with every sheet's name. In the middle, the current sheet. At the bottom: <strong>Previous</strong>, <strong>Next</strong>, <strong>Open in browser</strong>, <strong>Pop out view</strong>, <strong>HMI editor</strong>, <strong>Add part</strong>, <strong>Reset layout</strong> and <strong>Close</strong>.</div>
+<p>Move between sheets by clicking a name in the SHEETS list, clicking <strong>Previous</strong> / <strong>Next</strong>, or pressing the <strong>Left</strong> / <strong>Right</strong> arrow keys. Press <strong>Esc</strong> to close.</p>
+<h3 id="the-sheets-in-order">The sheets, in order</h3>
+<ol>
+<li><strong>Panel layout</strong> (<code>PANEL LAYOUT — &lt;name&gt;</code>). A drawing of the backplate seen from the front, to scale. Every part is drawn with its real outline shape and size, on DIN rails with wire ducts between them. You will also see where power comes in and goes out, the ground (PE) bar, and a scale bar so you can measure.</li>
+<li><strong>Door</strong> (<code>PANEL LAYOUT — &lt;name&gt; · DOOR</code>). Only the parts on the door: pushbuttons, lights, E-stops and the HMI. This appears when you asked for a door drawing.</li>
+<li><strong>Power schematic</strong>. How the big power flows: from the incoming supply, through the disconnect and breakers (protection), to each device, and back. Lines that run top-to-bottom are the power "rails". The green/yellow ground (PE) bar is separate.</li>
+<li><strong>Control schematic</strong>. The +24V and 0V control "ladder": pushbuttons, sensors, relays and PLC inputs and outputs. The PLC I/O on this sheet matches the parts in your project.</li>
+<li><strong>Wire schedule</strong> (<code>WIRE SCHEDULE — &lt;name&gt;</code>). A table of every wire: wire number, FROM, TO, color and gauge (thickness).</li>
+<li><strong>PLC I/O list sheets</strong>. Which button or light is connected to which PLC input or output.</li>
+<li><strong>HMI sheets</strong> (after you save an HMI): <strong>HMI SCREEN LAYOUT</strong> for each screen, <strong>HMI DOOR CUTOUT DETAIL</strong> (the hole to cut in the door), <strong>HMI WIRING + TAG TABLE</strong>, and <strong>HMI ALARM LIST</strong>.</li>
+</ol>
+<p>The ladder program is a separate document. It is printed from the Programming page, not here.</p>
+<h3 id="hover-for-wire-details">Hover for wire details</h3>
+<p>To keep the sheets clean, only short names and coil descriptions are printed on the sheet. To see the full details of a wire or part, <strong>rest your mouse near it</strong>. A pop-up shows its type, wire numbers, color, gauge, FROM–TO, I/O address and callout.</p>
+<div class="callout tip"><strong>Tip:</strong> <strong>Open in browser</strong> shows the shop-print version of the sheet (SVG) with all labels. It is also the best way to print.</div>
+<h3 id="move-parts-and-text-on-the-layout">Move parts and text on the layout</h3>
+<p>On the panel layout and door sheets you can tidy things up:</p>
+<ul>
+<li><strong>Drag a part</strong> to a new spot with the left mouse button.</li>
+<li><strong>Drag a text label</strong> to move it.</li>
+<li><strong>Right-click a part</strong> for <strong>Copy</strong> and <strong>Delete</strong>.</li>
+<li><strong>Right-click an empty spot</strong> for <strong>Paste here</strong> and <strong>Add part here</strong> (pick a part from the list).</li>
+<li><strong>Ctrl+C</strong> copies the clicked part.</li>
+<li><strong>Add part</strong> (bottom bar) adds a part to the sheet.</li>
+<li><strong>Reset layout</strong> puts every part on the sheet back in its automatic spot.</li>
+</ul>
+<div class="callout warn"><strong>Watch out:</strong> If the viewer says *Nothing to reset*, the sheet is already in its automatic layout.</div>
+<h3 id="pop-out-the-drawing">Pop out the drawing</h3>
+<p>Click <strong>Pop out view</strong> to put the drawing in its own window. Drag it to a second monitor if you have one. The sheet list and Previous / Next still work. Click <strong>Dock view</strong> to put it back.</p>
+<h3 id="printing-drawings">Printing drawings</h3>
+<ol>
+<li>In the drawing viewer, go to the sheet you want.</li>
+<li>Click <strong>Open in browser</strong>.</li>
+<li>In the browser, press <strong>Ctrl+P</strong>.</li>
+<li>Choose your printer. Set paper size to <strong>Tabloid (11×17)</strong> and orientation to <strong>Landscape</strong> if your printer can do it. Otherwise choose "Fit to page".</li>
+<li>Click <strong>Print</strong>.</li>
+</ol>
+<h3 id="the-footer-on-every-sheet">The footer on every sheet</h3>
+<p>Each sheet has this footer, once: <code>NOT A CERTIFIED UL 508A DRAWING. Design aid only.</code></p>
+<p>That means: these drawings are a helper. A qualified person must check and approve the design before anyone builds a real cabinet from it. Do not remove the footer.</p>
+<h2 id="ul-508a-review">UL 508A review <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Click <strong>UL 508A review</strong> (toolbar, left rail or <strong>Tools</strong> menu). It lists things to check against the UL 508A standard for industrial control panels, such as disconnect, short-circuit ratings, wire sizes and spacing. It is advice only. It does not certify anything.</p>
+<h2 id="the-programming-page">The Programming page <a class="top" href="#contents">(back to contents)</a></h2>
+<p>The Programming page is where you build the PLC program. Open it with <strong>Programming</strong> on the left rail or toolbar.</p>
+<div class="callout see"><strong>What you'll see:</strong> A big full-screen window with its own menu bar (<strong>File, Edit, View, Rung, Simulate, Tools, Help</strong>), a toolbar, a SIMULATE row, the ladder drawing in the middle, and the rung editor strip along the bottom. A status bar at the bottom shows messages.</div>
+<p>When you are finished, click <strong>Done</strong> (top right) or press <strong>Esc</strong> to go back to the cabinet.</p>
+<h3 id="ladder-logic-in-one-minute">Ladder logic in one minute</h3>
+<p>A ladder program looks like a ladder lying on its side:</p>
+<ul>
+<li>The two side rails are the "power" lines. Power flows from the <strong>left rail</strong> to the <strong>right rail</strong>.</li>
+<li>Each step of the ladder is a <strong>rung</strong>. The PLC reads rungs from top to bottom, again and again, very fast. One trip through all the rungs is a <strong>scan</strong>.</li>
+<li>On the left of a rung are <strong>contacts</strong>. They are like questions: "Is the Start button pressed?"</li>
+<li>On the right is a <strong>coil</strong>. It is the answer: "Then turn the motor ON."</li>
+<li>If every contact on a path lets power through, the coil turns ON.</li>
+</ul>
+<p>Two kinds of contact:</p>
+<ul>
+<li><strong>NO (normally open), called XIC</strong>: lets power through when its tag is <strong>ON</strong>.</li>
+<li><strong>NC (normally closed), called XIO</strong>: lets power through when its tag is <strong>OFF</strong>.</li>
+</ul>
+<div class="callout tip"><strong>Tip:</strong> A classic first rung is a "seal-in": Start (NO) OR Motor (NO), in series with Stop (NC), driving the Motor coil. Press Start and the motor keeps itself on until Stop is pressed.</div>
+<h3 id="the-programming-toolbar">The Programming toolbar</h3>
+<table><thead><tr><th>Button</th><th>What it does</th></tr></thead><tbody>
+<tr><td><strong>New…</strong></td><td>New Program / Routine wizard: make a new program or routine step by step</td></tr>
+<tr><td><strong>Ladder</strong> / <strong>PLC text</strong> / <strong>HMI text</strong></td><td>Switch between the ladder picture, the PLC text version, and the HMI tag text</td></tr>
+<tr><td><strong>Organizer</strong></td><td>Shows the Controller Organizer: a tree of routines, tags and I/O. Click a routine or tag; double-click an I/O point</td></tr>
+<tr><td><strong>Properties</strong></td><td>Shows details of the selected item</td></tr>
+<tr><td><strong>Pop out ladder</strong></td><td>Moves the ladder into its own window (click <strong>Dock ladder</strong> to bring it back)</td></tr>
+<tr><td><strong>Verify</strong> (F7)</td><td>Checks the program for problems, like a coil used twice or a tag that does not exist. "No issues found." means it is clean</td></tr>
+<tr><td><strong>Explain run</strong></td><td>Opens *Explain run - step by step*, which tells you in plain words what the simulator is doing and which rung is waiting. <strong>Copy all</strong> and <strong>Clear</strong> buttons are at the top</td></tr>
+<tr><td><strong>Tags / X-ref</strong> (Ctrl+T)</td><td>List of all tags. Click <strong>Used</strong> on a tag to see WHERE USED. You can add a new tag, describe it, or make an alias</td></tr>
+<tr><td><strong>Watch / Trend</strong></td><td>Watch tag values change over time. <strong>Pause</strong> / <strong>Resume</strong>, and <strong>Export CSV</strong> to save them as a spreadsheet</td></tr>
+<tr><td><strong>PLC / Device</strong></td><td>Opens the PLC / Device window (export files, live link)</td></tr>
+<tr><td><strong>HMI editor</strong></td><td>Opens the touch screen designer</td></tr>
+<tr><td><strong>☀ Light / ☾ Dark</strong></td><td>Switch theme</td></tr>
+<tr><td><strong>Done</strong></td><td>Go back to the cabinet</td></tr></tbody></table>
+<h3 id="the-file-menu-programming-page">The File menu (Programming page)</h3>
+<ul>
+<li><strong>New Program / Routine…</strong>: the step-by-step program wizard.</li>
+<li><strong>Ask questions (in the strip)…</strong>: answer simple questions and the program builds a starter ladder.</li>
+<li><strong>Build starter program</strong>: makes a starter ladder from the cabinet parts.</li>
+<li><strong>Build from drawings</strong>: makes the ladder from the I/O in your drawings.</li>
+<li><strong>Import PLCopen XML…</strong>: loads a ladder program saved in the PLCopen XML standard format. The program is very strict: if the file has anything it does not understand, or the logic does not check out exactly, it refuses the whole file instead of guessing.</li>
+<li><strong>Export Ladder…</strong>, <strong>Export PLCopen XML…</strong>, <strong>Export .txt…</strong>: save the program to a file.</li>
+<li><strong>Print ladder…</strong>: print the ladder. The printout keeps the safety note.</li>
+<li><strong>Done - return to cabinet</strong> (Esc).</li>
+</ul>
+<h3 id="the-rung-editor-bottom-strip">The rung editor (bottom strip)</h3>
+<p>The rung editor is the row of controls under the ladder. You choose parts in the boxes, then click an <strong>Add</strong> button.</p>
+<table><thead><tr><th>Control</th><th>What it does</th></tr></thead><tbody>
+<tr><td><strong>Contact</strong></td><td>Pick the input or bit this rung checks. NO (XIC) passes power when the tag is ON; NC (XIO) passes power when it is OFF</td></tr>
+<tr><td><strong>Coil</strong></td><td>Pick the output or bit this rung turns ON</td></tr>
+<tr><td><strong>Comment</strong></td><td>A note for this rung in plain words. It prints with the ladder</td></tr>
+<tr><td><strong>Timer</strong></td><td>Timer type (TON, TOF, RTO), its name and its preset time</td></tr>
+<tr><td><strong>Counter</strong></td><td>Counter type (CTU, CTD, RES), its name and preset</td></tr>
+<tr><td><strong>Compare A op B</strong></td><td>Compare two values: EQU, NEQ, GRT, GEQ, LES or LEQ</td></tr>
+<tr><td><strong>Math op → dest</strong></td><td>Math (ADD, SUB, MUL, DIV…) with the answer stored in dest</td></tr>
+<tr><td><strong>One-shot</strong></td><td>ONS, OSR (rising edge) or OSF (falling edge)</td></tr>
+<tr><td><strong>AOI</strong></td><td>Name of an Add-On Instruction (a reusable block)</td></tr>
+<tr><td><strong>JSR→</strong></td><td>Name of the subroutine that Add JSR jumps to</td></tr>
+<tr><td><strong>↶ Undo</strong> / <strong>↷ Redo</strong></td><td>Take back or put back a change (Ctrl+Z / Ctrl+Y)</td></tr>
+<tr><td><strong>Pop out editor</strong></td><td>Opens the rung editor in its own window you can drag anywhere, even to another monitor. <strong>Dock editor</strong> puts it back. Tick <strong>Keep on top</strong> to keep it in front</td></tr></tbody></table>
+<p>The <strong>Add</strong> buttons:</p>
+<ul>
+<li><strong>Add rung</strong>: the chosen Contact driving the chosen Coil.</li>
+<li><strong>Add timer</strong>, <strong>Add counter</strong>: the Contact driving a timer or counter.</li>
+<li><strong>Add nested OR</strong>: a rung with a parallel branch (either path turns the coil on, like a seal-in).</li>
+<li><strong>Add mid coil</strong>: an output in the middle of a rung, with more logic after it.</li>
+<li><strong>Add compare</strong>, <strong>Add math</strong>, <strong>Add LIM</strong> (between a low and a high limit), <strong>Add MEQ</strong> (masked equal), <strong>Add bitwise</strong> (AND / OR / XOR).</li>
+<li><strong>Add AOI</strong>, <strong>Add OTL</strong> (latch ON), <strong>Add OTU</strong> (unlatch), <strong>Add one-shot</strong>.</li>
+<li><strong>Add JSR</strong> (jump to a subroutine), <strong>Add SBR</strong> (make a new subroutine), <strong>Add RET</strong> (return from it).</li>
+<li><strong>Comment…</strong>: change the comment on the selected rung.</li>
+<li><strong>Add series contact</strong>: adds the chosen Contact to the selected rung (one more condition).</li>
+<li><strong>Delete rung</strong>: deletes the selected rung (Undo brings it back).</li>
+</ul>
+<p>The <strong>Edit</strong> controls:</p>
+<ul>
+<li><strong>Copy rung</strong> (Ctrl+C), <strong>Paste rung</strong> (Ctrl+V, pastes after the selected rung), <strong>Duplicate</strong> (Ctrl+D).</li>
+<li><strong>Move ↑</strong> / <strong>Move ↓</strong> (Ctrl+Up / Ctrl+Down): move the selected rung.</li>
+<li><strong>Copy instr…</strong> (Ctrl+Shift+C) and <strong>Paste instr</strong> (Ctrl+Shift+V): copy one instruction into another rung.</li>
+<li><strong>Delete instr</strong>: click one contact or coil on the ladder, then click this to delete just that one. The rest of the rung re-connects.</li>
+<li><strong>Replace instr</strong>: click one contact or coil, then click this to swap it for the Contact (or Coil) picked in the editor.</li>
+</ul>
+<h3 id="your-first-rung-step-by-step">Your first rung, step by step</h3>
+<ol>
+<li>Click a rung on the ladder (or the empty ladder) to select where the new rung goes.</li>
+<li>In <strong>Contact</strong>, pick an input, for example <code>Start_PB</code>. Choose NO.</li>
+<li>In <strong>Coil</strong>, pick an output, for example <code>Motor_Run</code>.</li>
+<li>Click <strong>Add rung</strong>.</li>
+<li>Type a <strong>Comment</strong> like <code>Start the motor</code>, then click <strong>Comment…</strong> to set it.</li>
+<li>Press <strong>F7</strong> (Verify) to check the program.</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> A new rung at the bottom of the ladder with a contact on the left and a coil on the right.</div>
+<h3 id="editing-instructions-on-the-ladder">Editing instructions on the ladder</h3>
+<ul>
+<li><strong>Click</strong> a contact or coil to select it.</li>
+<li><strong>Right-click</strong> it for a menu: <strong>Delete &lt;tag&gt;</strong>, <strong>Change NO / NC</strong>, <strong>Replace with contact…</strong> / <strong>Replace with coil…</strong>, <strong>Add contact … before</strong>, <strong>Add contact … after</strong>.</li>
+<li><strong>Drag</strong> a contact or coil with the left mouse button and drop it on another spot or another rung to move it.</li>
+</ul>
+<h3 id="the-instruction-palette">The instruction palette</h3>
+<p>The <strong>INSTRUCTIONS</strong> row shows buttons for each instruction (XIC, XIO, OTE, OTL, OTU, ONS, OSR, OSF, Branch, TON, TOF, RTO, CTU, CTD, RES, EQU, NEQ, LES, LEQ, GRT, GEQ, LIM, MEQ, ADD, SUB, MUL, DIV, MOV, AND, OR, XOR, NOT, JSR, SBR, RET, AOI). Hover over any of them to read what it does, with an example.</p>
+<h3 id="find-replace-and-undo">Find, replace and undo</h3>
+<ul>
+<li><strong>Edit &gt; Find…</strong> (Ctrl+F) and <strong>Replace…</strong>: find a tag and replace it everywhere. Tick <strong>Match case</strong> or <strong>Whole tag (T1 also finds T1.DN)</strong> as needed.</li>
+<li><strong>Undo</strong> (Ctrl+Z) and <strong>Redo</strong> (Ctrl+Y) work for every ladder change.</li>
+<li><strong>Copy PLC text</strong> and <strong>Copy HMI text</strong> (Edit menu) copy the text versions to paste into other software.</li>
+<li><strong>Sync text from ladder</strong> rebuilds the PLC text from the ladder.</li>
+</ul>
+<h3 id="layout-and-windows">Layout and windows</h3>
+<ul>
+<li><strong>View &gt; Layout &gt; Studio</strong> is the normal look. <strong>Classic (until v0.3.24)</strong> is the older look.</li>
+<li><strong>View &gt; Pop out / dock ladder</strong>, <strong>Float / dock I/O panel</strong>, <strong>Pop out / dock rung editor</strong>: move parts of the page into their own windows.</li>
+</ul>
+<h3 id="ask-ai">Ask AI</h3>
+<p>Click <strong>Ask AI</strong> (in the SIMULATE row, or <strong>Tools &gt; Ask AI</strong>) to ask questions about your program in plain words, like "What does rung 3 do?" Type your question and click <strong>Ask</strong>. When the AI suggests a change, you can click <strong>Apply</strong> or <strong>Dismiss</strong>. The AI can be wrong. Always check its work and run <strong>Verify</strong>.</p>
+<h2 id="the-simulator">The simulator <a class="top" href="#contents">(back to contents)</a></h2>
+<p>The simulator pretends to be a PLC so you can test your program safely on your computer.</p>
+<h3 id="the-simulate-row">The SIMULATE row</h3>
+<table><thead><tr><th>Button</th><th>Key</th><th>What it does</th></tr></thead><tbody>
+<tr><td><strong>Run</strong></td><td>F5</td><td>Starts scanning the program over and over like a real PLC. Click any contact to switch that input</td></tr>
+<tr><td><strong>Pause</strong></td><td>F9</td><td>Freezes the scan and timers where they are</td></tr>
+<tr><td><strong>Step rung</strong></td><td>F6</td><td>Runs ONE rung, then stops. Watch power flow left to right</td></tr>
+<tr><td><strong>Step scan</strong></td><td>F10</td><td>Runs every rung once (one full scan), then stops</td></tr>
+<tr><td><strong>Stop</strong></td><td>Shift+F5</td><td>Stops the simulation and lets go of every input you switched</td></tr>
+<tr><td><strong>Reset</strong></td><td></td><td>Clears all bits, timers and counters to zero, like a fresh power-up</td></tr>
+<tr><td><strong>Normal run</strong></td><td></td><td>Pretends the machine is running perfectly (see below)</td></tr>
+<tr><td>Speed menu</td><td></td><td><strong>0.25 s / rung</strong>, <strong>0.5 s / rung</strong>, <strong>1 s / rung</strong> (default), <strong>2 s / rung</strong>, or <strong>PLC speed (full scan)</strong></td></tr>
+<tr><td><strong>Follow rung</strong></td><td></td><td>Scrolls the ladder so the rung being scanned stays on screen</td></tr>
+<tr><td><strong>Each part</strong></td><td></td><td>Lights each part of a rung one at a time, left to right, so you can follow the logic</td></tr>
+<tr><td><strong>Ask AI</strong></td><td></td><td>Ask the AI about the program</td></tr></tbody></table>
+<div class="callout see"><strong>What you'll see:</strong> When power reaches a contact or coil, it turns bright (green). Coils that are ON stay lit.</div>
+<h3 id="switching-inputs-yourself">Switching inputs yourself</h3>
+<p>While the simulator runs, <strong>click a contact</strong> on the ladder to switch its input ON or OFF. You can also use the I/O panel: <strong>Force inputs (click to toggle)</strong>. Click <strong>Float I/O</strong> to move the I/O panel into its own window; <strong>Dock I/O</strong> puts it back.</p>
+<h3 id="normal-run-the-pretend-machine">Normal run: the pretend machine</h3>
+<p>Click <strong>Normal run</strong> and the simulator does the boring setup for you:</p>
+<ol>
+<li>It makes the stops and guards safe (E-stop released, light curtain clear).</li>
+<li>It presses <strong>Reset</strong> and <strong>Start</strong> for you.</li>
+<li>The pretend machine answers the outputs: the motor sends "running" feedback, cylinders reach their sensors, and parts pass the photo-eyes.</li>
+</ol>
+<p>Watch the ladder light up as the machine runs.</p>
+<h3 id="test-the-e-stop-and-light-curtain-yourself">Test the E-stop and light curtain yourself</h3>
+<p>Normal run never touches safety for you. You test it:</p>
+<ol>
+<li>Start <strong>Normal run</strong> and wait until the machine is running (stack light green).</li>
+<li>Click the <strong>E-stop</strong> contact (or its input in the I/O panel) to "press" it.</li>
+<li>Check: does the motor turn off? Does the stack light go red?</li>
+<li>Release the E-stop, then press Reset and Start. Does it run again?</li>
+<li>Now click the <strong>light curtain</strong> input to "break the beam".</li>
+<li>Check: does the machine stop? Does the stack light go amber?</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> Stack light colors in the simulator: <strong>green</strong> = ready / running, <strong>amber</strong> = light curtain broken, <strong>red</strong> = E-stop pressed.</div>
+<div class="callout safety"><strong>Safety:</strong> This only tests the *program's* reaction. On a real machine the E-stop and light curtain must stop the machine through hardwired circuits and rated safety relays, even if the PLC is broken.</div>
+<h3 id="explain-run">Explain run</h3>
+<p>Click <strong>Explain run</strong> to open a window that writes down, step by step, what the simulator does and why. If the machine seems stuck, Explain run tells you which rung is waiting and for what. Click <strong>Copy all</strong> to copy the explanation.</p>
+<h2 id="the-hmi-editor">The HMI editor <a class="top" href="#contents">(back to contents)</a></h2>
+<p>An HMI is the touch screen an operator uses to run the machine. The HMI editor lets you design those screens.</p>
+<p>Open it with <strong>HMI editor</strong> on the left rail, on the Programming page, or in the drawing viewer.</p>
+<div class="callout see"><strong>What you'll see:</strong> A window called <strong>HMI editor</strong>. Top row: <strong>Run interview</strong>, <strong>Validate</strong>, <strong>Undo</strong>, <strong>Delete object</strong>, <strong>Run with simulator</strong>, the <strong>Model:</strong> menu, <strong>Save</strong> and <strong>Close</strong>. Second row (QUICK BUILD): <strong>Auto-build (1 click)</strong>, <strong>Bind tags for me</strong>, <strong>Rebuild nav bar</strong>, <strong>Alarm list</strong>, <strong>Export tag CSV</strong>, <strong>Export for &lt;maker&gt;</strong> and the <strong>Theme:</strong> menu. Left: SCREENS, ADD TO SCREEN, MACHINE GRAPHICS and FACEPLATES (ONE CLICK). Middle: the screen. Right: PROPERTIES.</div>
+<h3 id="fastest-way-auto-build">Fastest way: Auto-build</h3>
+<ol>
+<li>Click <strong>Auto-build (1 click)</strong>.</li>
+<li>The program builds every screen from your cabinet parts and ladder tags: a faceplate for each motor, valve and stack light, plus alarms, trends and the go-to bar.</li>
+<li>Click <strong>Validate</strong> to check it.</li>
+<li>Click <strong>Save</strong>.</li>
+</ol>
+<h3 id="the-hmi-interview">The HMI interview</h3>
+<p>Click <strong>Run interview</strong> to answer a few questions, one at a time. Each has a suggested answer. Use <strong>Next</strong>, <strong>Back</strong>, <strong>Cancel</strong>, or <strong>Accept all</strong> (take every suggestion). On the last question the button says <strong>Build HMI</strong>. The questions:</p>
+<ol>
+<li>Which maker should the HMI touch screen be?</li>
+<li>How big should the screen be?</li>
+<li>Which HMI model?</li>
+<li>Which screens do you want?</li>
+<li>How should machine parts be grouped?</li>
+<li>Add a Machine picture screen (conveyors, motors, sensors, stack light)?</li>
+<li>Start / Stop buttons: hardwired on the door, or on the HMI too?</li>
+<li>Show alarms on the HMI?</li>
+<li>Show speeds / numbers (like drive speed)?</li>
+<li>How does the HMI cable reach the PLC?</li>
+</ol>
+<h3 id="screens">Screens</h3>
+<p>In <strong>SCREENS</strong> on the left, click a screen to open it. Type a name in the <strong>Screen name</strong> box, then click <strong>Add screen</strong> or <strong>Rename</strong>. <strong>Delete</strong> removes the current screen (Undo brings it back).</p>
+<h3 id="adding-things-to-the-screen">Adding things to the screen</h3>
+<p>Under <strong>ADD TO SCREEN</strong>, click an item to drop it in the first free spot, then drag it where you want:</p>
+<ul>
+<li><strong>Push button (momentary)</strong>: on only while pressed, like a doorbell (Start, Reset, Jog).</li>
+<li><strong>On/Off button (toggle)</strong>: press once for on, again for off (Manual / Auto).</li>
+<li><strong>Indicator lamp</strong>: shows if a PLC bit is on (Motor running, Fault).</li>
+<li><strong>Number display</strong>: shows a number (speed, part count).</li>
+<li><strong>Number entry</strong>: lets the operator type a number (speed setpoint).</li>
+<li><strong>Text label</strong>: plain words like a title.</li>
+<li><strong>Alarm banner</strong>: a strip that shows the newest alarm.</li>
+<li><strong>Go-to-screen button</strong>: jumps to another screen.</li>
+<li><strong>E-stop status (display only)</strong>: shows if the E-stop is pressed. The HMI can never stop or reset the machine safely.</li>
+<li><strong>Trend chart</strong>: a line of a number over time.</li>
+</ul>
+<h3 id="faceplates-one-click">Faceplates (one click)</h3>
+<p>A faceplate is a ready-made group of lamps, buttons and numbers for one machine part.</p>
+<ol>
+<li>In <strong>FACEPLATES (ONE CLICK)</strong>, pick a machine part from your cabinet.</li>
+<li>Pick the faceplate type: <strong>Motor</strong>, <strong>Motor with drive (VFD)</strong>, <strong>Valve / solenoid</strong>, <strong>Stack light</strong>, or <strong>Counter / timer readout</strong>.</li>
+<li>Click <strong>Add faceplate</strong>. It is already tied to the right tags. Drag any piece to move the whole group.</li>
+</ol>
+<h3 id="machine-graphics-and-animation">Machine graphics and animation</h3>
+<p>Under <strong>MACHINE GRAPHICS</strong> you can add pictures: Conveyor, Motor, Pump, Fan, Tank, Valve (2-way), Air cylinder, Robot arm, Light curtain, Stack light, Part / box, Pipe (straight / elbow / tee), Photo-eye, Prox sensor, Heater, Mixer, Press, Gauge (dial), Bar graph, Push-button picture and Selector switch picture.</p>
+<ol>
+<li>Click a graphic to drop it, then drag or resize it.</li>
+<li>On the right, pick its <strong>PLC tag</strong>.</li>
+<li>In <strong>Animate with tag</strong>, choose how it moves: spins / moves while ON, fills from a 0–100 number, a needle follows a number, or turns red when abnormal.</li>
+</ol>
+<p>Graphics move in <strong>Run with simulator</strong> and print still.</p>
+<h3 id="the-properties-panel-right-side">The PROPERTIES panel (right side)</h3>
+<p>Click an object on the screen (it gets a dashed outline). Then:</p>
+<ul>
+<li><strong>Words on the object</strong>: the text the operator sees.</li>
+<li><strong>PLC tag</strong>: the tag it reads or writes. Click <strong>Suggest tag</strong> to let the program pick the best match. Tags starting with <code>HMI_</code> are HMI memory bits you add to the PLC program.</li>
+<li><strong>Color</strong>: Green = running / OK, Red = stop / fault, Amber = warning.</li>
+<li><strong>Button action</strong>: Momentary or Toggle (buttons only).</li>
+<li><strong>Go to screen</strong>: which screen a Go-to button opens.</li>
+<li><strong>Animate with tag</strong>: for machine graphics.</li>
+<li>Click <strong>Apply changes</strong> to keep your edits.</li>
+</ul>
+<h3 id="the-tag-wizard-bind-tags-for-me">The tag wizard: Bind tags for me</h3>
+<p>Click <strong>Bind tags for me</strong> to fill in every empty PLC tag with the best match by name and type. Buttons get <code>HMI_</code> memory bits. Then click <strong>Validate</strong> to check for unknown tags, objects on top of each other and missing tags.</p>
+<h3 id="nav-bar-alarms-and-themes">Nav bar, alarms and themes</h3>
+<ul>
+<li><strong>Rebuild nav bar</strong>: adds a row of go-to buttons for every other screen along the bottom of each screen. Use it after adding or renaming screens.</li>
+<li><strong>Alarm list</strong>: shows the alarms made from the E-stop, safety, fault and overload tags, with a priority (1 = High). They also print on the HMI ALARM LIST sheet.</li>
+<li><strong>Theme:</strong> <strong>ISA-101 gray (high performance)</strong> (gray screen, color only when something is wrong, easy on the eyes), <strong>Classic bright</strong>, or <strong>Dark</strong>.</li>
+<li><strong>Model:</strong> pick a different touch screen model. Objects keep their places and resize to fit.</li>
+</ul>
+<h3 id="test-the-hmi-with-the-simulator">Test the HMI with the simulator</h3>
+<ol>
+<li>Click <strong>Run with simulator</strong>.</li>
+</ol>
+<div class="callout see"><strong>What you'll see:</strong> A red banner: <code>SIMULATION - not a live PLC. Buttons write the simulator only. E-stop and safety are never written by the HMI.</code></div>
+<ol start="2">
+<li>Click the screen buttons and watch lamps, numbers and graphics change.</li>
+<li>To send a number, select a Number entry, type a value in the <strong>Number</strong> box and click <strong>Send number</strong>.</li>
+<li>Click <strong>Stop</strong> to go back to editing.</li>
+</ol>
+<h3 id="save-and-export-the-hmi">Save and export the HMI</h3>
+<ul>
+<li><strong>Save</strong>: saves the HMI into the cabinet. The HMI screen layout, door cutout and HMI wiring sheets then appear in the drawings. Save the cabinet file too.</li>
+<li><strong>Export tag CSV</strong>: a spreadsheet of every HMI tag to import into FactoryTalk View, TIA Portal or NB-Designer.</li>
+<li><strong>Export for &lt;maker&gt;</strong>: writes import-ready files into the <code>hmi</code> folder: tag list, alarm list, screen spec and a picture of every screen. You import these in the maker's HMI software and rebuild the screens there. Cabinet Studio does not download into the HMI.</li>
+</ul>
+<h2 id="the-plc-device-window">The PLC / Device window <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Open it from the Programming page: click <strong>PLC / Device</strong> or <strong>Tools &gt; PLC / Device (export &amp; connect)…</strong>.</p>
+<p>At the top, pick the PLC or HMI to work with from the device menu. An orange note reminds you: full program download into Allen-Bradley, Siemens and Omron PLCs is done in the maker's software (Studio 5000 / CCW, TIA Portal, Sysmac Studio / CX-Programmer). Cabinet Studio writes import-ready files and offers a live Ethernet tag link for testing.</p>
+<h3 id="files-row">Files row</h3>
+<ol>
+<li><strong>Assign I/O</strong>: gives every pushbutton, sensor, light and coil a PLC input or output address in this PLC's own format. Addresses you already gave are kept.</li>
+<li><strong>I/O list CSV</strong>: saves the I/O list (tag, device, address, module, terminal, wire #) as a spreadsheet.</li>
+<li><strong>Export files</strong>: writes import-ready files for the selected PLC or HMI (program, tag tables, I/O list) and a <strong>README</strong> with step-by-step import instructions.</li>
+<li><strong>Open folder</strong>: opens the folder with the exported files.</li>
+<li><strong>Download / upload program</strong>: explains how to put the program into the real PLC using the maker's software.</li>
+</ol>
+<div class="callout tip"><strong>Tip:</strong> After <strong>Export files</strong>, click <strong>Open folder</strong> and open the README first. It lists the exact import steps for your PLC's software.</div>
+<h3 id="live-link-beta">Live link (beta)</h3>
+<p>The live link reads and writes tags in a real PLC over Ethernet. It is for testing on a bench.</p>
+<ol>
+<li>Pick a driver: <strong>Allen-Bradley Logix (CompactLogix / ControlLogix)</strong>, <strong>Allen-Bradley Micro800</strong>, <strong>Siemens S7-1200 / S7-1500</strong>, <strong>Siemens S7-300 / S7-400</strong>, <strong>Omron FINS (BETA)</strong>, or <strong>Simulated PLC (no network)</strong>.</li>
+<li>Type the PLC's <strong>IP</strong> address (like <code>192.168.1.10</code>) and the <strong>Slot</strong> (ControlLogix: usually 0; S7-1200/1500: 1; S7-300: 2).</li>
+<li>Click <strong>Connect</strong>. It reads the PLC's name, model and firmware.</li>
+<li><strong>Read info</strong> reads them again. <strong>Compare tags</strong> compares the PLC's tags to your project (missing, extra and type mismatches). <strong>Disconnect</strong> closes the link.</li>
+</ol>
+<div class="callout tip"><strong>Tip:</strong> Practice with <strong>Simulated PLC (no network)</strong> first. It needs no PLC and no network.</div>
+<h3 id="watching-tags">Watching tags</h3>
+<ol>
+<li>Type or pick a tag in the <strong>Watch</strong> box and click <strong>Add</strong>. <strong>Add all I/O</strong> adds every I/O point. <strong>Remove</strong> takes one off.</li>
+<li>Click <strong>Start watch</strong>. Values update about once a second. Click <strong>Stop watch</strong> to stop.</li>
+</ol>
+<h3 id="writing-a-tag-be-careful">Writing a tag (be careful)</h3>
+<p>You can write only non-safety, non-I/O tags (like an <code>HMI_</code> bit or a setpoint):</p>
+<ol>
+<li>Type the tag (for example <code>HMI_Start</code>) and a value (1 / 0 for a bit, or a number).</li>
+<li>Tick <strong>I am at the machine and it is safe</strong>. Only tick this when you can see the machine and nobody can be hurt.</li>
+<li>Click <strong>Write</strong>.</li>
+</ol>
+<div class="callout safety"><strong>Safety:</strong> Safety tags and physical I/O are always refused. Writing a tag changes a running machine. Only bench-test on a test PLC, never on running production machinery.</div>
+<p>Click <strong>Close</strong> to disconnect and close the window.</p>
+<h2 id="ai-settings">AI settings <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Some features use AI: the New build with AI tips, AI suggest, and Ask AI. Cabinet Studio has a free built-in helper (<strong>Cabinet Studio AI (free, offline)</strong>). For smarter answers you can connect an online AI with <strong>your own key</strong>.</p>
+<p>To open AI settings: on the Programming page use <strong>Tools &gt; AI settings…</strong>, or click <strong>AI settings…</strong> in the Ask AI window.</p>
+<ol>
+<li>Pick the AI provider, for example <strong>Groq (free key)</strong> or <strong>xAI (Grok)</strong>. Others: OpenAI (ChatGPT), Anthropic (Claude), Google (Gemini), GitHub Models (Copilot), Microsoft Azure OpenAI, and Ollama (local, offline).</li>
+<li>Get a key from that provider's website (sign up, then find "API keys").</li>
+<li>Paste it into the <strong>API key</strong> box. Tick <strong>Show</strong> to see what you typed.</li>
+<li>Click <strong>Refresh models</strong> and pick a <strong>Model</strong>.</li>
+<li>Click <strong>Test connection</strong>, then <strong>Save</strong>.</li>
+</ol>
+<div class="callout warn"><strong>Watch out:</strong> Your API key is like a password. Keep it private. Never share it, post it, or put it in a screenshot. It is saved only on your computer. Click <strong>Clear key</strong> to remove it. No key is shipped with Cabinet Studio.</div>
+<div class="callout tip"><strong>Tip:</strong> The AI can make mistakes. Always check its suggestions, and run <strong>Verify</strong> on the program.</div>
+<h2 id="keyboard-shortcuts">Keyboard shortcuts <a class="top" href="#contents">(back to contents)</a></h2>
+<p><strong>Main window</strong></p>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody>
+<tr><td>Ctrl+N</td><td>New project</td></tr>
+<tr><td>Ctrl+O</td><td>Open</td></tr>
+<tr><td>Ctrl+S</td><td>Save</td></tr>
+<tr><td>Ctrl+Shift+S</td><td>Save As</td></tr>
+<tr><td>Ctrl+Z</td><td>Undo</td></tr>
+<tr><td>Delete</td><td>Remove the selected device</td></tr>
+<tr><td>Double-click a tile</td><td>Define the device</td></tr></tbody></table>
+<p><strong>Programming page</strong></p>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody>
+<tr><td>F1</td><td>Keyboard shortcuts</td></tr>
+<tr><td>F5 / F9 / F6 / F10 / Shift+F5</td><td>Run / Pause / Step rung / Step scan / Stop</td></tr>
+<tr><td>F7</td><td>Verify</td></tr>
+<tr><td>Ctrl+Z / Ctrl+Y</td><td>Undo / Redo</td></tr>
+<tr><td>Ctrl+C / Ctrl+V / Ctrl+D</td><td>Copy / Paste / Duplicate rung</td></tr>
+<tr><td>Ctrl+Shift+C / Ctrl+Shift+V</td><td>Copy / Paste instruction</td></tr>
+<tr><td>Delete</td><td>Delete rung</td></tr>
+<tr><td>Ctrl+Up / Ctrl+Down</td><td>Move rung up / down</td></tr>
+<tr><td>Ctrl+E</td><td>Rung comment</td></tr>
+<tr><td>Ctrl+F</td><td>Find</td></tr>
+<tr><td>Ctrl+T</td><td>Tags / X-ref</td></tr>
+<tr><td>Esc</td><td>Done - return to cabinet</td></tr></tbody></table>
+<p><strong>Drawing viewer</strong></p>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody>
+<tr><td>Left / Right</td><td>Previous / Next sheet</td></tr>
+<tr><td>Ctrl+C</td><td>Copy the clicked part</td></tr>
+<tr><td>Esc</td><td>Close</td></tr></tbody></table>
+<h2 id="troubleshooting-and-faq">Troubleshooting and FAQ <a class="top" href="#contents">(back to contents)</a></h2>
+<p><strong>Windows says "Windows protected your PC".</strong><br>
+Click <strong>More info</strong>, then <strong>Run anyway</strong>. The program is not code-signed yet.</p>
+<p><strong>The app will not start.</strong></p>
+<ol>
+<li>Wait 20 seconds. The first start can be slow.</li>
+<li>Check Task Manager. If Cabinet Studio is already running, switch to it.</li>
+<li>Portable ZIP: make sure the <code>_internal</code> folder is next to <code>CabinetStudio.exe</code> and that you extracted the ZIP (do not run it from inside the ZIP).</li>
+<li>Your antivirus may have blocked it. Ask the person who manages your computer.</li>
+<li>Reinstall with the installer.</li>
+</ol>
+<p><strong>The rung editor or another window is hidden behind the main window.</strong><br>
+Click its button again; it comes to the front. For the rung editor, tick <strong>Keep on top</strong>. You can also press <strong>Alt+Tab</strong> to find it, or dock it with <strong>Dock editor</strong>.</p>
+<p><strong>I can't find a button.</strong></p>
+<ol>
+<li>Make the window bigger (maximize it).</li>
+<li>Scroll the left rail with the mouse wheel.</li>
+<li>Look in the menus. Every toolbar button is also in a menu.</li>
+<li>On the Programming page, toolbars scroll sideways when the window is narrow.</li>
+<li>Search this manual (Ctrl+F in the browser).</li>
+</ol>
+<p><strong>My drawings did not change after I edited a part.</strong><br>
+Click <strong>Drawings</strong> again to regenerate them.</p>
+<p><strong>The simulator does nothing.</strong><br>
+Click <strong>Run</strong> (or <strong>Normal run</strong>). Check that the E-stop and light curtain inputs are in their safe state. Open <strong>Explain run</strong> to see which rung is waiting.</p>
+<p><strong>Import PLCopen XML refused my file.</strong><br>
+That is on purpose. The import refuses the whole file if anything is unknown, missing or does not match exactly, so you never get a wrong program. Export the file again from the source program, or rebuild the logic by hand.</p>
+<p><strong>The AI says my key is rejected.</strong><br>
+Open <strong>AI settings</strong>, check the key (tick <strong>Show</strong>), click <strong>Test connection</strong>. Make a new key on the provider's website if needed.</p>
+<p><strong>Where did my project go?</strong><br>
+Look in <code>Documents\Cabinet Studio\saves</code>. Use <strong>Open</strong> in the program.</p>
+<p><strong>Can Cabinet Studio download the program into my PLC?</strong><br>
+No. It writes import-ready files. You import and download them using the maker's software (Studio 5000, CCW, TIA Portal, Sysmac Studio, CX-Programmer).</p>
+<h2 id="glossary-words-you-will-see">Glossary: words you will see <a class="top" href="#contents">(back to contents)</a></h2>
+<p><strong>AOI (Add-On Instruction)</strong>: a reusable block of ladder logic, like a mini program you can drop into a rung.</p>
+<p><strong>Backplate</strong>: the flat metal sheet inside the cabinet where parts are bolted.</p>
+<p><strong>Branch</strong>: a side path on a rung. Power can go through either path (OR).</p>
+<p><strong>Coil</strong>: the output at the right end of a rung. It turns ON when power reaches it. Also called OTE.</p>
+<p><strong>Contact, NO (normally open, XIC)</strong>: passes power when its tag is ON. Like a doorbell button: the circuit is open until you press it.</p>
+<p><strong>Contact, NC (normally closed, XIO)</strong>: passes power when its tag is OFF. Like a Stop button: the circuit is closed until you press it.</p>
+<p><strong>Contactor</strong>: a heavy-duty electric switch that turns a motor on and off.</p>
+<p><strong>Counter</strong>: counts events (CTU counts up, CTD counts down, RES resets).</p>
+<p><strong>DIN rail</strong>: a standard metal rail (35 mm wide) that parts clip onto.</p>
+<p><strong>Disconnect</strong>: the main power switch for the cabinet.</p>
+<p><strong>Enclosure</strong>: the metal box that holds everything (Hoffman, Saginaw, Hammond are makers).</p>
+<p><strong>E-stop (emergency stop)</strong>: the big red mushroom button that stops the machine in an emergency. It must be hardwired through a safety relay.</p>
+<p><strong>Faceplate</strong>: a ready-made group of HMI objects for one machine part.</p>
+<p><strong>Gauge (wire)</strong>: the thickness of a wire, like 14 AWG. A smaller number means a thicker wire.</p>
+<p><strong>HMI (Human-Machine Interface)</strong>: the touch screen the operator uses.</p>
+<p><strong>I/O (Inputs / Outputs)</strong>: inputs are things the PLC reads (buttons, sensors); outputs are things the PLC turns on (lights, motors, valves).</p>
+<p><strong>Interposing relay</strong>: a small relay between the PLC and a bigger load.</p>
+<p><strong>Ladder logic</strong>: a way of writing PLC programs that looks like a ladder.</p>
+<p><strong>Light curtain</strong>: a row of light beams across an opening. If a beam is broken, the machine must stop.</p>
+<p><strong>NFPA 79 / ISO 13849</strong>: safety standards for industrial machine wiring and safety controls.</p>
+<p><strong>PE (protective earth) / ground bar</strong>: a copper bar where every ground wire connects, for safety.</p>
+<p><strong>PLC (Programmable Logic Controller)</strong>: a tough little computer that runs a machine.</p>
+<p><strong>PLCopen XML</strong>: a standard file format for sharing PLC programs between software.</p>
+<p><strong>Relay</strong>: a switch turned on and off by electricity.</p>
+<p><strong>Rung</strong>: one line of a ladder program, from the left rail to the right rail.</p>
+<p><strong>Safety relay</strong>: a special rated relay that watches E-stops and light curtains and safely cuts power.</p>
+<p><strong>Scan</strong>: one trip of the PLC through every rung, from top to bottom.</p>
+<p><strong>Schematic</strong>: a drawing that shows how parts are wired together, using symbols.</p>
+<p><strong>Simulator</strong>: pretend PLC on your computer, used for safe testing.</p>
+<p><strong>Stack light</strong>: a tower of colored lights on a machine (green, amber, red).</p>
+<p><strong>Tag</strong>: the name of a piece of data in the PLC, like <code>Start_PB</code> or <code>Motor_Run</code>.</p>
+<p><strong>Timer</strong>: waits a set time. TON waits before turning ON, TOF waits before turning OFF, RTO keeps its time.</p>
+<p><strong>UL 508A</strong>: the US safety standard for building industrial control panels. Cabinet Studio drawings are NOT certified to it.</p>
+<p><strong>VFD (Variable Frequency Drive)</strong>: a box that controls a motor's speed.</p>
+<p><strong>Wire duct</strong>: plastic channel with slots that holds wires neatly between rows of parts.</p>
+<p><strong>Wire number</strong>: a label on each end of a wire so electricians know where it goes.</p>
+<p><strong>Wire schedule</strong>: a table listing every wire with its number, FROM, TO, color and gauge.</p>
+<h2 id="about-this-manual">About this manual <a class="top" href="#contents">(back to contents)</a></h2>
+<p>Cabinet Studio v0.3.35 · Warren Williams · ERMCO</p>
+<p><code>NOT A CERTIFIED UL 508A DRAWING. Design aid only.</code> E-stop and safety functions must be hardwired or use rated safety relays (NFPA 79 / ISO 13849). The software is never the safety function.</p>
+<div class="footer">NOT A CERTIFIED UL 508A DRAWING. Design aid only.</div>
+</main></body></html>
